@@ -1,0 +1,56 @@
+/* Scoped independently from the retired template composition rules. All eight
+   templates share these dimensions; only the inline visual tokens change. */
+.qtm-public-profile { min-height: 100dvh; background: #edf4f8; display: grid; place-items: center; }
+.qtm-profile-surface { container-type: inline-size; width: 100%; max-width: 460px; margin-inline: auto; color: #17394b; }
+.qtm-professional-card { position: relative; isolation: isolate; overflow: hidden; width: 100%; height: 177.9487cqw; background: var(--card-background); font-family: var(--font-body), Arial, sans-serif; color: #17394b; }
+.qtm-card-scroll { position: relative; z-index: 1; width: 100%; height: 100%; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: var(--card-accent) transparent; }
+.qtm-card-layout { min-height: 177.9487cqw; padding: 3.08cqw; display: grid; grid-template-rows: 10.77cqw 34.36cqw 26cqw minmax(45.13cqw, auto) 20cqw 15.38cqw; gap: 1.23cqw; box-sizing: border-box; }
+.qtm-safe-decor { position: absolute; inset: 0; z-index: 0; pointer-events: none; width: 100%; height: 177.9487cqw; color: var(--card-accent); opacity: var(--motif-opacity); transition: opacity 180ms ease, color 180ms ease; }
+.qtm-profile-brand { display: flex; align-items: flex-start; justify-content: space-between; }
+.qtm-profile-brand .qtm-card-brand { gap: 1.3cqw; color: var(--card-accent); }
+.qtm-profile-brand .qtm-card-brand img { width: 8.72cqw; height: 8.72cqw; object-fit: contain; }
+.qtm-profile-brand .qtm-card-brand strong { font-size: 7.69cqw; line-height: 1.15; letter-spacing: -.05em; color: var(--card-accent); }
+.qtm-culture { border-left: .5cqw solid color-mix(in srgb,var(--card-accent) 28%,white); padding-left: 1.8cqw; font-size: 2.05cqw; line-height: 1.25; letter-spacing: .1em; color: #17394b; }
+.qtm-portrait { position: relative; display: flex; justify-content: center; align-items: center; }
+.qtm-portrait .avatar { width: 33.33cqw !important; height: 33.33cqw !important; font-size: 10cqw !important; border: .65cqw solid white; border-radius: 50%; box-shadow: var(--style-avatar-shadow,0 1.2cqw 4cqw color-mix(in srgb,var(--card-accent) 20%,transparent)); box-sizing: border-box; }
+.qtm-creative { position: absolute; left: 1cqw; top: 10cqw; font-size: 2.31cqw; line-height: 1.35; color: #17394b; margin: 0; }
+.qtm-creative strong { font-weight: 750; }
+.qtm-creative span { display: block; margin-top: 1.2cqw; width: 6cqw; height: .5cqw; background: color-mix(in srgb,var(--card-accent) 35%,white); }
+.qtm-profile-tools { position: absolute; right: 0; top: 2cqw; display: flex; gap: 1cqw; }
+.qtm-profile-tools :is(button,a) { width: 7.7cqw; height: 7.7cqw; border-radius: 50%; background: #ffffffda; color: var(--card-accent); border: 1px solid #d6e3e9; display: grid; place-items: center; cursor: pointer; }
+.qtm-profile-tools svg { width: 4cqw; height: 4cqw; }
+.qtm-profile-identity { text-align: center; align-self: center; height: 26cqw; overflow-y: auto; align-content: safe center; scrollbar-width: thin; }
+.qtm-profile-identity h1, .qtm-profile-identity h2 { margin: 0; font-family: var(--style-font,var(--card-font)); font-size: 4.62cqw; font-weight: var(--style-weight,800); letter-spacing: var(--style-tracking,0); line-height: 1.18; color: var(--card-accent); text-transform: uppercase; overflow-wrap: anywhere; }
+.qtm-position { margin: 1cqw 0 0; font-size: 2.82cqw; line-height: 1.3; font-style: italic; overflow-wrap: anywhere; }
+.qtm-identity-rule { display: block; width: var(--style-rule-width,8cqw); height: var(--style-rule-height,.65cqw); margin: 1.6cqw auto; border-radius: 1cqw; background: var(--card-accent); }
+.qtm-profile-identity h3 { color: #17394b; margin: 0; font-size: 2.82cqw; line-height: 1.35; font-weight: 750; text-transform: uppercase; overflow-wrap: anywhere; }
+.qtm-company-short { margin: .8cqw 0 0; font-size: 2.31cqw; line-height: 1.3; letter-spacing: .07em; }
+.qtm-profile-contacts { background: transparent; border: 0; border-radius: 0; box-shadow: none; margin-inline: -3.08cqw; padding: 1cqw 5.08cqw; align-self: stretch; display: flex; flex-direction: column; justify-content: center; }
+
+.qtm-contact { display: grid; grid-template-columns: 7.7cqw 22cqw minmax(0,1fr); gap: 1.4cqw; align-items: center; padding: 1.4cqw 0; border-bottom: 1px solid #e6eef2; font-size: 2.56cqw; line-height: 1.4; }
+.qtm-contact:last-child { border: 0; }
+.qtm-contact strong { font-size: 2.4cqw; font-weight: 750; color: #17394b; }
+.qtm-contact > span:last-child, .qtm-contact > a { color: #274655; overflow-wrap: anywhere; text-decoration: none; }
+.qtm-contact-icon { width: 7.7cqw; height: 7.7cqw; display: grid; place-items: center; border-radius: var(--style-icon-radius,50%); background: var(--style-icon-fill,color-mix(in srgb,var(--card-accent) 10%,white)); }
+.qtm-contact-icon svg { width: 4.1cqw; height: 4.1cqw; color: var(--card-accent); stroke-width: 2.5; }
+.qtm-professional-card .card-actions { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1.5cqw; margin: 0; align-self: stretch; }
+.qtm-professional-card .card-actions a, .qtm-professional-card .card-actions button { display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 1.3cqw; min-height: 0; padding: 1.5cqw 1cqw; margin: 0; background: var(--style-button-fill,color-mix(in srgb,var(--card-accent) 8%,white)); border: var(--style-button-width,1px) var(--style-button-border-style,solid) var(--style-button-border,color-mix(in srgb,var(--card-accent) 16%,white)); border-radius: var(--style-button-radius,3cqw); color: var(--card-accent); font-size: 2.4cqw; font-weight: 700; line-height: 1.25; box-shadow: var(--style-button-shadow,0 .5cqw 1cqw #163a590b); }
+.qtm-professional-card .card-actions a[href^="tel:"] { background: var(--card-accent); color: white; border-color: var(--card-accent); }
+.qtm-professional-card .card-actions svg { width: 4.5cqw; height: 4.5cqw; flex-shrink: 0; stroke-width: 2.3; }
+.qtm-professional-card .card-actions :is(a,button):hover { filter: brightness(.95); transform: none; }
+.qtm-professional-card :is(a,button):focus-visible { outline: 2px solid var(--card-accent); outline-offset: 2px; }
+.qtm-profile-footer { position: relative; display: flex; flex-direction: column; justify-content: space-between; padding-top: 2cqw; }
+.qtm-profile-slogan { position: relative; width: 48%; max-height: 10.8cqw; overflow-y: auto; margin: 0; font-family: var(--font-handwriting), cursive; font-size: 3.59cqw; line-height: 1.2; color: var(--card-accent); overflow-wrap: anywhere; }
+.qtm-profile-motto { margin: 0; text-align: center; font-size: 1.8cqw; letter-spacing: .16em; color: #274655; }
+.qtm-preview-frame { background: #edf4f8; overflow: hidden; }
+.qtm-preview-device { width: 390px; height: 694px; margin-inline: auto; }
+.qtm-preview-device .qtm-profile-surface { max-width: none; }
+@media (min-width: 600px) { .qtm-public-profile > .qtm-profile-surface { margin-block: 24px; box-shadow: 0 16px 60px #17394b18; } }
+@media (prefers-reduced-motion: reduce) { .qtm-safe-decor { transition: none; } }
+
+.qtm-professional-card :is(h1,h2,svg,a,button) { transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease; }
+@media (prefers-reduced-motion: reduce) { .qtm-professional-card * { transition: none !important; } }
+
+.qtm-contact-value { background: none; border: 0; padding: 0; margin: 0; text-align: left; font: inherit; color: #274655; cursor: pointer; overflow-wrap: anywhere; }
+
+.qtm-footer-decor { position: absolute; right: 0; top: 1.2cqw; width: 48%; height: 11cqw; pointer-events: none; color: var(--card-accent); opacity: var(--motif-opacity); transition: color 180ms ease, opacity 180ms ease; }

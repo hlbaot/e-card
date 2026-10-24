@@ -1492,7 +1492,88 @@
 .sidebar-footer {
   margin-top: auto;
   border-top: 1px solid var(--line);
-  padding-top: 20px;
+  padding-top: 16px;
+}
+.sidebar-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #ef4444 !important; /* Font màu đỏ */
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  font-family: inherit;
+}
+.sidebar-logout-btn svg {
+  color: #ef4444 !important;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+.sidebar-logout-btn:hover {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: #f87171 !important;
+}
+.sidebar-logout-btn:hover svg {
+  color: #f87171 !important;
+  transform: translateX(2px);
+}
+.sidebar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sidebar-close-btn {
+  display: none;
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+.sidebar-close-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+.admin-mobile-trigger {
+  display: none;
+}
+@media (max-width: 900px) {
+  .admin-mobile-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 18;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(5, 11, 26, 0.88);
+    backdrop-filter: blur(14px);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    transition: all 0.2s ease;
+  }
+  .admin-mobile-trigger:hover {
+    border-color: rgba(34, 211, 238, 0.4);
+    color: var(--cyan);
+  }
+  .sidebar-close-btn {
+    display: inline-flex;
+  }
 }
 .demo-badge {
   background: rgba(34, 211, 238, 0.1);
@@ -1937,7 +2018,7 @@ tbody tr:last-child td {
 }
 .preview-column {
   position: sticky;
-  top: 100px;
+  top: 24px;
   min-width: 0;
 }
 .preview-header {
@@ -4169,7 +4250,7 @@ body:has(dialog[open]) > .toast {
     overflow: hidden;
   }
   .admin-content:has(.employee-form-layout) {
-    height: calc(100dvh - 76px);
+    height: 100dvh;
     overflow: hidden;
     padding: 0 !important;
     max-width: none;
@@ -4408,12 +4489,12 @@ body:has(dialog[open]) > .toast {
 .profile-view-root.profile-view-dark .ecard-footer { background: transparent; }
 .decor-suggestion { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; font-size: 11px; color: #b6c2d9; }
 .decor-suggestion button { color: #22d3ee; border: 1px solid #22d3ee60; border-radius: 7px; padding: 6px 10px; cursor: pointer; }
-.decor-options { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.decor-options { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 .decor-option { position: relative; min-width: 0; display: flex; flex-direction: column; gap: 7px; text-align: center; padding: 7px; border: 1px solid #ffffff25; border-radius: 10px; color: #b6c2d9; font-size: 11px; cursor: pointer; }
 .decor-option.selected { border-color: #22d3ee; box-shadow: 0 0 0 1px #22d3ee; color: #ecfeff; }
 .decor-option:focus-within { outline: 2px solid #22d3ee; outline-offset: 3px; }
 .decor-option input { position: absolute; width: 1px; height: 1px; opacity: 0; }
-.decor-thumbnail { position: relative; display: block; overflow: hidden; height: 46px; border-radius: 6px; background: #f4f9fc; }
+.decor-thumbnail { position: relative; display: block; overflow: hidden; height: 64px; border-radius: 7px; background: #f4f9fc; }
 .decor-thumbnail > svg { position: absolute; inset: 0; height: 100%; width: 100%; mask-image: none; max-height: none; }
 .decor-tick { position: absolute; top: 7px; right: 7px; color: #0891b2; background: #ecfeff; border-radius: 50%; }
 @media (max-width: 640px) { .decor-options { grid-template-columns: repeat(3, minmax(0, 1fr)); } }

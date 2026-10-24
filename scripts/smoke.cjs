@@ -83,7 +83,7 @@ async function main() {
   assert.equal(localizeEmployee(custom).slogan, custom.slogan);
   const { migrateCardTheme } = require("../src/shared/utils/migrate-theme.ts");
   const { decorOptions } = require("../src/shared/constants/card-themes.ts");
-  assert.deepEqual(decorOptions.map((option) => option.id), ["none", "blobs", "circles", "skyline", "waves", "bokeh"]);
+  assert.deepEqual(decorOptions.map((option) => option.id), ["none", "blobs", "circles", "skyline", "bokeh", "leaves", "network", "geometry"]);
   for (const templateId of ["bubble-blue", "dark-tech"]) {
     for (const pattern of ["dot", "dots", "grid", "diagonal", "art-deco", "plus", "crosses", "lines", "checks", "diamonds", "leaf", "leaf-dots", "none"]) {
       for (const field of ["pattern", "patternId"]) {
@@ -100,6 +100,23 @@ async function main() {
   }
   assert.equal(migrateCardTheme({ ...employees[0].theme, decorOpacity: 100 }).decorOpacity, 100);
   assert.deepEqual(migrateCardTheme({ ...employees[0].theme, decor: [] }).decor, []);
+  assert.deepEqual(migrateCardTheme({ ...employees[0].theme, decor: ["leaves", "network", "geometry", "leaves", "invalid"] }).decor, ["leaves", "network", "geometry"]);
+  const { getProfileDecorPlacements } = require("../src/shared/utils/decor-layout.ts");
+  const motifKeys = ["blobs", "circles", "bokeh", "leaves", "network", "geometry"];
+  // Every combination must occupy separate slots, with no paint beside contacts.
+  for (let mask = 0; mask < 1 << motifKeys.length; mask++) {
+    const selected = motifKeys.filter((_, index) => mask & (1 << index));
+    const placements = getProfileDecorPlacements(selected);
+    assert.equal(placements.length, selected.length === 0 ? 0 : selected.length <= 3 ? 3 : 6);
+    assert.deepEqual(placements, getProfileDecorPlacements([...selected].reverse()));
+    for (const key of selected) assert.ok(placements.some(slot => slot.decor === key));
+    placements.forEach((a, index) => {
+      assert.ok(a.y + a.height < 300);
+      for (const b of placements.slice(index + 1)) {
+        assert.ok(a.x + a.width <= b.x || b.x + b.width <= a.x || a.y + a.height <= b.y || b.y + b.height <= a.y);
+      }
+    });
+  }
   assert.ok(templates.length >= 8);
   assert.ok(colorPresets.length >= 24);
   assert.equal(new Set(templates.map((t) => t.id)).size, templates.length);
@@ -109,6 +126,8 @@ async function main() {
     assert.ok(contrastRatio(hex, contrastText(hex)) >= 4.5);
     assert.ok(contrastRatio(readableAccent(hex, false), "#F5F5F4") >= 4.5);
     assert.ok(contrastRatio(readableAccent(hex, true), "#172334") >= 4.5);
+    // Profile accents must remain readable on the darkest allowed pastel too.
+    assert.ok(contrastRatio(readableAccent(hex, false, "#E0E0E0"), "#E0E0E0") >= 4.5);
   }
   process.env.NEXT_PUBLIC_SITE_URL = "https://profiles.example.com";
   assert.equal(
@@ -145,6 +164,14 @@ async function main() {
     assert.ok(html.includes(`template-${template.id}`));
     const preview = renderToStaticMarkup(createElement(ECard, { employee }));
     assert.ok(preview.includes("<h2"));
+    assert.ok(html.includes("qtm-card-layout") && preview.includes("qtm-card-layout"));
+    for (const label of ["CULTURE", "TECHNOLOGY", "MEDIA", "EVENT", "+ AI TECH", "QUALITY - TECHNOLOGY - MINDSET"]) {
+      assert.ok(preview.includes(label) && html.includes(label));
+    }
+    assert.ok(!template.dark, `${template.id} must have a light surface`);
+    const { getThemeBackgroundCss } = require("../src/config/card-themes.ts");
+    assert.ok(!getThemeBackgroundCss(employee.theme).includes("#0B0C10"));
+
   }
 
   const { CardDecorations } = require("../src/client/components/card/CardDecorations.tsx");

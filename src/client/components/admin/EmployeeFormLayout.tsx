@@ -23,7 +23,7 @@ export function EmployeeFormLayout({
     <form
       onSubmit={onSubmit}
       noValidate
-      className="employee-form-layout w-full lg:h-[calc(100dvh-76px)] lg:overflow-hidden"
+      className="employee-form-layout w-full lg:h-[100dvh] lg:overflow-hidden"
     >
       <div className="mx-auto h-full w-full max-w-[1600px] grid grid-cols-1 lg:grid-cols-[minmax(0,62%)_minmax(380px,38%)] xl:grid-cols-[minmax(0,64%)_minmax(400px,36%)] gap-0 lg:gap-7 lg:px-8">
         {/* Left Column: THE ONLY SCROLLABLE AREA on Desktop */}

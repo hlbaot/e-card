@@ -3,18 +3,18 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Home,
   LayoutDashboard,
   Users,
   ContactRound,
   LogOut,
   Menu,
+  X,
 } from "lucide-react";
 import { Brand } from "./PublicHeader";
-import { Avatar } from "@/client/components/ui/Avatar";
 import { useAuth } from "@/client/hooks/useAuth";
 import { cn } from "@/shared/utils/cn";
 import { routes } from "@/shared/constants/routes";
+
 export function AdminSidebar({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
@@ -25,6 +25,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
     { href: routes.employees, label: "Nhân viên", icon: Users },
     { href: routes.cards, label: "Danh thiếp số", icon: ContactRound },
   ];
+
   return (
     <div className="admin-shell">
       {open && (
@@ -34,9 +35,33 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
           onClick={() => setOpen(false)}
         />
       )}
+
+      {/* Nút mở menu trên mobile khi thanh topbar đã gỡ bỏ */}
+      <button
+        type="button"
+        className="admin-mobile-trigger"
+        aria-label="Mở menu quản trị"
+        aria-expanded={open}
+        onClick={() => setOpen(true)}
+      >
+        <Menu size={20} />
+      </button>
+
       <aside className={cn("sidebar", open && "open")}>
-        <Brand />
+        <div className="sidebar-top flex items-center justify-between">
+          <Brand />
+          <button
+            type="button"
+            className="sidebar-close-btn lg:hidden"
+            aria-label="Đóng menu"
+            onClick={() => setOpen(false)}
+          >
+            <X size={18} />
+          </button>
+        </div>
+
         <div className="sidebar-label">KHÔNG GIAN QUẢN TRỊ</div>
+
         <nav aria-label="Điều hướng quản trị">
           {nav.map(({ href, label, icon: Icon }) => (
             <Link
@@ -54,41 +79,23 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
             </Link>
           ))}
         </nav>
-      </aside>
-      <header className="admin-header">
-        <button
-          className="icon-button mobile-menu"
-          aria-label="Mở menu"
-          aria-expanded={open}
-          onClick={() => setOpen(true)}
-        >
-          <Menu size={20} />
-        </button>
-        <p className="admin-context">
-          Không gian làm việc <span className="mx-2">/</span>
-          <strong>QTM MediaTech</strong>
-        </p>
-        <div className="admin-user">
-          <Link href={routes.home} className="btn btn-ghost admin-home-link" aria-label="Về trang chủ">
-            <Home size={16} aria-hidden="true" />
-            <span>Trang chủ</span>
-          </Link>
-          <Avatar name="Quản trị QTM" src="" size={32} color="#387c83" />
-          <div className="admin-user-info">
-            Quản trị viên<span>admin@qtmmedia.vn</span>
-          </div>
+
+        {/* Nút Đăng xuất ở bên trái trong sidebar - font chữ màu đỏ */}
+        <div className="sidebar-footer">
           <button
-            className="btn btn-ghost"
+            type="button"
+            className="sidebar-logout-btn"
             onClick={async () => {
               await logout();
               router.replace(routes.login);
             }}
           >
-            <LogOut size={16} />
-            Đăng xuất
+            <LogOut size={18} />
+            <span>Đăng xuất</span>
           </button>
         </div>
-      </header>
+      </aside>
+
       <main className="admin-content">{children}</main>
     </div>
   );

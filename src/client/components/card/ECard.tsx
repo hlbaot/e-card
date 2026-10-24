@@ -1,166 +1,98 @@
 "use client";
-import { QtmBrand } from "./QtmBrand";
-import type { CSSProperties } from "react";
-import { MapPin, Phone, Mail, Globe } from "lucide-react";
+
+import Link from "next/link";
+import { useEffect, useRef, type CSSProperties } from "react";
+import { MapPin, Phone, Mail, Globe, QrCode, Share2, ArrowLeft } from "lucide-react";
 import { getPublicFields, type Employee } from "@/shared/types/employee";
-import {
-  backgrounds,
-  getTemplate,
-  getThemeBackgroundCss,
-} from "@/shared/constants/card-themes";
-import { contrastText, readableAccent } from "@/shared/utils/color";
+import { getTemplate, getThemeBackgroundCss } from "@/config/card-themes";
+import { readableAccent } from "@/shared/utils/color";
 import { Avatar } from "@/client/components/ui/Avatar";
 import { migrateCardTheme } from "@/shared/utils/migrate-theme";
-import { CardDecorations } from "./CardDecorations";
-import { CardActions } from "./CardActions";
 import { websiteUrl } from "@/shared/utils/vcard";
+import { QtmBrand } from "./QtmBrand";
+import { CardActions } from "./CardActions";
+import { ProfileDecorations, ProfileFooterDecorations } from "./ProfileDecorations";
+import "./professional-card.css";
+import "./card-styles.css";
 
-export function ECard({
-  employee: e,
-  variant = "preview",
-}: {
+/** One layout for the public profile, live panel and every preview size.
+ * Template differences are deliberately limited to visual tokens. */
+export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onOpenAddresses }: {
   employee: Employee;
   variant?: "preview" | "profile";
+  onOpenQr?: () => void;
+  onShare?: () => void;
+  onOpenAddresses?: () => void;
 }) {
-  const t = migrateCardTheme(e.theme);
+  const theme = migrateCardTheme(e.theme);
+  const template = getTemplate(theme.templateId);
   const pf = getPublicFields(e);
-  const template = getTemplate(t.templateId);
-  const background = backgrounds.find((b) => b.id === t.backgroundId);
-  const dark = !!template.dark || !!background?.dark;
-  const accent = readableAccent(t.primaryColor, dark);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const accent = readableAccent(theme.primaryColor || template.defaultColor, false, "#E0E0E0");
   const Name = variant === "profile" ? "h1" : "h2";
-  const showDecor = t.showDecor ?? true;
-  const style = {
-    "--primary": t.primaryColor,
-    "--accent": accent,
-    "--on-primary": contrastText(t.primaryColor),
-    background: getThemeBackgroundCss(t),
-    color: dark ? "#edf7ff" : "#263d50",
-  } as CSSProperties;
+  const slogan = !e.slogan || e.slogan.trim().toLowerCase() === "let's create a brighter tomorrow together"
+    ? "Cùng nhau kiến tạo một tương lai tươi sáng" : e.slogan;
+  const rows = [
+    ...(pf.offices ? e.offices.map((office, index) => ({
+      key: `office-${index}`, Icon: MapPin,
+      label: office.label || `Văn phòng ${index + 1}`,
+      value: office.address || "Chưa cập nhật địa chỉ", href: "",
+    })) : []),
+    ...(pf.phone ? [{ key: "phone", Icon: Phone, label: "Điện thoại", value: e.phone || "Chưa cập nhật", href: e.phone ? `tel:${e.phone.replace(/\s/g, "")}` : "" }] : []),
+    ...(pf.email ? [{ key: "email", Icon: Mail, label: "Thư điện tử", value: e.email || "Chưa cập nhật", href: e.email ? `mailto:${e.email}` : "" }] : []),
+    ...(pf.website ? [{ key: "website", Icon: Globe, label: "Trang web", value: e.website || "Chưa cập nhật", href: websiteUrl(e.website) }] : []),
+  ];
+  useEffect(() => { scrollRef.current?.scrollTo({ top: 0 }); }, [theme.templateId]);
+
   return (
-    <article
-      className={`ecard template-${t.templateId}${dark ? " ecard-dark" : ""}${variant === "profile" ? " ecard-profile" : ""}`}
-      style={style}
-      aria-label={`Hồ sơ của ${e.fullName || "nhân viên"}`}
-    >
-      <CardDecorations
-        theme={t}
-        showDecor={showDecor}
-        variant="preview"
-      />
-      <div className="ecard-content">
-        {t.templateId === "bubble-blue" ? (
-          <div className="ecard-brand">
-            <QtmBrand />
-            <span>
-              VĂN HÓA
-              <br />
-              CÔNG NGHỆ
-              <br />
-              TRUYỀN THÔNG
-              <br />
-              SỰ KIỆN
-            </span>
-          </div>
-        ) : (
-          <div className="ecard-wordmark">
-            <QtmBrand />
-            <span>
-              HỒ SƠ CÁ NHÂN
-              <br />
-              KẾT NỐI KHÔNG GIỚI HẠN
-            </span>
-          </div>
-        )}
-        <header className="ecard-identity">
-          <Avatar
-            name={e.fullName}
-            src={e.avatarUrl}
-            color={t.primaryColor}
-            size={
-              (variant === "profile"
-                ? { sm: 96, md: 132, lg: 160 }
-                : { sm: 82, md: 110, lg: 136 })[t.avatarSize]
-            }
-            rounded={t.avatarShape === "rounded"}
-          />
-          <div className="identity-copy">
-            <Name>{e.fullName || "HỌ TÊN NHÂN VIÊN"}</Name>
-            <p>{e.position || "Chức vụ"}</p>
-            <i />
-          </div>
-        </header>
-        <section className="ecard-company" aria-label="Đơn vị công tác">
-          <h3>{e.company}</h3>
-          <p>{e.companyShort}</p>
-        </section>
-        <div className="ecard-section-title">
-          <span>Thông tin liên hệ</span>
-          <i />
-        </div>
-        <section className="ecard-info" aria-label="Thông tin liên hệ">
-          {pf.offices &&
-            e.offices.map((o, i) => (
-              <div key={i} className="contact-office">
-                <MapPin size={17} />
-                <p>
-                  <strong>{o.label || `Văn phòng ${i + 1}`}</strong>
-                  <span>{o.address || "Chưa cập nhật địa chỉ"}</span>
-                </p>
+    <div className="qtm-profile-surface" style={{
+      "--card-accent": accent,
+      "--card-background": getThemeBackgroundCss(theme),
+      "--card-font": template.fontStyle === "serif" ? "Georgia, serif" : template.fontStyle === "mono" ? "\"Courier New\", monospace" : "var(--font-body), Arial, sans-serif",
+      "--motif-opacity": (theme.showDecor === false ? 0 : (theme.decorOpacity ?? 65)) / 100,
+    } as CSSProperties}>
+      <article className={`qtm-professional-card qtm-template-${theme.templateId}`} aria-label={`Hồ sơ của ${e.fullName || "nhân viên"}`}>
+        <div className="qtm-card-scroll" ref={scrollRef}>
+          <ProfileDecorations theme={theme} />
+          <div className="qtm-card-layout">
+            <header className="qtm-profile-brand">
+              <QtmBrand />
+              <div className="qtm-culture">CULTURE<br />TECHNOLOGY<br />MEDIA<br />EVENT</div>
+            </header>
+            <div className="qtm-portrait">
+              <p className="qtm-creative"><strong>QTM<br />MEDIATECH</strong><br />CREATIVE<br />+ AI TECH<span /></p>
+              <Avatar name={e.fullName} src={e.avatarUrl} color={accent} size={130} />
+              <div className="qtm-profile-tools">
+                {onOpenQr && <Link href="/" aria-label="Về trang chủ"><ArrowLeft /></Link>}
+                {onOpenQr && <button type="button" aria-label="Mở mã QR" onClick={onOpenQr}><QrCode /></button>}
+                {onShare && <button type="button" aria-label="Chia sẻ hồ sơ" onClick={onShare}><Share2 /></button>}
               </div>
-            ))}
-          {pf.phone && (
-            <div>
-              <Phone size={17} />
-              <p>
-                <strong>Điện thoại</strong>
-                {e.phone ? (
-                  <a href={`tel:${e.phone.replace(/\s/g, "")}`}>{e.phone}</a>
-                ) : (
-                  <span>Chưa cập nhật</span>
-                )}
-              </p>
             </div>
-          )}
-          {pf.email && (
-            <div>
-              <Mail size={17} />
-              <p>
-                <strong>Thư điện tử</strong>
-                {e.email ? (
-                  <a href={`mailto:${e.email}`}>{e.email}</a>
-                ) : (
-                  <span>Chưa cập nhật</span>
-                )}
-              </p>
-            </div>
-          )}
-          {pf.website && (
-            <div>
-              <Globe size={17} />
-              <p>
-                <strong>Trang web</strong>
-                {websiteUrl(e.website) ? (
-                  <a
-                    href={websiteUrl(e.website)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {e.website}
-                  </a>
-                ) : (
-                  <span>Chưa cập nhật</span>
-                )}
-              </p>
-            </div>
-          )}
-        </section>
-        <CardActions employee={e} />
-        <footer className="ecard-closing">
-          <p className="ecard-slogan">{e.slogan}</p>
-          <p className="ecard-motto">CHẤT LƯỢNG · CÔNG NGHỆ · TƯ DUY</p>
-        </footer>
-      </div>
-    </article>
+            <section className="qtm-profile-identity" aria-label="Thông tin cá nhân">
+              <Name>{e.fullName || "HỌ TÊN NHÂN VIÊN"}</Name>
+              <p className="qtm-position">{e.position || "Chức vụ"}</p>
+              <span className="qtm-identity-rule" aria-hidden="true" />
+              <h3>{e.company || "CÔNG TY CỔ PHẦN CÔNG NGHỆ TRUYỀN THÔNG QTM"}</h3>
+              <p className="qtm-company-short">{e.companyShort || "QTM MEDIATECH.,JSC"}</p>
+            </section>
+            <section className="qtm-profile-contacts" aria-label="Thông tin liên hệ">
+              {rows.map(({ key, Icon, label, value, href }) => (
+                <div className="qtm-contact" key={key}>
+                  <span className="qtm-contact-icon"><Icon aria-hidden="true" /></span>
+                  <strong>{label}</strong>
+                  {key.startsWith("office-") && onOpenAddresses ? <button className="qtm-contact-value" type="button" onClick={onOpenAddresses}>{value}</button> : href ? <a href={href} target={key === "website" ? "_blank" : undefined} rel={key === "website" ? "noopener noreferrer" : undefined}>{value}</a> : <span>{value}</span>}
+                </div>
+              ))}
+            </section>
+            <CardActions employee={e} />
+            <footer className="qtm-profile-footer">
+              <ProfileFooterDecorations theme={theme} />
+              <p className="qtm-profile-slogan">{slogan}</p>
+              <p className="qtm-profile-motto">QUALITY - TECHNOLOGY - MINDSET</p>
+            </footer>
+          </div>
+        </div>
+      </article>
+    </div>
   );
 }

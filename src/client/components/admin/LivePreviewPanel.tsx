@@ -3,15 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import type { Employee } from "@/shared/types/employee";
 import { ECard } from "@/client/components/card/ECard";
-import { ProfileView } from "@/client/components/card/ProfileView";
 import { PreviewToggleButton } from "./PreviewToggleButton";
 
 export interface ScaledECardViewportProps {
   employee: Employee;
   /**
-   * - "panel": fills the right-hand LivePreviewPanel completely (expands to full frame width & height)
-   * - "mobile": 9:19 portrait phone preview in PreviewModal
-   * - "desktop": horizontal 2-column desktop detail layout (ProfileView) in PreviewModal
+   * - "panel": fixed 390 × 694 mobile canvas fitted to the panel
+   * - "mobile": same fixed portrait canvas in PreviewModal
+   * - "desktop": desktop viewport containing the shared portrait profile
    */
   mode?: "panel" | "mobile" | "desktop";
   maxScale?: number;
@@ -25,148 +24,28 @@ export function ScaledECardViewport({
   className = "",
 }: ScaledECardViewportProps) {
   const stageRef = useRef<HTMLDivElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  const [metrics, setMetrics] = useState<{
-    baseWidth: number;
-    minHeight: number;
-    scale: number;
-    cardHeight: number;
-  }>(() => {
-    if (mode === "desktop") {
-      return {
-        baseWidth: 1120,
-        minHeight: 650,
-        scale: 0.85,
-        cardHeight: 650,
-      };
-    }
-    if (mode === "panel") {
-      return {
-        baseWidth: 420,
-        minHeight: 580,
-        scale: 0.95,
-        cardHeight: 580,
-      };
-    }
-    return {
-      baseWidth: 380,
-      minHeight: 780,
-      scale: 0.85,
-      cardHeight: 780,
-    };
-  });
+  const baseWidth = mode === "desktop" ? 1120 : 390;
+  const baseHeight = mode === "desktop" ? 760 : 694;
+  const [scale, setScale] = useState(0.8);
 
   useEffect(() => {
-    const stageEl = stageRef.current;
-    const cardEl = cardRef.current;
-    if (!stageEl || !cardEl) return;
-
-    const recalc = () => {
-      const availW = stageEl.clientWidth;
-      const availH = stageEl.clientHeight;
-      if (availW <= 0 || availH <= 0) return;
-
-      if (mode === "desktop") {
-        const baseW = 1120;
-        const baseH = 650;
-        const scaleW = (availW - 4) / baseW;
-        const scaleH = (availH - 4) / baseH;
-        const nextScale = Math.max(0.25, Math.min(maxScale, scaleW, scaleH));
-        setMetrics((prev) =>
-          Math.abs(prev.scale - nextScale) < 0.002 &&
-          prev.baseWidth === baseW &&
-          prev.cardHeight === baseH
-            ? prev
-            : {
-                baseWidth: baseW,
-                minHeight: baseH,
-                scale: nextScale,
-                cardHeight: baseH,
-              },
-        );
-        return;
-      }
-
-      if (mode === "panel") {
-        // Fill the entire preview frame while keeping 100% of the card visible:
-        // Match the card's aspect ratio to the available stage aspect ratio.
-        const stageAspect = availW / availH;
-        const measuredContentH = cardEl.scrollHeight || 560;
-        // Pick a baseHeight that fits all content comfortably (at least 560px),
-        // and derive baseWidth from stageAspect so scaleW === scaleH.
-        const targetBaseW = 410;
-        const targetMinH = Math.max(540, Math.round(targetBaseW / stageAspect));
-        const actualH = Math.max(measuredContentH, targetMinH);
-        const adjustedBaseW = Math.max(
-          360,
-          Math.min(540, Math.round(actualH * stageAspect)),
-        );
-        const finalMinH = Math.round(adjustedBaseW / stageAspect);
-        const finalH = Math.max(measuredContentH, finalMinH);
-
-        const scaleW = availW / adjustedBaseW;
-        const scaleH = availH / finalH;
-        const nextScale = Math.max(0.3, Math.min(1.25, scaleW, scaleH));
-
-        setMetrics((prev) => {
-          if (
-            Math.abs(prev.scale - nextScale) < 0.003 &&
-            Math.abs(prev.baseWidth - adjustedBaseW) < 2 &&
-            Math.abs(prev.cardHeight - finalH) < 2
-          ) {
-            return prev;
-          }
-          return {
-            baseWidth: adjustedBaseW,
-            minHeight: finalMinH,
-            scale: nextScale,
-            cardHeight: finalH,
-          };
-        });
-        return;
-      }
-
-      // mode === "mobile" (in PreviewModal)
-      const baseW = 450;
-      const minH = 760;
-      const naturalH = Math.max(cardEl.offsetHeight, minH);
-      const scaleW = (availW - 8) / baseW;
-      const scaleH = (availH - 8) / naturalH;
-      const nextScale = Math.max(0.25, Math.min(maxScale, scaleW, scaleH));
-
-      setMetrics((prev) => {
-        if (
-          Math.abs(prev.scale - nextScale) < 0.002 &&
-          Math.abs(prev.cardHeight - naturalH) < 1 &&
-          prev.baseWidth === baseW
-        ) {
-          return prev;
-        }
-        return {
-          baseWidth: baseW,
-          minHeight: minH,
-          scale: nextScale,
-          cardHeight: naturalH,
-        };
-      });
-    };
-
+    const stage = stageRef.current;
+    if (!stage) return;
+    const recalc = () => setScale(Math.max(0.05, Math.min(
+      maxScale, stage.clientWidth / baseWidth, stage.clientHeight / baseHeight,
+    )));
     recalc();
-
     const observer = new ResizeObserver(recalc);
-    observer.observe(stageEl);
-    observer.observe(cardEl);
-    window.addEventListener("resize", recalc);
+    observer.observe(stage);
+    return () => observer.disconnect();
+  }, [baseWidth, baseHeight, maxScale]);
 
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", recalc);
-    };
-  }, [mode, maxScale, employee]);
+  useEffect(() => {
+    stageRef.current?.querySelector(".qtm-card-scroll")?.scrollTo({ top: 0 });
+  }, [employee.theme.templateId]);
 
-  const scaledW = Math.round(metrics.baseWidth * metrics.scale);
-  const scaledH = Math.round(metrics.cardHeight * metrics.scale);
+  const scaledW = baseWidth * scale;
+  const scaledH = baseHeight * scale;
 
   return (
     <div
@@ -181,28 +60,17 @@ export function ScaledECardViewport({
         }}
       >
         <div
-          ref={cardRef}
-          className={`ecard-scaled-frame absolute top-0 left-0 shrink-0 ${
-            mode === "desktop"
-              ? "ecard-scaled-desktop"
-              : mode === "panel"
-                ? "ecard-scaled-panel"
-                : "ecard-scaled-mobile"
-          }`}
+          className="qtm-preview-frame absolute top-0 left-0 shrink-0"
           style={{
-            width: `${metrics.baseWidth}px`,
-            minWidth: `${metrics.baseWidth}px`,
-            maxWidth: `${metrics.baseWidth}px`,
-            minHeight: `${metrics.minHeight}px`,
-            transform: `scale(${metrics.scale})`,
+            width: baseWidth,
+            height: baseHeight,
+            transform: `scale(${scale})`,
             transformOrigin: "top left",
           }}
         >
-          {mode === "desktop" ? (
-            <ProfileView employee={employee} />
-          ) : (
+          <div className="qtm-preview-device">
             <ECard employee={employee} variant="preview" />
-          )}
+          </div>
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { QtmBrand } from "./QtmBrand";
+import Image from "next/image";
 import { ArrowLeft, QrCode, Share2 } from "lucide-react";
 
 interface CardHeaderProps {
@@ -15,22 +15,47 @@ export function CardHeader({ onOpenQr, onShare }: CardHeaderProps) {
   return (
     <div className="shrink-0">
       <header className="flex items-start justify-between gap-2">
-        {/* Left: QTM Logo + "QTM MEDIATECH · SÁNG TẠO & CÔNG NGHỆ AI" with short line */}
+        {/* Left: QTM Brand Lockup (Logo + QTM / MEDIATECH / CREATIVE / + AI TECH with underline) */}
         <div
           data-aos="fade-right"
           data-aos-delay="50"
-          className="flex flex-col items-start min-w-0"
+          className="flex items-start gap-2 sm:gap-2.5 min-w-0"
         >
-          <QtmBrand />
-          <div className="mt-1 flex items-center gap-1.5">
+          <Image
+            src="/images/brand/qtm-logo.png"
+            width={36}
+            height={36}
+            alt="QTM MediaTech"
+            unoptimized
+            className="shrink-0 object-contain mt-0.5"
+          />
+          <div className="flex flex-col items-start leading-[1.18] select-none">
             <span
-              className="text-[clamp(6.5px,1.05dvh,9px)] font-bold tracking-[0.14em] uppercase"
-              style={{ color: "var(--pv-muted)" }}
+              className="text-[clamp(11px,1.65dvh,14px)] font-black tracking-tight uppercase"
+              style={{ color: "var(--pv-primary)" }}
             >
-              QTM MEDIATECH · SÁNG TẠO & CÔNG NGHỆ AI
+              QTM
             </span>
             <span
-              className="h-[1.5px] w-5 rounded-full"
+              className="text-[clamp(9.5px,1.4dvh,12px)] font-extrabold tracking-[0.06em] uppercase"
+              style={{ color: "var(--pv-primary)" }}
+            >
+              MEDIATECH
+            </span>
+            <span
+              className="text-[clamp(7.5px,1.15dvh,9.5px)] font-semibold tracking-[0.14em] uppercase mt-0.5"
+              style={{ color: "var(--pv-muted)" }}
+            >
+              CREATIVE
+            </span>
+            <span
+              className="text-[clamp(7.5px,1.15dvh,9.5px)] font-semibold tracking-[0.14em] uppercase"
+              style={{ color: "var(--pv-muted)" }}
+            >
+              + AI TECH
+            </span>
+            <span
+              className="h-[2px] w-6 rounded-full mt-1.5"
               style={{ background: "var(--pv-accent)" }}
               aria-hidden="true"
             />

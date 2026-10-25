@@ -1,9 +1,13 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { routes } from "@/shared/constants/routes";
+import { useAuth } from "@/client/hooks/useAuth";
+
+const emptySubscribe = () => () => {};
 
 export function Brand() {
   return (
@@ -29,14 +33,21 @@ export function Brand() {
 }
 
 export function PublicHeader() {
+  const { ready, authenticated } = useAuth();
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
+  const isLoggedIn = mounted && ready && authenticated;
+
   return (
     <header className="public-header">
       <div className="container header-inner">
         <Brand />
 
         <div className="header-nav">
-          <Link className="qtm-header-cta group" href={routes.login}>
-            <span>ĐĂNG NHẬP</span>
+          <Link
+            className="qtm-header-cta group"
+            href={isLoggedIn ? routes.admin : routes.login}
+          >
+            <span>{isLoggedIn ? "QUẢN TRỊ" : "ĐĂNG NHẬP"}</span>
             <ArrowRight
               size={14}
               className="transition-transform duration-200 group-hover:translate-x-1"

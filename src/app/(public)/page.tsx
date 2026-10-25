@@ -1,5 +1,8 @@
 import { HomeView } from "@/views/HomeView";
+import { getActiveEmployees } from "@/server/employees";
 
-export default function Page() {
-  return <HomeView />;
+export const dynamic = "force-dynamic";
+
+export default async function Page() {
+  return <HomeView employees={await getActiveEmployees()} />;
 }

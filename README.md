@@ -22,6 +22,10 @@ Nền tảng quản trị và chia sẻ danh thiếp số (E-Card) dành cho đ�
 
 ## 2. Cài đặt & Khởi chạy
 
+### Database
+
+Schema PostgreSQL mới gồm `admin_users`, `employees`, `card_themes` tại `prisma/schema.prisma`, kèm migration SQL và seed Argon2id. Xem [hướng dẫn database](prisma/README.md) để cấu hình và khởi tạo. Đăng nhập và trang public dùng API/database. CRUD quản trị và thống kê dùng `/api/admin/*`, dữ liệu lưu trong DB; upload avatar qua Cloudinary.
+
 Yêu cầu hệ thống: **Node.js >= 20** và **pnpm**.
 
 ```bash
@@ -29,7 +33,7 @@ Yêu cầu hệ thống: **Node.js >= 20** và **pnpm**.
 pnpm install
 
 # 2. Tạo file biến môi trường từ mẫu
-cp .env.example .env.local
+cp .env.example .env
 
 # 3. Chạy máy chủ phát triển (http://localhost:3000)
 pnpm dev
@@ -40,10 +44,9 @@ pnpm build
 pnpm start
 ```
 
-### Tài khoản quản trị dùng thử (Demo)
-- **Trang đăng nhập**: `/login`
-- **Thư điện tử**: `admin@qtmmedia.vn`
-- **Mật khẩu**: `admin123`
+### Đăng nhập quản trị
+
+Vào `/login`, dùng email và mật khẩu được tạo bởi `pnpm db:seed` (`SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD`). Không còn tài khoản đăng nhập giả lập hoặc mật khẩu cố định. Xem [API xác thực](docs/auth.md) để biết các endpoint và cấu hình token.
 
 ---
 
@@ -140,9 +143,9 @@ src/
 │   └── employees.ts           # Tầng dữ liệu phía server (getIndexableEmployees, getPublicEmployeeBySlug)
 ├── client/                    # Components, Hooks, Zustand Store & Services phía client
 ├── shared/                    # Types (Employee, PublicFields), Utils (vcard, qr, color)
-└── data/mock/                 # Dữ liệu nhân viên mẫu (mockEmployees)
+└── config/theme-options.ts    # Cấu hình giao diện, không chứa dữ liệu nhân viên
 ```
 
 ### Ghi chú kỹ thuật
-- **Chuyển đổi sang Supabase**: Hiện tại dữ liệu đọc từ `src/data/mock/employees.ts`. Khi tích hợp Supabase, chỉ cần cập nhật các hàm truy vấn trong [`src/server/employees.ts`](file:///Users/baotoan/Documents/e-card/src/server/employees.ts) (cho SSR/SEO/Sitemap) và [`src/client/services/employee.service.ts`](file:///Users/baotoan/Documents/e-card/src/client/services/employee.service.ts) (cho CRUD quản trị).
+- **Nguồn dữ liệu**: Trang public đọc DB qua `src/server/cards`; CRUD quản trị dùng `src/server/admin`. Xem `docs/admin-api.md`.
 - **Lưu ý về file cấu hình theme**: Dự án hiện có 2 file cấu hình theme là [`src/config/card-themes.ts`](file:///Users/baotoan/Documents/e-card/src/config/card-themes.ts) và [`src/shared/constants/card-themes.ts`](file:///Users/baotoan/Documents/e-card/src/shared/constants/card-themes.ts) đang được giữ nguyên để tương thích với các module hiện hữu.

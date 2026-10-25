@@ -9,7 +9,7 @@ import { Switch } from "@/client/components/ui/Switch";
 import { Badge } from "@/client/components/ui/Badge";
 import { Modal } from "@/client/components/ui/Modal";
 import { useToast } from "@/client/components/ui/Toast";
-import { useEmployees } from "@/client/hooks/useEmployees";
+import { employeeService } from "@/client/services/employee.service";
 import { routes } from "@/shared/constants/routes";
 import { TeamRowCard } from "./TeamRowCard";
 
@@ -25,7 +25,7 @@ export function TeamTable({
   showPanelHeader = true,
 }: TeamTableProps) {
   const [deleting, setDeleting] = useState<Employee | null>(null);
-  const { remove, toggleActive } = useEmployees();
+  const { remove, toggleActive } = employeeService;
   const toast = useToast();
 
   const handleToggle = async (e: Employee) => {

@@ -2,8 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { useAuthStore } from "../src/client/store/auth.store";
 import { restoreSession, login, logout } from "../src/client/hooks/useAuth";
-import { apiFetch } from "../src/client/api/http";
-import { authApi } from "../src/client/api/auth.api";
+import { apiFetch, authApi } from "../src/api";
 const user = { id: "test-admin", email: "admin@example.com" };
 const json = (body: unknown, status = 200) => Response.json(body, { status });
 

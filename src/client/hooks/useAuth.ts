@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useAuthStore } from "@/client/store/auth.store";
-import { authApi } from "@/client/api/auth.api";
+import { authApi } from "@/api/auth.api";
 import { withAuthLock } from "@/client/auth/session-lock";
 
 // Shared across hook instances so restore cannot race login/logout.

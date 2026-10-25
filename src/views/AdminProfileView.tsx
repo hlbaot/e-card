@@ -15,7 +15,7 @@ import {
 import { useAuth } from "@/client/hooks/useAuth";
 import { useAos } from "@/client/hooks/useAos";
 import { useToast } from "@/client/components/ui/Toast";
-import { authApi } from "@/client/api/auth.api";
+import { authApi } from "@/api/auth.api";
 import { Skeleton } from "@/client/components/ui/Skeleton";
 import { PasswordMatchMeter } from "@/client/components/auth/PasswordMatchMeter";
 

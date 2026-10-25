@@ -1,0 +1,86 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum AvatarSize {
+  sm
+  md
+  lg
+
+  @@map("avatar_size")
+}
+
+enum AvatarShape {
+  circle
+  rounded
+
+  @@map("avatar_shape")
+}
+
+enum ButtonStyle {
+  filled
+  soft
+  outline
+
+  @@map("button_style")
+}
+
+model AdminUser {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email            String    @unique @db.VarChar(255)
+  passwordHash     String    @map("password_hash") @db.VarChar(255)
+  refreshTokenHash String?   @map("refresh_token_hash") @db.Char(64)
+  refreshExpiresAt DateTime? @map("refresh_expires_at") @db.Timestamptz(6)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("admin_users")
+}
+
+model Employee {
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug          String     @unique @db.VarChar(120)
+  fullName      String     @map("full_name") @db.VarChar(150)
+  position      String     @db.VarChar(150)
+  company       String     @default("") @db.VarChar(255)
+  companyShort  String     @default("") @map("company_short") @db.VarChar(150)
+  website       String     @default("") @db.Text
+  offices       Json       @default("[]") @db.JsonB
+  email         String?    @db.VarChar(255)
+  phone         String?    @db.VarChar(30)
+  zalo          String?    @db.VarChar(30)
+  slogan        String?    @db.VarChar(255)
+  avatarUrl     String?    @map("avatar_url") @db.Text
+  isActive      Boolean    @default(true) @map("is_active")
+  allowIndexing Boolean    @default(false) @map("allow_indexing")
+  createdAt     DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt     DateTime?  @map("deleted_at") @db.Timestamptz(6)
+  theme         CardTheme?
+
+  @@index([isActive, deletedAt], map: "idx_employees_public_list")
+  @@map("employees")
+}
+
+model CardTheme {
+  employeeId   String      @id @map("employee_id") @db.Uuid
+  templateId   String      @map("template_id") @db.VarChar(32)
+  backgroundId String      @map("background_id") @db.VarChar(32)
+  primaryColor String      @map("primary_color") @db.VarChar(7)
+  avatarSize   AvatarSize  @default(lg) @map("avatar_size")
+  avatarShape  AvatarShape @default(circle) @map("avatar_shape")
+  buttonStyle  ButtonStyle @default(soft) @map("button_style")
+  decor        String[]    @default([]) @db.Text
+  shapes       Json        @default("{}") @db.JsonB
+  showDecor    Boolean     @default(true) @map("show_decor")
+  decorOpacity Int         @default(65) @map("decor_opacity") @db.SmallInt
+  employee     Employee    @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@map("card_themes")
+}

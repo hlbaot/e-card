@@ -9,7 +9,7 @@ import { Skeleton } from "@/client/components/ui/Skeleton";
 import { slugify } from "@/shared/utils/slugify";
 
 export function AdminCardsView() {
-  const { employees, ready } = useEmployees();
+  const { employees, ready, error } = useEmployees();
   useAos(ready);
   const [search, setSearch] = useState("");
   const filtered = employees.filter((e) =>
@@ -37,6 +37,7 @@ export function AdminCardsView() {
           />
         </Link>
       </div>
+      {error && <p role="alert" className="panel text-red-400">{error}</p>}
       <div className="section-heading" data-aos="fade-up" data-aos-delay="100">
         <div className="section-title">
           <ContactRound size={18} className="text-[#22D3EE]" />

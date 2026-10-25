@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, LockKeyhole } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useAuth } from "@/client/hooks/useAuth";
 import { useAos } from "@/client/hooks/useAos";
 import { Brand } from "@/client/components/layout/PublicHeader";
@@ -52,16 +52,15 @@ export function LoginView() {
             e.preventDefault();
             setError("");
             if (!email.trim() || !password) {
-              setError("Vui lòng nhập địa chỉ thư điện tử và mật khẩu.");
+              setError("Vui lòng nhập email và mật khẩu.");
               return;
             }
             setBusy(true);
             try {
               await login(email, password);
-              router.replace("/admin");
             } catch (err) {
               setError(
-                err instanceof Error ? err.message : "Không thể đăng nhập",
+                err instanceof Error ? err.message : "Đăng nhập không thành công. Vui lòng thử lại.",
               );
             } finally {
               setBusy(false);
@@ -82,7 +81,7 @@ export function LoginView() {
               id="email"
               type="email"
               autoComplete="username"
-              placeholder="admin@qtmmedia.vn"
+              placeholder="Nhập địa chỉ thư điện tử"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -112,21 +111,6 @@ export function LoginView() {
               className="transition-transform duration-200 group-hover:translate-x-1"
             />
           </button>
-          <div className="demo-info">
-            <strong className="button-row">
-              <LockKeyhole size={14} className="text-[#22D3EE]" />
-              Tài khoản dùng thử
-            </strong>
-            <div>
-              Thư điện tử: <code>admin@qtmmedia.vn</code>
-            </div>
-            <div>
-              Mật khẩu: <code>admin123</code>
-            </div>
-            <p>
-              Đây là bản dùng thử. Đăng nhập giả lập, không kết nối máy chủ.
-            </p>
-          </div>
         </form>
       </div>
     </main>

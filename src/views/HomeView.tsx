@@ -1,20 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import {
   Search,
   Users,
   ArrowRight,
-  Award,
-  Briefcase,
-  Handshake,
   Sparkles,
 } from "lucide-react";
 import { PublicHeader } from "@/client/components/layout/PublicHeader";
 import { PublicFooter } from "@/client/components/layout/PublicFooter";
-import { useEmployees } from "@/client/hooks/useEmployees";
+import type { Employee } from "@/shared/types/employee";
 import { useAos } from "@/client/hooks/useAos";
+import { useAuth } from "@/client/hooks/useAuth";
 import { CardListItem } from "@/client/components/card/CardListItem";
 import { Skeleton } from "@/client/components/ui/Skeleton";
 import { Badge } from "@/client/components/ui/Badge";
@@ -25,11 +23,17 @@ import { routes } from "@/shared/constants/routes";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/shared/utils/cn";
 
-export function HomeView() {
-  const { employees, ready } = useEmployees();
+const emptySubscribe = () => () => {};
+
+export function HomeView({ employees }: { employees: Employee[] }) {
+  const ready = true;
   useAos(ready);
+  const { ready: authReady, authenticated } = useAuth();
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [search, setSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
+
+  const isLoggedIn = mounted && authReady && authenticated;
 
   const active = employees.filter((e) => e.isActive);
   const departments = Array.from(
@@ -44,28 +48,11 @@ export function HomeView() {
     return matchesSearch && matchesTab;
   });
 
-  const stats = [
-    {
-      value: "16+",
-      label: "Năm kinh nghiệm MediaTech",
-      icon: Award,
-    },
-    {
-      value: "200+",
-      label: "Dự án đã triển khai",
-      icon: Briefcase,
-    },
-    {
-      value: "100+",
-      label: "Khách hàng tin tưởng",
-      icon: Handshake,
-    },
-    {
-      value: `${active.length.toString().padStart(2, "0")}+`,
-      label: "Danh thiếp số hoạt động",
-      icon: Sparkles,
-    },
-  ];
+  const stats = [{
+    value: String(active.length),
+    label: "Danh thiếp số hoạt động",
+    icon: Sparkles,
+  }];
 
   return (
     <>
@@ -101,8 +88,11 @@ export function HomeView() {
                 QUALITY <span>•</span> TECHNOLOGY <span>•</span> MINDSET
               </div>
               <div className="button-row mt-6">
-                <Link href={routes.login} className="btn btn-primary group">
-                  ĐĂNG NHẬP
+                <Link
+                  href={isLoggedIn ? routes.admin : routes.login}
+                  className="btn btn-primary group"
+                >
+                  {isLoggedIn ? "VÀO TRANG QUẢN TRỊ" : "ĐĂNG NHẬP"}
                   <ArrowRight
                     size={15}
                     className="transition-transform duration-200 group-hover:translate-x-1"

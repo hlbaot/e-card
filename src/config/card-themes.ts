@@ -3,7 +3,7 @@ import {
   backgrounds as baseBackgrounds,
 
   type TemplateOption,
-} from "@/data/mock/theme-options";
+} from "@/config/theme-options";
 import type { CardTheme, DecorKey, TemplateId } from "@/shared/types/employee";
 
 export interface DecorationLayerConfig {
@@ -171,7 +171,7 @@ export const backgrounds = [
   { id: "rose-cream", name: "Hồng phấn", css: "#FFF5F7", dark: false },
 ];
 
-export { decorOptions } from "@/data/mock/theme-options";
+export { decorOptions } from "@/config/theme-options";
 
 export const colorPresets = [
   { name: "Xanh QTM", hex: "#0F4C75" },

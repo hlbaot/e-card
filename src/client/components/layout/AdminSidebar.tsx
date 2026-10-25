@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Users,
   ContactRound,
+  UserCog,
   LogOut,
   Menu,
 } from "lucide-react";
@@ -15,15 +16,18 @@ import { Avatar } from "@/client/components/ui/Avatar";
 import { useAuth } from "@/client/hooks/useAuth";
 import { cn } from "@/shared/utils/cn";
 import { routes } from "@/shared/constants/routes";
+import { useToast } from "@/client/components/ui/Toast";
 export function AdminSidebar({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
+  const toast = useToast();
   const router = useRouter();
   const nav = [
     { href: routes.admin, label: "Tổng quan", icon: LayoutDashboard },
     { href: routes.employees, label: "Nhân viên", icon: Users },
     { href: routes.cards, label: "Danh thiếp số", icon: ContactRound },
+    { href: routes.profile, label: "Tài khoản", icon: UserCog },
   ];
   return (
     <div className="admin-shell">
@@ -73,15 +77,26 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
             <Home size={16} aria-hidden="true" />
             <span>Trang chủ</span>
           </Link>
-          <Avatar name="Quản trị QTM" src="" size={32} color="#387c83" />
-          <div className="admin-user-info">
-            Quản trị viên<span>admin@qtmmedia.vn</span>
-          </div>
+          <Link
+            href={routes.profile}
+            className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-white/5"
+            title="Xem hồ sơ & đổi mật khẩu"
+          >
+            <Avatar name="Quản trị QTM" src="" size={32} color="#387c83" />
+            <div className="admin-user-info">
+              Quản trị viên<span>{user?.email}</span>
+            </div>
+          </Link>
           <button
             className="btn btn-ghost"
             onClick={async () => {
-              await logout();
-              router.replace(routes.login);
+              try {
+                await logout();
+                router.replace(routes.login);
+                router.refresh();
+              } catch {
+                toast("Chưa thể đăng xuất. Vui lòng thử lại.");
+              }
             }}
           >
             <LogOut size={16} />

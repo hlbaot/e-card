@@ -7,11 +7,11 @@ import { Avatar } from "@/client/components/ui/Avatar";
 import { Switch } from "@/client/components/ui/Switch";
 import { Modal } from "@/client/components/ui/Modal";
 import { useToast } from "@/client/components/ui/Toast";
-import { useEmployees } from "@/client/hooks/useEmployees";
+import { employeeService } from "@/client/services/employee.service";
 import { routes } from "@/shared/constants/routes";
 export function EmployeeTable({ employees }: { employees: Employee[] }) {
   const [deleting, setDeleting] = useState<Employee | null>(null);
-  const { remove, toggleActive } = useEmployees();
+  const { remove, toggleActive } = employeeService;
   const toast = useToast();
   return (
     <>

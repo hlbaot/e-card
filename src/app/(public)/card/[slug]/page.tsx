@@ -1,20 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { absoluteUrl, siteConfig } from "@/config/site";
-import {
-  getActiveEmployees,
-  getPublicEmployeeBySlug,
-} from "@/server/employees";
+import { getPublicEmployeeBySlug } from "@/server/employees";
 import { CardView } from "@/views/CardView";
 
-export const dynamicParams = true;
-
-export async function generateStaticParams() {
-  const activeEmployees = await getActiveEmployees();
-  return activeEmployees.map((e) => ({
-    slug: e.slug,
-  }));
-}
+// Luôn kiểm tra DB để card vừa ẩn hoặc xóa trả 404 ngay.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,

@@ -10,7 +10,7 @@ export type TemplateId =
 export type AvatarSize = "sm" | "md" | "lg";
 export type AvatarShape = "circle" | "rounded";
 export type ButtonStyle = "filled" | "soft" | "outline";
-export type DecorKey = "blobs" | "circles" | "skyline" | "waves" | "bokeh";
+export type DecorKey = "blobs" | "circles" | "skyline" | "waves" | "bokeh" | "leaves" | "network" | "geometry";
 export interface CardTheme {
   templateId: TemplateId;
   backgroundId: string;

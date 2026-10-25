@@ -20,8 +20,7 @@ export function contrastText(background: string) {
     ? "#FFFFFF"
     : "#000000";
 }
-export function readableAccent(color: string, dark: boolean) {
-  const surface = dark ? "#172334" : "#F5F5F4";
+export function readableAccent(color: string, dark: boolean, surface = dark ? "#172334" : "#F5F5F4") {
   if (contrastRatio(color, surface) >= 4.5) return color;
   const channels = rgb(color);
   const target = dark ? 255 : 0;

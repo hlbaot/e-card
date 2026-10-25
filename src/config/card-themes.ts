@@ -3,7 +3,7 @@ import {
   backgrounds as baseBackgrounds,
 
   type TemplateOption,
-} from "@/data/mock/theme-options";
+} from "@/config/theme-options";
 import type { CardTheme, DecorKey, TemplateId } from "@/shared/types/employee";
 
 export interface DecorationLayerConfig {
@@ -28,9 +28,9 @@ const names: Record<string, string> = {
 };
 
 const descriptions: Record<string, string> = {
-  "bubble-blue": "Mềm mại & thân thiện",
-  "minimal-line": "Gọn gàng & thanh lịch",
-  "dark-tech": "Hiện đại & cá tính",
+  "bubble-blue": "Vệt nước lớn · Nút dạng viên",
+  "minimal-line": "Chữ thanh · Viền mảnh · Tối giản",
+  "dark-tech": "Chữ kỹ thuật · Viền quỹ đạo · Nút vuông",
 };
 
 export const templates: ThemeTemplate[] = [
@@ -38,10 +38,10 @@ export const templates: ThemeTemplate[] = [
     ...t,
     name: names[t.id] || t.name,
     description: descriptions[t.id] || "",
-    dark: t.id === "dark-tech",
-    defaultDecor: (t.id === "dark-tech" ? ["circles", "bokeh"] : ["blobs", "skyline"]) as DecorKey[],
+    dark: false,
+    defaultDecor: (t.id === "dark-tech" ? ["network", "geometry"] : t.id === "minimal-line" ? [] : ["blobs", "skyline"]) as DecorKey[],
     defaultDecorOpacity: 65,
-    fontStyle: "sans" as const,
+    fontStyle: t.id === "dark-tech" ? "mono" as const : "sans" as const,
     decorations: t.shapes.map((s) => ({
       id: s.id,
       label: s.label,
@@ -51,7 +51,7 @@ export const templates: ThemeTemplate[] = [
   {
     id: "editorial",
     name: "Biên tập",
-    description: "Chữ lớn & đường nét tạp chí",
+    description: "Chữ serif đậm · Nét kẻ tạp chí",
     defaultBackgroundId: "paper-cream",
     defaultColor: "#9A3412",
     defaultDecor: ["circles"],
@@ -69,10 +69,10 @@ export const templates: ThemeTemplate[] = [
   {
     id: "aurora",
     name: "Cực quang",
-    description: "Chuyển sắc & điểm sáng dịu",
+    description: "Viền phát sáng · Nút chuyển sắc",
     defaultBackgroundId: "lavender-mist",
     defaultColor: "#7C3AED",
-    defaultDecor: ["blobs", "skyline"],
+    defaultDecor: ["circles", "bokeh"],
     defaultDecorOpacity: 65,
     fontStyle: "sans",
     shapes: [
@@ -87,12 +87,12 @@ export const templates: ThemeTemplate[] = [
   {
     id: "luxury",
     name: "Sang trọng",
-    description: "Nền đen & ánh vàng dịu",
+    description: "Chữ serif thanh · Viền kép · Kim cương",
     defaultBackgroundId: "paper-cream",
     defaultColor: "#D4AF6A",
     defaultDecor: ["circles", "bokeh"],
     defaultDecorOpacity: 65,
-    dark: true,
+    dark: false,
     fontStyle: "serif",
     shapes: [
       { id: "gold-frame", label: "Khung viền đơn mảnh" },
@@ -106,10 +106,10 @@ export const templates: ThemeTemplate[] = [
   {
     id: "botanical",
     name: "Thiên nhiên",
-    description: "Cành lá SVG & đường cong hữu cơ",
+    description: "Chữ cổ điển · Nét lá · Bo góc hữu cơ",
     defaultBackgroundId: "sage-garden",
     defaultColor: "#3F6212",
-    defaultDecor: ["blobs", "skyline"],
+    defaultDecor: ["leaves", "skyline"],
     defaultDecorOpacity: 65,
     fontStyle: "serif",
     shapes: [
@@ -124,10 +124,10 @@ export const templates: ThemeTemplate[] = [
   {
     id: "creative",
     name: "Sáng tạo",
-    description: "Hình học đa sắc & góc xoay",
+    description: "Chữ đậm · Bóng lệch · Hình học",
     defaultBackgroundId: "peach-blush",
     defaultColor: "#BE185D",
-    defaultDecor: ["blobs", "skyline"],
+    defaultDecor: ["geometry", "bokeh"],
     defaultDecorOpacity: 65,
     fontStyle: "sans",
     shapes: [
@@ -171,7 +171,7 @@ export const backgrounds = [
   { id: "rose-cream", name: "Hồng phấn", css: "#FFF5F7", dark: false },
 ];
 
-export { decorOptions } from "@/data/mock/theme-options";
+export { decorOptions } from "@/config/theme-options";
 
 export const colorPresets = [
   { name: "Xanh QTM", hex: "#0F4C75" },
@@ -221,13 +221,9 @@ export function isDarkTheme(theme: CardTheme): boolean {
 export function getThemeBackgroundCss(theme: CardTheme): string {
   const template = getTemplate(theme.templateId);
   const bg = backgrounds.find((b) => b.id === theme.backgroundId);
-  if (template.id === "luxury") {
-    if (bg && bg.dark) return bg.css;
-    return "radial-gradient(circle at 80% 10%, rgba(212,175,106,0.18) 0%, transparent 45%), radial-gradient(circle at 18% 88%, rgba(212,175,106,0.09) 0%, transparent 45%), linear-gradient(155deg,#0B0C10 0%,#15151C 55%,#1F1D24 100%)";
+  // Saved dark backgrounds also migrate visually to a light professional surface.
+  if (template.id === "luxury" && (!bg || bg.id === "paper-cream")) {
+    return "linear-gradient(155deg,#FFFCF5,#F5EDDC)";
   }
-  if (template.id === "dark-tech") {
-    if (bg && bg.dark) return bg.css;
-    return "radial-gradient(circle at 85% 12%, rgba(56,189,248,0.16) 0%, transparent 45%), linear-gradient(160deg,#081528 0%,#0E223D 55%,#112B4F 100%)";
-  }
-  return bg?.css || "linear-gradient(180deg,#FFFFFF 0%,#EAF4FD 100%)";
+  return bg && !bg.dark ? bg.css : "linear-gradient(180deg,#F4FAFF,#E3F1FC)";
 }

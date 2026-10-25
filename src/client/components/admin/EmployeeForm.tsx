@@ -19,10 +19,7 @@ import {
   getPublicFields,
   type Employee,
 } from "@/shared/types/employee";
-import type { EmployeeInput } from "@/client/services/employee.service";
-import { useEmployees } from "@/client/hooks/useEmployees";
-import { localizeEmployee } from "@/shared/utils/localize";
-import { mockEmployees } from "@/data/mock/employees";
+import { employeeService, type EmployeeInput } from "@/client/services/employee.service";
 import { QRPanel } from "@/client/components/card/QRPanel";
 import { Avatar } from "@/client/components/ui/Avatar";
 import { Switch } from "@/client/components/ui/Switch";
@@ -35,7 +32,11 @@ import { PreviewToggleButton } from "./PreviewToggleButton";
 import { websiteUrl } from "@/shared/utils/vcard";
 
 const blank: EmployeeInput = {
-  ...localizeEmployee(mockEmployees[0]),
+  company: "",
+  companyShort: "",
+  website: "",
+  slogan: "",
+  isActive: true,
   fullName: "",
   position: "",
   avatarUrl: "",
@@ -44,8 +45,12 @@ const blank: EmployeeInput = {
   zalo: "",
   allowIndexing: false,
   publicFields: { ...DEFAULT_PUBLIC_FIELDS },
-  offices: structuredClone(localizeEmployee(mockEmployees[0]).offices),
-  theme: structuredClone(mockEmployees[0].theme),
+  offices: [],
+  theme: {
+    templateId: "bubble-blue", backgroundId: "sky-soft", primaryColor: "#0F4C75",
+    avatarSize: "lg", avatarShape: "circle", buttonStyle: "soft",
+    decor: ["blobs", "skyline"], shapes: {}, showDecor: true, decorOpacity: 65,
+  },
 };
 
 type TextField =
@@ -71,13 +76,14 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
   });
   const [errors, setErrors] = useState<Partial<Record<TextField, string>>>({});
   const [busy, setBusy] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
 
   const desktopToggleRef = useRef<HTMLButtonElement>(null);
   const mobileFabRef = useRef<HTMLButtonElement>(null);
   const lastTriggerRef = useRef<HTMLElement | null>(null);
 
-  const { create, update } = useEmployees();
+  const { create, update } = employeeService;
   const toast = useToast();
   const router = useRouter();
 
@@ -205,12 +211,13 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
           <div>
             <label className="btn btn-secondary file-label">
               <Upload size={14} />
-              Tải ảnh lên
+              {uploading ? "Đang tải ảnh…" : "Tải ảnh lên"}
               <input
                 className="sr-only"
                 type="file"
                 accept="image/png,image/jpeg,image/webp"
-                onChange={(e) => {
+                disabled={uploading}
+                onChange={async (e) => {
                   const file = e.target.files?.[0];
                   if (!file) return;
                   if (
@@ -222,14 +229,14 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
                     toast("Chọn ảnh JPG, PNG hoặc WebP tối đa 2 MB");
                     return;
                   }
-                  const reader = new FileReader();
-                  reader.onload = () => {
-                    if (typeof reader.result === "string")
-                      set("avatarUrl", reader.result);
-                  };
-                  reader.onerror = () => toast("Không thể đọc ảnh");
-                  reader.readAsDataURL(file);
-                  e.target.value = "";
+                  const input = e.currentTarget;
+                  setUploading(true);
+                  try {
+                    set("avatarUrl", await employeeService.uploadAvatar(file));
+                    toast("Đã tải ảnh lên");
+                  } catch (error) {
+                    toast(error instanceof Error ? error.message : "Không thể tải ảnh");
+                  } finally { setUploading(false); input.value = ""; }
                 }}
               />
             </label>
@@ -381,7 +388,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
       <Link href="/admin/employees" className="btn btn-secondary">
         Hủy
       </Link>
-      <button type="submit" className="btn btn-primary" disabled={busy}>
+      <button type="submit" className="btn btn-primary" disabled={busy || uploading}>
         <Save size={16} />
         {busy ? "Đang lưu…" : employee ? "Lưu thay đổi" : "Tạo nhân viên"}
       </button>

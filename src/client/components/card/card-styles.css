@@ -1,0 +1,118 @@
+/* Visual languages shared by each profile and its selector thumbnail.
+   These tokens never change the shared grid, avatar dimensions or spacing. */
+.qtm-template-bubble-blue, .qtm-art-bubble-blue {
+  --style-font: "Trebuchet MS", Arial, sans-serif;
+  --style-weight: 800; --style-tracking: -.025em;
+  --style-button-radius: 5cqw; --style-mini-radius: 12px;
+  --style-avatar-shadow: 0 1.2cqw 4cqw color-mix(in srgb,var(--card-accent) 24%,transparent);
+  --style-mini-shadow: 0 3px 10px color-mix(in srgb,var(--card-accent) 25%,transparent);
+  --style-rule-width: 8cqw; --style-rule-height: .8cqw;
+}
+.qtm-template-minimal-line, .qtm-art-minimal-line {
+  --style-font: Arial, sans-serif; --style-weight: 500; --style-tracking: .07em;
+  --style-button-radius: .6cqw; --style-mini-radius: 1px;
+  --style-button-fill: transparent; --style-button-shadow: none;
+  --style-button-border: var(--card-accent); --style-button-width: 1px;
+  --style-avatar-shadow: 0 0 0 1px var(--card-accent); --style-mini-shadow: 0 0 0 1px var(--card-accent);
+  --style-icon-fill: transparent; --style-icon-radius: 0;
+  --style-rule-width: 17cqw; --style-rule-height: 1px;
+}
+.qtm-template-dark-tech, .qtm-art-dark-tech {
+  --style-font: "Courier New", monospace; --style-weight: 800; --style-tracking: -.04em;
+  --style-button-radius: .7cqw; --style-mini-radius: 1px;
+  --style-button-fill: color-mix(in srgb,var(--card-accent) 5%,white);
+  --style-button-shadow: inset 0 -2px var(--card-accent);
+  --style-avatar-shadow: 0 0 0 1cqw color-mix(in srgb,var(--card-accent) 13%,transparent),0 0 0 1px var(--card-accent);
+  --style-mini-shadow: 0 0 0 3px color-mix(in srgb,var(--card-accent) 16%,transparent);
+  --style-icon-radius: 15%; --style-rule-width: 19cqw; --style-rule-height: .5cqw;
+}
+.qtm-template-editorial, .qtm-art-editorial {
+  --style-font: Georgia, "Times New Roman", serif; --style-weight: 800; --style-tracking: -.04em;
+  --style-button-radius: 0; --style-mini-radius: 0;
+  --style-button-fill: transparent; --style-button-shadow: 0 2px 0 var(--card-accent);
+  --style-button-border: transparent;
+  --style-avatar-shadow: none; --style-mini-shadow: none;
+  --style-icon-radius: 0; --style-icon-fill: transparent;
+  --style-rule-width: 26cqw; --style-rule-height: 2px;
+}
+.qtm-template-aurora, .qtm-art-aurora {
+  --style-font: "Trebuchet MS", Arial, sans-serif; --style-weight: 600; --style-tracking: .03em;
+  --style-button-radius: 3cqw; --style-mini-radius: 7px;
+  --style-button-fill: linear-gradient(120deg,#f0edff,#ecfbff);
+  --style-button-shadow: 0 .7cqw 2cqw #7867c51c;
+  --style-avatar-shadow: -1cqw .4cqw 3cqw #a78bfa60,1cqw -.4cqw 3cqw #67e8f960;
+  --style-mini-shadow: -3px 0 8px #a78bfa80,3px 0 8px #67e8f980;
+  --style-icon-fill: linear-gradient(135deg,#ede9fe,#e0f7fa);
+  --style-rule-width: 12cqw; --style-rule-height: .8cqw;
+}
+.qtm-template-luxury, .qtm-art-luxury {
+  --style-font: Georgia, "Times New Roman", serif; --style-weight: 500; --style-tracking: .09em;
+  --style-button-radius: .8cqw; --style-mini-radius: 2px;
+  --style-button-fill: transparent; --style-button-border: var(--card-accent);
+  --style-button-width: 3px; --style-button-border-style: double;
+  --style-button-shadow: none;
+  --style-avatar-shadow: 0 0 0 .65cqw #fff,0 0 0 .95cqw var(--card-accent);
+  --style-mini-shadow: 0 0 0 2px white,0 0 0 3px var(--card-accent);
+  --style-rule-width: 22cqw; --style-rule-height: 1px;
+}
+.qtm-template-botanical, .qtm-art-botanical {
+  --style-font: Palatino, "Palatino Linotype", Georgia, serif; --style-weight: 700; --style-tracking: 0;
+  --style-button-radius: 4cqw 1cqw 4cqw 1cqw; --style-mini-radius: 9px 2px 9px 2px;
+  --style-button-fill: color-mix(in srgb,var(--card-accent) 7%,white);
+  --style-button-shadow: none; --style-icon-radius: 50% 15% 50% 15%;
+  --style-avatar-shadow: 0 0 0 .7cqw color-mix(in srgb,var(--card-accent) 17%,transparent);
+  --style-mini-shadow: 0 0 0 3px color-mix(in srgb,var(--card-accent) 18%,transparent);
+  --style-rule-width: 13cqw; --style-rule-height: .7cqw;
+}
+.qtm-template-creative, .qtm-art-creative {
+  --style-font: Verdana, Arial, sans-serif; --style-weight: 900; --style-tracking: -.045em;
+  --style-button-radius: 1.6cqw; --style-mini-radius: 4px;
+  --style-button-fill: color-mix(in srgb,var(--card-accent) 4%,white);
+  --style-button-border: var(--card-accent);
+  --style-button-shadow: .7cqw .7cqw 0 color-mix(in srgb,var(--card-accent) 20%,transparent);
+  --style-avatar-shadow: 1.3cqw 1cqw 0 color-mix(in srgb,var(--card-accent) 23%,transparent);
+  --style-mini-shadow: 4px 3px 0 color-mix(in srgb,var(--card-accent) 25%,transparent);
+  --style-icon-radius: 25%; --style-rule-width: 16cqw; --style-rule-height: 1cqw;
+}
+
+/* Signature details sit entirely in the portrait and divider spaces. */
+.qtm-template-dark-tech .qtm-portrait::after {
+  content: ""; position: absolute; pointer-events: none; width: 35cqw; height: 35cqw;
+  left: 50%; top: 50%; transform: translate(-50%,-50%);
+  border: 1px dashed var(--card-accent); border-radius: 50%; opacity: .5;
+}
+.qtm-template-editorial .qtm-identity-rule { border-radius: 0; }
+.qtm-template-aurora .qtm-identity-rule { background: linear-gradient(90deg,var(--card-accent),#22a8b5); }
+.qtm-template-luxury .qtm-identity-rule { position: relative; }
+.qtm-template-luxury .qtm-identity-rule::after {
+  content: ""; position: absolute; width: 1.4cqw; height: 1.4cqw; top: 50%; left: 50%;
+  background: var(--card-accent); transform: translate(-50%,-50%) rotate(45deg);
+}
+.qtm-template-creative .qtm-identity-rule { border-radius: 0; background: linear-gradient(90deg,var(--card-accent) 65%,transparent 65%,transparent 73%,#d48c32 73%); }
+.qtm-template-minimal-line .qtm-position { font-style: normal; }
+.qtm-template-dark-tech .qtm-company-short { font-family: "Courier New",monospace; }
+.qtm-template-editorial .qtm-profile-identity h3 { font-family: Georgia,serif; }
+.qtm-template-luxury .qtm-company-short { letter-spacing: .18em; }
+
+/* Every thumbnail demonstrates the same treatments as its full profile. */
+.template-art { --card-accent: var(--thumb-color); }
+.template-art .art-avatar { box-shadow: var(--style-mini-shadow,none); border-radius: 50%; }
+.template-art .art-name { background: none; width: auto; height: auto; font-family: var(--style-font); font-weight: var(--style-weight); letter-spacing: var(--style-tracking); font-size: 10px; line-height: 1.25; color: var(--thumb-color); opacity: 1; }
+.template-art .art-role { background: none; width: auto; height: auto; font-size: 7px; line-height: 1.2; color: var(--thumb-color); opacity: .8; }
+.template-art .art-buttons i { border-radius: var(--style-mini-radius,3px); background: var(--style-button-fill,color-mix(in srgb,var(--thumb-color) 12%,white)); border: var(--style-button-width,1px) var(--style-button-border-style,solid) var(--style-button-border,color-mix(in srgb,var(--thumb-color) 45%,white)); opacity: 1; }
+.qtm-art-minimal-line .art-avatar { border: 3px solid white; }
+.qtm-art-dark-tech .art-avatar { outline: 1px dashed var(--thumb-color); outline-offset: 3px; }
+.qtm-art-editorial .art-name { text-decoration: underline; text-underline-offset: 3px; }
+.qtm-art-aurora .art-buttons i { border-color: #c4b5fd; }
+.qtm-art-luxury .art-brand { font-family: Georgia,serif; letter-spacing: 1px; font-style: normal; }
+.qtm-art-luxury .art-buttons i { border-width: 3px; border-style: double; }
+.qtm-art-creative .art-buttons i { box-shadow: 2px 2px 0 color-mix(in srgb,var(--thumb-color) 25%,transparent); }
+
+.template-art .art-rule { width: var(--style-mini-rule-width,28px); height: var(--style-mini-rule-height,2px); background: var(--thumb-color); border-radius: 3px; z-index: 1; flex-shrink: 0; }
+.qtm-art-minimal-line { --style-mini-rule-width: 52px; --style-mini-rule-height: 1px; }
+.qtm-art-dark-tech { --style-mini-rule-width: 64px; }
+.qtm-art-editorial { --style-mini-rule-width: 76px; --style-mini-rule-height: 1px; }
+.qtm-art-aurora .art-rule { width: 40px; background: linear-gradient(90deg,var(--thumb-color),#22a8b5); }
+.qtm-art-luxury { --style-mini-rule-width: 60px; --style-mini-rule-height: 1px; }
+.qtm-art-botanical { --style-mini-rule-width: 42px; --style-mini-rule-height: 3px; }
+.qtm-art-creative .art-rule { width: 48px; height: 3px; border-radius: 0; background: linear-gradient(90deg,var(--thumb-color) 65%,transparent 65%,transparent 73%,#d48c32 73%); }

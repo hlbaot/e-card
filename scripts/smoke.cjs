@@ -44,17 +44,20 @@ global.window = { localStorage: global.localStorage };
 async function main() {
   const { slugify } = require("../src/shared/utils/slugify.ts");
   const { createVCard, websiteUrl } = require("../src/shared/utils/vcard.ts");
-  const {
-    employeeService: service,
-  } = require("../src/client/services/employee.service.ts");
-  const {
-    useEmployeeStore: store,
-  } = require("../src/client/store/employee.store.ts");
-  const { authService } = require("../src/client/services/auth.service.ts");
-  const { useAuthStore } = require("../src/client/store/auth.store.ts");
   assert.equal(slugify("  Đặng Thị Ánh!  "), "dang-thi-anh");
-  await store.persist.rehydrate();
-  const employees = await service.getAll();
+  // Test fixtures are created only inside this process; production starts empty.
+  const employees = Array.from({ length: 5 }, (_, index) => ({
+    id: `test-${index + 1}`, slug: `test-${index + 1}`, fullName: `Test Employee ${index + 1}`,
+    position: "Test Position", company: "Test Company", companyShort: "TC",
+    website: "example.com", offices: [{ label: "Test Office", address: "Test Address" }],
+    avatarUrl: "", phone: "0123456789", email: "test@example.com", zalo: "0123456789",
+    slogan: "", isActive: true, allowIndexing: false,
+    publicFields: { phone: true, email: true, zalo: true, website: true, offices: true },
+    theme: { templateId: "bubble-blue", backgroundId: "sky-soft", primaryColor: "#0F4C75",
+      avatarSize: "lg", avatarShape: "circle", buttonStyle: "soft", decor: ["blobs", "skyline"],
+      shapes: {}, showDecor: true, decorOpacity: 65 },
+    createdAt: "2026-10-25T00:00:00.000Z", updatedAt: "2026-10-25T00:00:00.000Z",
+  }));
   const { localizeEmployee } = require("../src/shared/utils/localize.ts");
   const {
     contrastText,
@@ -68,10 +71,10 @@ async function main() {
   } = require("../src/shared/constants/card-themes.ts");
   const { cardUrl } = require("../src/shared/utils/qr.ts");
   const localized = localizeEmployee(employees[3]);
-  assert.equal(localized.fullName, "NGUYỄN HOÀNG LONG");
+  assert.equal(localized.fullName, "Test Employee 4");
   assert.equal(localized.slug, employees[3].slug);
-  assert.equal(localized.offices[0].label, "Trụ sở chính");
-  assert.equal(employees[3].fullName, "NGUYEN HOANG LONG");
+  assert.equal(localized.offices[0].label, "Test Office");
+  assert.equal(employees[3].fullName, "Test Employee 4");
   const custom = {
     ...employees[3],
     fullName: "Bảo Toàn",
@@ -83,7 +86,7 @@ async function main() {
   assert.equal(localizeEmployee(custom).slogan, custom.slogan);
   const { migrateCardTheme } = require("../src/shared/utils/migrate-theme.ts");
   const { decorOptions } = require("../src/shared/constants/card-themes.ts");
-  assert.deepEqual(decorOptions.map((option) => option.id), ["none", "blobs", "circles", "skyline", "waves", "bokeh"]);
+  assert.deepEqual(decorOptions.map((option) => option.id), ["none", "blobs", "circles", "skyline", "bokeh", "leaves", "network", "geometry"]);
   for (const templateId of ["bubble-blue", "dark-tech"]) {
     for (const pattern of ["dot", "dots", "grid", "diagonal", "art-deco", "plus", "crosses", "lines", "checks", "diamonds", "leaf", "leaf-dots", "none"]) {
       for (const field of ["pattern", "patternId"]) {
@@ -100,6 +103,23 @@ async function main() {
   }
   assert.equal(migrateCardTheme({ ...employees[0].theme, decorOpacity: 100 }).decorOpacity, 100);
   assert.deepEqual(migrateCardTheme({ ...employees[0].theme, decor: [] }).decor, []);
+  assert.deepEqual(migrateCardTheme({ ...employees[0].theme, decor: ["leaves", "network", "geometry", "leaves", "invalid"] }).decor, ["leaves", "network", "geometry"]);
+  const { getProfileDecorPlacements } = require("../src/shared/utils/decor-layout.ts");
+  const motifKeys = ["blobs", "circles", "bokeh", "leaves", "network", "geometry"];
+  // Every combination must occupy separate slots, with no paint beside contacts.
+  for (let mask = 0; mask < 1 << motifKeys.length; mask++) {
+    const selected = motifKeys.filter((_, index) => mask & (1 << index));
+    const placements = getProfileDecorPlacements(selected);
+    assert.equal(placements.length, selected.length === 0 ? 0 : selected.length <= 3 ? 3 : 6);
+    assert.deepEqual(placements, getProfileDecorPlacements([...selected].reverse()));
+    for (const key of selected) assert.ok(placements.some(slot => slot.decor === key));
+    placements.forEach((a, index) => {
+      assert.ok(a.y + a.height < 300);
+      for (const b of placements.slice(index + 1)) {
+        assert.ok(a.x + a.width <= b.x || b.x + b.width <= a.x || a.y + a.height <= b.y || b.y + b.height <= a.y);
+      }
+    });
+  }
   assert.ok(templates.length >= 8);
   assert.ok(colorPresets.length >= 24);
   assert.equal(new Set(templates.map((t) => t.id)).size, templates.length);
@@ -109,11 +129,13 @@ async function main() {
     assert.ok(contrastRatio(hex, contrastText(hex)) >= 4.5);
     assert.ok(contrastRatio(readableAccent(hex, false), "#F5F5F4") >= 4.5);
     assert.ok(contrastRatio(readableAccent(hex, true), "#172334") >= 4.5);
+    // Profile accents must remain readable on the darkest allowed pastel too.
+    assert.ok(contrastRatio(readableAccent(hex, false, "#E0E0E0"), "#E0E0E0") >= 4.5);
   }
   process.env.NEXT_PUBLIC_SITE_URL = "https://profiles.example.com";
   assert.equal(
     cardUrl(localized.slug),
-    "https://profiles.example.com/card/nguyen-hoang-long",
+    "https://profiles.example.com/card/test-4",
   );
   delete process.env.NEXT_PUBLIC_SITE_URL;
   delete global.window;
@@ -136,7 +158,7 @@ async function main() {
     };
     const html = renderToStaticMarkup(createElement(ProfilePage, { employee }));
     assert.ok(html.includes("<h1"));
-    assert.ok(html.includes("NGUYỄN HOÀNG LONG"));
+    assert.ok(html.includes("Test Employee 4"));
     assert.ok(html.includes("Gọi điện"));
     assert.ok(html.includes("Lưu danh bạ"));
     assert.ok(!html.includes('class="qr-panel"'));
@@ -145,6 +167,14 @@ async function main() {
     assert.ok(html.includes(`template-${template.id}`));
     const preview = renderToStaticMarkup(createElement(ECard, { employee }));
     assert.ok(preview.includes("<h2"));
+    assert.ok(html.includes("qtm-card-layout") && preview.includes("qtm-card-layout"));
+    for (const label of ["CULTURE", "TECHNOLOGY", "MEDIA", "EVENT", "+ AI TECH", "QUALITY - TECHNOLOGY - MINDSET"]) {
+      assert.ok(preview.includes(label) && html.includes(label));
+    }
+    assert.ok(!template.dark, `${template.id} must have a light surface`);
+    const { getThemeBackgroundCss } = require("../src/config/card-themes.ts");
+    assert.ok(!getThemeBackgroundCss(employee.theme).includes("#0B0C10"));
+
   }
 
   const { CardDecorations } = require("../src/client/components/card/CardDecorations.tsx");
@@ -159,75 +189,15 @@ async function main() {
       assert.ok(!/<pattern|background-image|animate/i.test(preview));
     }
   }
-  const legacyEmployee = structuredClone(employees[0]);
-  delete legacyEmployee.theme.decor;
-  legacyEmployee.theme.patternId = "plus";
-  legacyEmployee.theme.decorOpacity = 100;
-  storage.set("ecard-employees", JSON.stringify({ state: { employees: [legacyEmployee] }, version: 0 }));
-  await store.persist.rehydrate();
-  assert.deepEqual(store.getState().employees[0].theme.decor, ["blobs"]);
-  assert.equal(store.getState().employees[0].theme.decorOpacity, 80);
-  store.getState().setEmployees(employees);
-  assert.equal(employees.length, 5);
-  assert.equal((await service.getBySlug("le-minh-chau")).id, "e2");
-  assert.equal(await service.getById("does-not-exist"), undefined);
-  const input = { ...employees[0], fullName: "Đặng Thị Ánh", avatarUrl: "" };
-  const first = await service.create(input);
-  const second = await service.create(input);
-  assert.equal(first.slug, "dang-thi-anh");
-  assert.match(second.slug, /^dang-thi-anh-[a-z0-9]{4}$/);
-  assert.notEqual(first.id, second.id);
-  const renamed = await service.update(first.id, {
-    ...first,
-    fullName: "Tên mới",
-    slug: "attempt-to-change",
-  });
-  assert.equal(renamed.slug, first.slug);
-  assert.equal(renamed.createdAt, first.createdAt);
-  const { toggleActive } = service;
-  await toggleActive(first.id);
-  assert.equal((await service.getById(first.id)).isActive, false);
-  const previousCount = (await service.getAll()).length;
-  const originalSet = global.localStorage.setItem;
-  global.localStorage.setItem = () => {
-    throw new Error("QuotaExceededError");
-  };
-  await assert.rejects(service.create(input), /Không thể lưu dữ liệu/);
-  assert.equal((await service.getAll()).length, previousCount);
-  global.localStorage.setItem = originalSet;
-  const snapshot = storage.get("ecard-employees");
-  store.getState().setEmployees([]);
-  storage.set("ecard-employees", snapshot);
-  await store.persist.rehydrate();
-  assert.equal((await service.getAll()).length, 7);
-  assert.equal((await service.getById(first.id)).fullName, "Tên mới");
-  assert.equal((await service.getById(first.id)).slug, first.slug);
-  await service.remove(second.id);
-  assert.equal(await service.getById(second.id), undefined);
-  await assert.rejects(service.update("missing", input));
+  const input = employees[0];
   const vcard = createVCard({ ...input, fullName: "Nguyễn; An, Bình\nDemo" });
   assert.ok(vcard.startsWith("BEGIN:VCARD\r\nVERSION:3.0\r\n"));
   assert.ok(vcard.includes("FN:Nguyễn\\; An\\, Bình\\nDemo"));
   assert.ok(vcard.endsWith("END:VCARD\r\n"));
   assert.equal(websiteUrl("qtmmedia.vn"), "https://qtmmedia.vn/");
   assert.equal(websiteUrl("javascript:alert(1)"), "");
-  await assert.rejects(authService.login("admin@qtmmedia.vn", "wrong"));
-  assert.equal(useAuthStore.getState().authenticated, false);
-  await authService.login("admin@qtmmedia.vn", "admin123");
-  const authSnapshot = storage.get("ecard-auth");
-  await authService.logout();
-  assert.equal(useAuthStore.getState().authenticated, false);
-  storage.set("ecard-auth", authSnapshot);
-  await useAuthStore.persist.rehydrate();
-  assert.equal(useAuthStore.getState().authenticated, true);
-  await service.reset();
-  assert.equal((await service.getAll()).length, 5);
-  assert.equal(
-    (await service.getAll()).every((e) => e.isActive),
-    true,
-  );
   console.log(
-    "PASS: CRUD, immutable QR URLs, persistence, vCard, auth, Vietnamese localization, 8 standalone profile templates and accessible colors.",
+    "PASS: vCard, content preservation, 8 standalone profile templates and accessible colors.",
   );
 }
 main().catch((error) => {

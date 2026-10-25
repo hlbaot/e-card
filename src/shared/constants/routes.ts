@@ -5,6 +5,7 @@ export const routes = {
   employees: "/admin/employees",
   newEmployee: "/admin/employees/new",
   cards: "/admin/cards",
+  profile: "/admin/profile",
   card: (slug: string) => `/card/${slug}`,
   employee: (id: string) => `/admin/employees/${id}`,
 };

@@ -2,30 +2,31 @@
 import { useEffect, useState } from "react";
 import { useEmployeeStore } from "@/client/store/employee.store";
 import { employeeService } from "@/client/services/employee.service";
-import { useHydration } from "./useHydration";
-import { localizeEmployee } from "@/shared/utils/localize";
+import { useAuthStore } from "@/client/store/auth.store";
 import type { Employee } from "@/shared/types/employee";
+
 export function useEmployees() {
-  const ready = useHydration();
+  const revision = useEmployeeStore((state) => state.revision);
+  const authenticated = useAuthStore((state) => state.authenticated);
   const [employees, setEmployees] = useState<Employee[]>([]);
-  const [loaded, setLoaded] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [error, setError] = useState("");
   useEffect(() => {
-    if (!ready) return;
+    if (!authenticated) return;
     let active = true;
-    const refresh = () => {
+    let sequence = 0;
+    const load = () => {
+      const current = ++sequence;
       void employeeService.getAll().then((data) => {
-        if (active) {
-          setEmployees(data.map(localizeEmployee));
-          setLoaded(true);
-        }
+        if (active && current === sequence) { setEmployees(data); setError(""); setReady(true); }
+      }).catch((reason) => {
+        if (active && current === sequence) { setError(reason instanceof Error ? reason.message : "Không thể tải nhân viên."); setReady(true); }
       });
     };
-    refresh();
-    const unsubscribe = useEmployeeStore.subscribe(refresh);
-    return () => {
-      active = false;
-      unsubscribe();
-    };
-  }, [ready]);
-  return { employees, ready: ready && loaded, ...employeeService };
+    load();
+    const onFocus = () => { if (document.visibilityState === "visible") load(); };
+    document.addEventListener("visibilitychange", onFocus);
+    return () => { active = false; document.removeEventListener("visibilitychange", onFocus); };
+  }, [revision, authenticated]);
+  return { employees: authenticated ? employees : [], ready: authenticated && ready, error, ...employeeService };
 }

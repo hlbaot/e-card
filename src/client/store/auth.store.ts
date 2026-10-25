@@ -1,14 +1,13 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+export interface AuthUser { id: string; email: string; createdAt?: string }
 export const useAuthStore = create<{
   authenticated: boolean;
-  setAuthenticated: (authenticated: boolean) => void;
-}>()(
-  persist(
-    (set) => ({
-      authenticated: false,
-      setAuthenticated: (authenticated) => set({ authenticated }),
-    }),
-    { name: "ecard-auth", skipHydration: true },
-  ),
-);
+  ready: boolean;
+  user: AuthUser | null;
+  setUser: (user: AuthUser | null) => void;
+}>()((set) => ({
+  authenticated: false,
+  ready: false,
+  user: null,
+  setUser: (user) => set({ user, authenticated: user !== null, ready: true }),
+}));

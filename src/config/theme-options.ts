@@ -11,10 +11,12 @@ export const backgrounds = [
 {id:"sand-warm",name:"Cát ấm",css:"linear-gradient(180deg,#FFFBF3 0%,#F8EBD4 100%)"}];
 export const decorOptions: { id: import("@/shared/types/employee").DecorKey | "none"; name: string }[] = [
   { id: "none", name: "Không" },
-  { id: "blobs", name: "Bong bóng" },
+  { id: "blobs", name: "Vệt nước" },
   { id: "circles", name: "Vòng tròn" },
   { id: "skyline", name: "Thành phố" },
-  { id: "waves", name: "Sóng" },
   { id: "bokeh", name: "Chấm sáng" },
+  { id: "leaves", name: "Cành lá" },
+  { id: "network", name: "Kết nối số" },
+  { id: "geometry", name: "Hình học" },
 ];
 export const colorPresets = ["#0F4C75","#1F2937","#0E9F6E","#7C3AED","#DC2626","#D97706","#38BDF8"];

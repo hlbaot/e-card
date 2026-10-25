@@ -1,25 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { Copy, Download, ExternalLink, MapPin, X } from "lucide-react";
 import { getPublicFields, type Employee } from "@/shared/types/employee";
-import { getTemplate, isDarkTheme } from "@/config/card-themes";
-import { contrastText, readableAccent } from "@/shared/utils/color";
 import { cardUrl, downloadQR } from "@/shared/utils/qr";
-import { cn } from "@/shared/utils/cn";
 import { useToast } from "@/client/components/ui/Toast";
-import { useAos } from "@/client/hooks/useAos";
 import { migrateCardTheme } from "@/shared/utils/migrate-theme";
-import { CardDecorations } from "./CardDecorations";
-import { CardHeader } from "./CardHeader";
-import { ProfileInfo } from "./ProfileInfo";
-import { ContactList } from "./ContactList";
-import { ActionGrid } from "./ActionGrid";
+import { ECard } from "./ECard";
 
 export function ProfileView({ employee }: { employee: Employee }) {
   const e = { ...employee, theme: migrateCardTheme(employee.theme) };
-  useAos(!!e);
 
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [addressModalOpen, setAddressModalOpen] = useState(false);
@@ -32,63 +23,6 @@ export function ProfileView({ employee }: { employee: Employee }) {
     e.offices.length > 0
       ? e.offices
       : [{ label: "Trụ sở chính", address: "Chưa cập nhật địa chỉ" }];
-  const sloganText =
-    !e.slogan ||
-    e.slogan.trim().toLowerCase() ===
-      "let's create a brighter tomorrow together"
-      ? "Cùng nhau kiến tạo tương lai tươi sáng"
-      : e.slogan;
-
-  const template = getTemplate(e.theme.templateId);
-  const dark = isDarkTheme(e.theme);
-  const rawPrimary = e.theme.primaryColor || template.defaultColor;
-  const accent = readableAccent(rawPrimary, dark);
-  const isDefaultQtm =
-    e.theme.templateId === "bubble-blue" &&
-    !dark &&
-    rawPrimary.toLowerCase() === "#0f4c75";
-
-  const pvPrimary = isDefaultQtm ? "#0F4C75" : accent;
-  const pvAccent = isDefaultQtm ? "#1B8FD0" : accent;
-  const pvStrong = dark ? "#F8FAFC" : isDefaultQtm ? "#0A2540" : "#111827";
-  const pvBody = dark ? "#E2E8F0" : isDefaultQtm ? "#163A59" : "#334155";
-  const pvMuted = dark
-    ? "rgba(226,232,240,0.72)"
-    : isDefaultQtm
-      ? "#3B698B"
-      : "#64748B";
-  const pvBtnBg = dark
-    ? `color-mix(in srgb, ${pvPrimary} 16%, rgba(255,255,255,0.06))`
-    : isDefaultQtm
-      ? "#E2F0FC"
-      : `color-mix(in srgb, ${pvPrimary} 12%, #FFFFFF)`;
-  const pvBtnBorder = dark
-    ? `color-mix(in srgb, ${pvPrimary} 34%, transparent)`
-    : `color-mix(in srgb, ${pvPrimary} 16%, transparent)`;
-  const pvBtnHoverBg = pvPrimary;
-  const pvBtnHoverText = contrastText(pvPrimary);
-  const pvAvatarBorder = dark
-    ? `color-mix(in srgb, ${pvAccent} 55%, #FFFFFF)`
-    : "#FFFFFF";
-
-  const themeVars = {
-    "--pv-primary": pvPrimary,
-    "--pv-accent": pvAccent,
-    "--pv-strong": pvStrong,
-    "--pv-body": pvBody,
-    "--pv-muted": pvMuted,
-    "--pv-btn-bg": pvBtnBg,
-    "--pv-btn-text": pvPrimary,
-    "--pv-btn-border": pvBtnBorder,
-    "--pv-btn-hover-bg": pvBtnHoverBg,
-    "--pv-btn-hover-text": pvBtnHoverText,
-    "--pv-avatar-border": pvAvatarBorder,
-    "--pv-pill-bg": dark ? "rgba(255,255,255,0.09)" : "rgba(255,255,255,0.85)",
-    "--pv-pill-border": dark
-      ? `color-mix(in srgb, ${pvPrimary} 35%, transparent)`
-      : `color-mix(in srgb, ${pvPrimary} 18%, transparent)`,
-  } as CSSProperties;
-
   useEffect(() => {
     if (!qrModalOpen && !addressModalOpen) return;
     const onKeyDown = (ev: KeyboardEvent) => {
@@ -145,115 +79,11 @@ export function ProfileView({ employee }: { employee: Employee }) {
   };
 
   return (
-    <main
-      className={cn(
-        "profile-view-root relative h-dvh w-full overflow-hidden flex flex-col justify-between select-none",
-        `profile-template-${e.theme.templateId}`,
-        dark && "profile-view-dark",
-      )}
-      style={themeVars}
-      aria-label={`Hồ sơ của ${e.fullName}`}
-    >
-      {/* Shared background and sparse SVG decorations */}
-      <CardDecorations
-        theme={e.theme}
-        showDecor={e.theme.showDecor ?? true}
-        variant="profile"
-      />
-
-      {/* Hidden high-res QR canvas for PNG export */}
+    <main className="qtm-public-profile">
+      <ECard employee={e} variant="profile" onOpenQr={() => setQrModalOpen(true)} onShare={handleShare} onOpenAddresses={() => setAddressModalOpen(true)} />
       <div className="sr-only" aria-hidden="true">
-        <QRCodeCanvas
-          ref={qrCanvasRef}
-          value={url}
-          size={512}
-          level="H"
-          marginSize={4}
-        />
+        <QRCodeCanvas ref={qrCanvasRef} value={url} size={512} level="H" marginSize={4} />
       </div>
-
-      {/* Main single-screen container:
-          - Mobile (< 768px): 1 column flex-col justify-between
-          - Desktop (>= 768px): 2 columns (md:grid md:grid-cols-12, left 5 cols, right 7 cols)
-      */}
-      <div className="ecard-shell relative z-10 flex flex-col justify-between h-full w-full max-w-[460px] md:max-w-[1160px] mx-auto min-h-0">
-        {/* ROW 1: Header */}
-        <CardHeader
-          onOpenQr={() => setQrModalOpen(true)}
-          onShare={handleShare}
-          dark={dark}
-        />
-
-        {/* ROW 2: Main Content (1 col on mobile < 768px, 2 cols on desktop >= 768px) */}
-        <div className="ecard-main flex-1 min-h-0 flex flex-col justify-evenly md:grid md:grid-cols-12 md:items-center md:gap-8 lg:gap-12">
-          {/* Left Column (md:col-span-5): Avatar + Name + Position + Company */}
-          <section
-            aria-label="Thông tin cá nhân"
-            className="ecard-col-left md:col-span-5 min-h-0 flex flex-col items-center md:items-start justify-center"
-          >
-            <ProfileInfo employee={e} />
-          </section>
-
-          {/* Right Column (md:col-span-7): "Kết nối với tôi" (desktop) + ContactList + ActionGrid */}
-          <section
-            aria-label="Thông tin liên hệ và hành động"
-            className="ecard-col-right md:col-span-7 min-h-0 flex flex-col justify-center w-full gap-[clamp(6px,1.3dvh,16px)]"
-          >
-            <div
-              data-aos="fade-left"
-              data-aos-delay="150"
-              className="hidden md:flex items-center gap-3"
-            >
-              <span
-                className="text-xs font-extrabold uppercase tracking-[0.18em]"
-                style={{ color: "var(--pv-primary)" }}
-              >
-                Kết nối với tôi
-              </span>
-              <span
-                className="h-px flex-1 opacity-25"
-                style={{ background: "var(--pv-primary)" }}
-                aria-hidden="true"
-              />
-            </div>
-
-            <ContactList
-              employee={e}
-              onOpenAddresses={
-                pf.offices ? () => setAddressModalOpen(true) : undefined
-              }
-            />
-
-            <ActionGrid employee={e} />
-          </section>
-        </div>
-
-        {/* ROW 3: Footer (Slogan script font + CHẤT LƯỢNG · CÔNG NGHỆ · TƯ DUY) */}
-        <div
-          data-aos="fade-up"
-          data-aos-delay="650"
-          className="ecard-footer-aos shrink-0"
-        >
-          <footer className="ecard-footer flex flex-col md:flex-row items-center justify-between gap-0.5 md:gap-4 pt-0.5">
-            <p
-              className="qtm-slogan text-center md:text-left truncate max-w-full"
-              style={{
-                fontFamily: "var(--font-handwriting), cursive",
-                color: "var(--pv-primary)",
-              }}
-            >
-              {sloganText}
-            </p>
-            <p
-              className="qtm-motto font-extrabold uppercase tracking-[0.22em] text-center md:text-right shrink-0"
-              style={{ color: "var(--pv-muted)" }}
-            >
-              CHẤT LƯỢNG · CÔNG NGHỆ · TƯ DUY
-            </p>
-          </footer>
-        </div>
-      </div>
-
       {/* MODAL 1: QR CODE (Dark QTM Glass Modal) */}
       {qrModalOpen && (
         <div

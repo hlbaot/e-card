@@ -1,4 +1,5 @@
 "use client";
+import "@/client/components/card/card-styles.css";
 import { useState } from "react";
 import { migrateCardTheme } from "@/shared/utils/migrate-theme";
 import { Palette, Check, WandSparkles, Sparkles } from "lucide-react";
@@ -11,9 +12,9 @@ import {
 } from "@/shared/constants/card-themes";
 import type { CardTheme } from "@/shared/types/employee";
 import { CardDecorations, DecorArtwork } from "@/client/components/card/CardDecorations";
-import { Switch } from "@/client/components/ui/Switch";
+import { DecorSwatch } from "@/client/components/card/DecorIllustration";
 import { cn } from "@/shared/utils/cn";
-import { contrastText } from "@/shared/utils/color";
+import { contrastText, readableAccent } from "@/shared/utils/color";
 
 export function ThemeCustomizer({
   theme: rawTheme,
@@ -35,7 +36,6 @@ export function ThemeCustomizer({
   };
 
   const template = getTemplate(theme.templateId);
-  const showDecor = theme.showDecor ?? true;
   const decorOpacity = theme.decorOpacity ?? template.defaultDecorOpacity;
 
   return (
@@ -89,18 +89,20 @@ export function ThemeCustomizer({
               }
             >
               <span
-                className={`template-art art-${t.id}`}
+                className={`template-art qtm-art-${t.id}`}
+                aria-hidden="true"
                 style={
                   {
-                    "--thumb-color": t.defaultColor,
+                    "--thumb-color": readableAccent(t.defaultColor, false, "#E0E0E0"),
                   } as React.CSSProperties
                 }
               >
                 <CardDecorations theme={thumbTheme} variant="thumb" />
                 <span className="art-brand">QTM</span>
                 <i className="art-avatar" />
-                <span className="art-name" />
-                <span className="art-role" />
+                <span className="art-name">NGUYỄN MINH AN</span>
+                <i className="art-rule" />
+                <span className="art-role">Chuyên viên phát triển</span>
                 <span className="art-buttons">
                   <i />
                   <i />
@@ -187,7 +189,7 @@ export function ThemeCustomizer({
           </h3>
         </div>
         <div className="decor-suggestion">
-          <span>Gợi ý cho mẫu này: {template.defaultDecor.map((key) => decorOptions.find((option) => option.id === key)?.name).join(" + ")}</span>
+          <span>Gợi ý cho mẫu này: {template.defaultDecor.map((key) => decorOptions.find((option) => option.id === key)?.name).join(" + ") || "Không họa tiết"}</span>
           <button type="button" onClick={() => set({ decor: [...template.defaultDecor], decorOpacity: template.defaultDecorOpacity })}>Áp dụng gợi ý</button>
         </div>
         <div className="decor-options" role="group" aria-label="Họa tiết nền (có thể chọn nhiều)">
@@ -200,7 +202,7 @@ export function ThemeCustomizer({
                   set({ decor: id === "none" ? [] : selected ? theme.decor.filter((key) => key !== id) : [...theme.decor, id] });
                 }} />
                 <span className="decor-thumbnail" style={{ color: theme.primaryColor }}>
-                  {option.id === "none" ? <svg viewBox="0 0 80 50" aria-hidden="true"><path d="M29 36L51 14" stroke="currentColor" strokeWidth="1" /></svg> : <DecorArtwork decor={option.id} seed={theme.templateId} />}
+                  {option.id === "none" ? <svg viewBox="0 0 80 50" aria-hidden="true"><path d="M29 36L51 14" stroke="currentColor" strokeWidth="1" /></svg> : option.id === "skyline" ? <DecorArtwork decor={option.id} seed={theme.templateId} /> : <DecorSwatch decor={option.id} />}
                 </span>
                 <span>{option.name}</span>
                 {selected && <Check className="decor-tick" size={14} />}
@@ -235,40 +237,6 @@ export function ThemeCustomizer({
             <span>100% (Rõ nét)</span>
           </div>
         </div>
-      </div>
-
-      <div className="customizer-section">
-        <div className="theme-group-heading">
-          <h3>Chi tiết trang trí</h3>
-          <span>{showDecor ? "Đang bật" : "Đang tắt"}</span>
-        </div>
-
-        <div className="shape-row">
-          <div>
-            <strong className="text-[11px] text-white block">
-              Hiển thị họa tiết góc & khung viền ({template.name})
-            </strong>
-          </div>
-          <Switch
-            label="Hiển thị họa tiết trang trí"
-            checked={showDecor}
-            onChange={(value) => set({ showDecor: value })}
-          />
-        </div>
-
-        {showDecor &&
-          template.shapes.map((s) => (
-            <div className="shape-row" key={s.id}>
-              <span>{s.label}</span>
-              <Switch
-                label={s.label}
-                checked={theme.shapes[s.id] === true}
-                onChange={(value) =>
-                  set({ shapes: { ...theme.shapes, [s.id]: value } })
-                }
-              />
-            </div>
-          ))}
       </div>
 
       {/* BƯỚC: MÀU CHỦ ĐẠO */}
@@ -342,36 +310,6 @@ export function ThemeCustomizer({
         </p>
       </div>
 
-      {/* BƯỚC: CÀI ĐẶT AVATAR & NÚT */}
-      <div className="customizer-section settings-grid">
-        <label>
-          Kích thước ảnh đại diện
-          <select
-            className="control-select"
-            value={theme.avatarSize}
-            onChange={(e) =>
-              set({ avatarSize: e.target.value as CardTheme["avatarSize"] })
-            }
-          >
-            <option value="sm">Nhỏ</option>
-            <option value="md">Vừa</option>
-            <option value="lg">Lớn</option>
-          </select>
-        </label>
-        <label>
-          Hình dáng ảnh đại diện
-          <select
-            className="control-select"
-            value={theme.avatarShape}
-            onChange={(e) =>
-              set({ avatarShape: e.target.value as CardTheme["avatarShape"] })
-            }
-          >
-            <option value="circle">Hình tròn</option>
-            <option value="rounded">Bo góc</option>
-          </select>
-        </label>
-      </div>
     </section>
   );
 }

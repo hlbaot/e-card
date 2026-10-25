@@ -1,7 +1,7 @@
 import type { CardTheme, DecorKey } from "@/shared/types/employee";
-import { getTemplate, isDarkTheme } from "@/config/card-themes";
+import { getTemplate } from "@/config/card-themes";
 
-const keys: DecorKey[] = ["blobs", "circles", "skyline", "waves", "bokeh"];
+const keys: DecorKey[] = ["blobs", "circles", "skyline", "waves", "bokeh", "leaves", "network", "geometry"];
 type StoredTheme = Omit<CardTheme, "decor"> & {
   decor?: unknown;
   patternId?: string;
@@ -17,7 +17,7 @@ export function migrateCardTheme(stored: StoredTheme): CardTheme {
   const selected: DecorKey[] = Array.isArray(decor)
     ? [...new Set(decor.filter((key): key is DecorKey => keys.includes(key as DecorKey))) ]
     : legacy
-      ? oldPattern === "none" ? [] : [isDarkTheme({ ...rest, decor: [] }) ? "circles" : "blobs"]
+      ? oldPattern === "none" ? [] : [stored.templateId === "dark-tech" || stored.templateId === "luxury" ? "circles" : "blobs"]
       : [...template.defaultDecor];
   const value = stored.decorOpacity;
   const opacity = typeof value === "number" && Number.isFinite(value)

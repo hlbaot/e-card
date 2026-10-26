@@ -32,6 +32,3 @@ export const employeeOptions = (userId: string, id: string, client?: QueryClient
     initialDataUpdatedAt: () => client?.getQueryState(listKey)?.dataUpdatedAt,
   });
 };
-export const statsOptions = (userId: string) => queryOptions({
-  queryKey: queryKeys.stats.detail(userId), queryFn: ({ signal }) => employeeApi.getStats(signal),
-});

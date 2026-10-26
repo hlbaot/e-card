@@ -25,12 +25,12 @@ const emptySubscribe = () => () => {};
 
 export function HomeView({ employees }: { employees: Employee[] }) {
   const ready = true;
-  useAos(ready);
   const { ready: authReady, authenticated } = useAuth();
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [search, setSearch] = useState("");
   const deferredSearch = useDeferredValue(search);
   const [activeFilter, setActiveFilter] = useState("all");
+  useAos(ready, `${deferredSearch}:${activeFilter}`);
 
   const hasLocalSession = useSyncExternalStore(
     emptySubscribe,

@@ -6,7 +6,6 @@ import {
   ContactRound,
   Globe,
   MapPin,
-  ChevronRight,
 } from "lucide-react";
 import { getPublicFields } from "@/shared/types";
 import type { Employee } from "@/shared/types";
@@ -86,7 +85,8 @@ export function CardActions({
         const aosProps = animate
           ? {
               "data-aos": "zoom-in-up",
-              "data-aos-delay": String(300 + index * 55),
+              "data-aos-delay": String(200 + index * 50),
+              "data-aos-duration": "500",
             }
           : {};
         return href ? (
@@ -102,7 +102,6 @@ export function CardActions({
               <Icon size={16} />
               <span>{label}</span>
             </span>
-            <ChevronRight size={13} className="action-btn-chevron" />
           </a>
         ) : (
           <button
@@ -121,7 +120,6 @@ export function CardActions({
               <Icon size={16} />
               <span>{label}</span>
             </span>
-            <ChevronRight size={13} className="action-btn-chevron" />
           </button>
         );
       })}

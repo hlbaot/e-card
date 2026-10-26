@@ -1,5 +1,71 @@
 import type { CardTheme, DecorKey } from "@/shared/types";
 
+function AmbientCluster({ position }: { position: string }) {
+  return (
+    <svg className={`qtm-ambient-cluster qtm-ambient-cluster--${position}`} viewBox="0 0 180 240" fill="none" focusable="false">
+      <g stroke="currentColor" strokeWidth="0.8" opacity="0.3">
+        <circle cx="38" cy="46" r="39" />
+        <circle cx="38" cy="46" r="51" strokeDasharray="2 7" />
+        <path d="M-15 72C42 38 105 105 67 155S54 214 166 247" />
+        <path d="M-15 82C42 48 115 115 77 165S64 224 176 257" />
+        <path d="M20 126L62 110L105 143L84 186L135 206" strokeDasharray="3 5" />
+      </g>
+      <g fill="currentColor">
+        <path d="M108 48Q108 63 123 63Q108 63 108 78Q108 63 93 63Q108 63 108 48Z" opacity="0.5" />
+        <path d="M37 157Q37 167 47 167Q37 167 37 177Q37 167 27 167Q37 167 37 157Z" opacity="0.45" />
+        <path d="M135 183Q135 190 142 190Q135 190 135 197Q135 190 128 190Q135 190 135 183Z" opacity="0.4" />
+        <circle cx="74" cy="23" r="3" opacity="0.5" />
+        <circle cx="143" cy="103" r="9" opacity="0.18" />
+        <circle cx="91" cy="107" r="4" opacity="0.4" />
+        <circle cx="20" cy="126" r="3" opacity="0.45" />
+        <circle cx="62" cy="110" r="3.5" opacity="0.4" />
+        <circle cx="105" cy="143" r="3" opacity="0.5" />
+        <circle cx="84" cy="186" r="3.5" opacity="0.4" />
+        <circle cx="135" cy="206" r="3" opacity="0.45" />
+        <circle cx="24" cy="211" r="7" opacity="0.2" />
+        <circle cx="61" cy="223" r="2" opacity="0.5" />
+      </g>
+    </svg>
+  );
+}
+
+/** A flexible illustration occupies only the space left below the contact buttons. */
+export function ProfileConnectionArtwork({ theme }: { theme: CardTheme }) {
+  if (theme.showDecor === false || !theme.decor?.length) return null;
+
+  return (
+    <div className="qtm-connection-art" aria-hidden="true">
+      <svg viewBox="0 0 360 150" fill="none" focusable="false">
+        <g stroke="currentColor" strokeWidth="0.8" opacity="0.3">
+          <path d="M-24 112C45 34 98 142 180 78S307 16 384 74" />
+          <path d="M-24 125C45 47 98 155 180 91S307 29 384 87" />
+          <path d="M-24 138C45 60 98 168 180 104S307 42 384 100" />
+          <ellipse cx="180" cy="75" rx="87" ry="43" transform="rotate(-18 180 75)" />
+          <ellipse cx="180" cy="75" rx="104" ry="56" transform="rotate(-18 180 75)" strokeDasharray="2 7" opacity="0.6" />
+        </g>
+        {/* A connected-node signature echoes the QTM brand mark. */}
+        <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.55">
+          <path d="M151 78L172 57M161 97L182 76L203 55M192 95L213 74" />
+          <g fill="currentColor" stroke="none">
+            {[[151, 78], [172, 57], [161, 97], [182, 76], [203, 55], [192, 95], [213, 74]].map(([cx, cy]) => (
+              <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="4.5" />
+            ))}
+          </g>
+        </g>
+        <g fill="currentColor">
+          <circle cx="88" cy="52" r="5" opacity="0.14" />
+          <circle cx="281" cy="103" r="8" opacity="0.1" />
+          <circle cx="49" cy="100" r="2.5" opacity="0.38" />
+          <circle cx="300" cy="43" r="3" opacity="0.35" />
+          <circle cx="235" cy="30" r="2" opacity="0.3" />
+          <path d="M112 94Q112 104 122 104Q112 104 112 114Q112 104 102 104Q112 104 112 94Z" opacity="0.45" />
+          <path d="M257 43Q257 55 269 55Q257 55 257 67Q257 55 245 55Q257 55 257 43Z" opacity="0.4" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
 /**
  * Rich, delicate background decorations based on the user's sample (Image 3):
  * - Fluid organic water splash, ripples, and floating bubbles surrounding the avatar.
@@ -15,6 +81,7 @@ export function ProfileDecorations({ theme }: { theme: CardTheme }) {
   }
 
   return (
+    <>
     <svg
       className="qtm-safe-decor"
       viewBox="0 0 390 694"
@@ -409,6 +476,19 @@ export function ProfileDecorations({ theme }: { theme: CardTheme }) {
         </g>
       )}
     </svg>
+    <div className="qtm-ambient-decor" aria-hidden="true">
+      {["top-left", "top-right", "bottom-left", "bottom-right"].map((position) => (
+        <AmbientCluster key={position} position={position} />
+      ))}
+      <svg className="qtm-ambient-waves" viewBox="0 0 1000 120" fill="none" preserveAspectRatio="none" focusable="false">
+        <g stroke="currentColor" strokeWidth="0.8" opacity="0.24">
+          <path d="M-40 85C160-40 310 160 520 65S820-10 1040 80" />
+          <path d="M-40 97C160-28 310 172 520 77S820 2 1040 92" />
+          <path d="M-40 109C160-16 310 184 520 89S820 14 1040 104" />
+        </g>
+      </svg>
+    </div>
+    </>
   );
 }
 

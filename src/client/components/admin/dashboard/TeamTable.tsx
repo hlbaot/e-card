@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
 import { Pencil, Trash2, ArrowUpRight } from "lucide-react";
 import type { Employee } from "@/shared/types";
@@ -28,14 +28,17 @@ export function TeamTable({
   const { remove, toggleActive, isToggling } = useEmployeeMutations();
   const toast = useToast();
 
-  const handleToggle = async (e: Employee) => {
-    try {
-      await toggleActive(e.id);
-      toast(e.isActive ? "Đã tắt danh thiếp" : "Đã bật danh thiếp");
-    } catch (err) {
-      toast(err instanceof Error ? err.message : "Không thể đổi trạng thái", "error");
-    }
-  };
+  const handleToggle = useCallback(
+    async (e: Employee) => {
+      try {
+        await toggleActive(e.id);
+        toast(e.isActive ? "Đã tắt danh thiếp" : "Đã bật danh thiếp");
+      } catch (err) {
+        toast(err instanceof Error ? err.message : "Không thể đổi trạng thái", "error");
+      }
+    },
+    [toggleActive, toast],
+  );
 
   return (
     <>

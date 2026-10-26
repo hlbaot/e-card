@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import Link from "next/link";
 import { Pencil, Trash2, Phone, Mail } from "lucide-react";
 import type { Employee } from "@/shared/types";
@@ -14,7 +15,7 @@ export interface TeamRowCardProps {
   onDeleteRequest: (employee: Employee) => void;
 }
 
-export function TeamRowCard({
+export const TeamRowCard = memo(function TeamRowCard({
   employee: e,
   onToggleActive,
   toggling,
@@ -112,4 +113,4 @@ export function TeamRowCard({
       </div>
     </article>
   );
-}
+});

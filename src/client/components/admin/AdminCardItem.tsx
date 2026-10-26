@@ -1,20 +1,27 @@
 "use client";
-import { useRef, useState } from "react";
+import { memo, useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
-import { QRCodeCanvas } from "qrcode.react";
 import { Eye, QrCode, Download, Pencil } from "lucide-react";
 import type { Employee } from "@/shared/types";
 import { CardListContent } from "@/client/components/card/CardListItem";
-import { QRPanel } from "@/client/components/card/QRPanel";
 import { CopyButton } from "@/client/components/ui/CopyButton";
 import { Modal } from "@/client/components/ui/Modal";
 import { useToast } from "@/client/components/ui/Toast";
-import { cardUrl, downloadQR } from "@/shared/utils/qr";
+import { cardUrl, downloadQrBySlug } from "@/shared/utils/qr";
 import { routes } from "@/shared/constants/routes";
 
-export function AdminCardItem({ employee: e }: { employee: Employee }) {
+const QRPanel = dynamic(
+  () => import("@/client/components/card/QRPanel").then((m) => m.QRPanel),
+  { ssr: false },
+);
+
+export const AdminCardItem = memo(function AdminCardItem({
+  employee: e,
+}: {
+  employee: Employee;
+}) {
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLCanvasElement>(null);
   const toast = useToast();
   const url = cardUrl(e.slug);
 
@@ -72,23 +79,18 @@ export function AdminCardItem({ employee: e }: { employee: Employee }) {
         <button
           className="btn btn-ghost"
           type="button"
-          onClick={() => {
-            downloadQR(ref.current, e.slug);
-            toast("Đã tải mã QR PNG");
+          onClick={async () => {
+            try {
+              await downloadQrBySlug(e.slug, url);
+              toast("Đã tải mã QR PNG");
+            } catch {
+              toast("Không thể tạo mã QR", "error");
+            }
           }}
         >
           <Download size={14} />
           Tải QR (PNG)
         </button>
-      </div>
-      <div className="admin-card-qr" aria-hidden="true">
-        <QRCodeCanvas
-          ref={ref}
-          value={url}
-          size={512}
-          level="H"
-          marginSize={4}
-        />
       </div>
       {open && (
         <Modal title={`Mã QR · ${e.fullName}`} onClose={() => setOpen(false)}>
@@ -97,4 +99,4 @@ export function AdminCardItem({ employee: e }: { employee: Employee }) {
       )}
     </article>
   );
-}
+});

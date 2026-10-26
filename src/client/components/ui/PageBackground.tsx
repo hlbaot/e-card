@@ -1,5 +1,3 @@
-"use client";
-
 export function PageBackground() {
   const nodes = [
     { cx: 8, cy: 14, r: 2.2 },
@@ -46,23 +44,23 @@ export function PageBackground() {
       aria-hidden="true"
       className="qtm-page-bg pointer-events-none fixed inset-0 -z-10 overflow-hidden select-none"
     >
-      {/* Ambient cyan & violet corner glows */}
+      {/* Ambient cyan & violet corner glows using soft radial gradients (no heavy GPU blur-3xl) */}
       <div
-        className="absolute -top-[18%] -left-[10%] h-[55%] w-[55%] rounded-full blur-3xl"
+        className="absolute -top-[18%] -left-[10%] h-[55%] w-[55%] rounded-full"
         style={{
           background:
             "radial-gradient(circle, rgba(34,211,238,0.13) 0%, rgba(59,130,246,0.05) 45%, transparent 72%)",
         }}
       />
       <div
-        className="absolute -bottom-[20%] -right-[10%] h-[65%] w-[65%] rounded-full blur-3xl"
+        className="absolute -bottom-[20%] -right-[10%] h-[65%] w-[65%] rounded-full"
         style={{
           background:
             "radial-gradient(circle, rgba(139,92,246,0.22) 0%, rgba(26,20,69,0.12) 50%, transparent 75%)",
         }}
       />
       <div
-        className="absolute top-[30%] left-[42%] h-[40%] w-[40%] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
+        className="absolute top-[30%] left-[42%] h-[40%] w-[40%] -translate-x-1/2 -translate-y-1/2 rounded-full"
         style={{
           background:
             "radial-gradient(circle, rgba(45,212,191,0.06) 0%, transparent 70%)",

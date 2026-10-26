@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { AuthUser } from "@/shared/types";
+import { QueryProvider } from "@/client/providers/QueryProvider";
 import { AuthGuard } from "@/client/components/layout/AuthGuard";
 import { AdminSidebar } from "@/client/components/layout/AdminSidebar";
 import { ACCESS_COOKIE, REFRESH_COOKIE } from "@/server/auth/http";
@@ -42,8 +43,10 @@ export default async function AdminLayout({
   }
 
   return (
-    <AuthGuard initialUser={initialUser}>
-      <AdminSidebar>{children}</AdminSidebar>
-    </AuthGuard>
+    <QueryProvider>
+      <AuthGuard initialUser={initialUser}>
+        <AdminSidebar>{children}</AdminSidebar>
+      </AuthGuard>
+    </QueryProvider>
   );
 }

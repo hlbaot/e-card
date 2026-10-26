@@ -1,24 +1,36 @@
 "use client";
+import { useDeferredValue, useMemo } from "react";
 import { useEmployeeStore } from "@/client/store/employee.store";
 import Link from "next/link";
 import { Plus, Search, ArrowRight } from "lucide-react";
 import { useEmployees } from "@/client/hooks/useEmployees";
-import { useAos } from "@/client/hooks/useAos";
 import { EmployeeTable } from "@/client/components/admin/EmployeeTable";
 import { Skeleton } from "@/client/components/ui/Skeleton";
 import { slugify } from "@/shared/utils/slugify";
 
 export function AdminEmployeesView() {
   const { employees, ready, error } = useEmployees();
-  useAos(ready);
   const search = useEmployeeStore(state => state.employeeSearch);
   const setSearch = useEmployeeStore(state => state.setEmployeeSearch);
-  const filtered = employees.filter((e) =>
-    slugify(`${e.fullName} ${e.position} ${e.email}`).includes(slugify(search)),
+  const deferredSearch = useDeferredValue(search);
+  const normalizedSearch = useMemo(
+    () => slugify(deferredSearch),
+    [deferredSearch],
+  );
+  const filtered = useMemo(
+    () =>
+      !normalizedSearch
+        ? employees
+        : employees.filter((e) =>
+            slugify(`${e.fullName} ${e.position} ${e.email}`).includes(
+              normalizedSearch,
+            ),
+          ),
+    [employees, normalizedSearch],
   );
   return (
-    <>
-      <div className="page-heading" data-aos="fade-up" data-aos-delay="50">
+    <div className="admin-fade-in">
+      <div className="page-heading">
         <div>
           <div className="eyebrow mb-2">QTM MEDIATECH PLATFORM</div>
           <h1>
@@ -36,7 +48,7 @@ export function AdminEmployeesView() {
         </Link>
       </div>
       {error && <p role="alert" className="panel text-red-400">{error}</p>}
-      <section className="panel" data-aos="fade-up" data-aos-delay="100">
+      <section className="panel">
         <div className="table-toolbar">
           <label className="search-box">
             <Search size={16} />
@@ -60,6 +72,6 @@ export function AdminEmployeesView() {
           </>
         )}
       </section>
-    </>
+    </div>
   );
 }

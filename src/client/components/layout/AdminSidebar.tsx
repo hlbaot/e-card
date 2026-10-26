@@ -1,7 +1,7 @@
 "use client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/client/store/auth.store";
-import { employeesOptions, statsOptions } from "@/client/queries/employees";
+import { employeesOptions } from "@/client/queries/employees";
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -26,7 +26,6 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
   const prefetch = (href: string) => {
     if (!userId) return;
     if ([routes.admin, routes.employees, routes.cards].includes(href)) void client.prefetchQuery(employeesOptions(userId));
-    if (href === routes.admin) void client.prefetchQuery(statsOptions(userId));
   };
   const [open, setOpen] = useState(false);
   const pathname = usePathname();

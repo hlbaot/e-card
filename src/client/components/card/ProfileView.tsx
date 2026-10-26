@@ -7,10 +7,12 @@ import { getPublicFields } from "@/shared/types";
 import type { Employee } from "@/shared/types";
 import { cardUrl, downloadQR } from "@/shared/utils/qr";
 import { useToast } from "@/client/components/ui/Toast";
+import { useAos } from "@/client/hooks/useAos";
 import { migrateCardTheme } from "@/shared/utils/migrate-theme";
 import { ECard } from "./ECard";
 
 export function ProfileView({ employee }: { employee: Employee }) {
+  useAos(true);
   const e = { ...employee, theme: migrateCardTheme(employee.theme) };
 
   const [qrModalOpen, setQrModalOpen] = useState(false);

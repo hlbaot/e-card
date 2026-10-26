@@ -225,3 +225,70 @@ test("avatar adapter sends the configured Cloudinary preset and hides provider e
     else process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET = originalPreset;
   }
 });
+
+test("adminHandler runs GET in parallel, never leaks data or masks 401 when token fails, and keeps writes sequential", async () => {
+  process.env.DATABASE_URL = "postgresql://localhost:5432/admin_tests_never_connected";
+  process.env.JWT_SECRET = "test-only-secret-with-at-least-32-bytes";
+  process.env.NEXT_PUBLIC_SITE_URL = "https://ecard.example.com";
+  const { NextRequest, NextResponse } = await import("next/server");
+  const { serverAuth } = await import("../src/server/auth/runtime");
+  const { adminHandler } = await import("../src/server/admin/http");
+  const originalCurrentUser = serverAuth.currentUser;
+
+  try {
+    // 1. Verify GET runs auth and action concurrently
+    const events: string[] = [];
+    serverAuth.currentUser = async (token) => {
+      events.push("auth:start");
+      await new Promise((resolve) => setTimeout(resolve, 15));
+      events.push("auth:end");
+      if (token !== "valid") throw new AuthError();
+      return { id: "admin", email: "admin@example.com" };
+    };
+
+    const getReq = (cookie: string) =>
+      new NextRequest("https://ecard.example.com/api/admin/employees", {
+        method: "GET",
+        headers: { cookie, origin: "https://ecard.example.com" },
+      });
+
+    const okRes = await adminHandler(getReq("ecard_access=valid"), async () => {
+      events.push("action:start");
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      events.push("action:end");
+      return NextResponse.json({ secretData: "allowed" });
+    });
+    assert.equal(okRes.status, 200);
+    // action:start happened before auth:end because they ran in parallel
+    assert.ok(events.indexOf("action:start") < events.indexOf("auth:end"));
+
+    // 2. When token is invalid on GET, action result is discarded (no data leak) and status is 401
+    const unauthRes = await adminHandler(getReq("ecard_access=invalid"), async () => {
+      return NextResponse.json({ secretData: "TOP_SECRET_LEAK" });
+    });
+    assert.equal(unauthRes.status, 401);
+    const unauthText = await unauthRes.text();
+    assert.ok(!unauthText.includes("TOP_SECRET_LEAK"));
+
+    // 3. When token is invalid on GET AND action throws an error first (e.g. 400/404/500), 401 is still returned
+    const maskedRes = await adminHandler(getReq("ecard_access=invalid"), async () => {
+      throw new AuthError("ID nhân viên không hợp lệ.", 400);
+    });
+    assert.equal(maskedRes.status, 401);
+
+    // 4. Write requests (POST/PATCH/DELETE) remain sequential: action does not run when auth fails
+    let writeExecuted = false;
+    const postReq = new NextRequest("https://ecard.example.com/api/admin/employees", {
+      method: "POST",
+      headers: { cookie: "ecard_access=invalid", origin: "https://ecard.example.com" },
+    });
+    const postRes = await adminHandler(postReq, async () => {
+      writeExecuted = true;
+      return NextResponse.json({ created: true }, { status: 201 });
+    });
+    assert.equal(postRes.status, 401);
+    assert.equal(writeExecuted, false);
+  } finally {
+    serverAuth.currentUser = originalCurrentUser;
+  }
+});

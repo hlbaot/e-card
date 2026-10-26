@@ -1,23 +1,53 @@
 "use client";
 
-import { useEffect } from "react";
+import type { AuthUser } from "@/shared/types";
 import { useAuthStore } from "@/client/store/auth.store";
 import { authApi } from "@/api/auth.api";
 import { withAuthLock } from "@/client/auth/session-lock";
 
+export const SESSION_CHECK_THROTTLE_MS = 60_000;
+
 // Shared across hook instances so restore cannot race login/logout.
 let restoring: Promise<void> | undefined;
+let lastCheckedAt = 0;
+
+export function markSessionChecked(timestamp = Date.now()) {
+  lastCheckedAt = timestamp;
+}
+
+export function shouldCheckSessionOnVisibility(
+  now = Date.now(),
+  throttleMs = SESSION_CHECK_THROTTLE_MS,
+) {
+  if (lastCheckedAt <= 0) return true;
+  return now - lastCheckedAt >= throttleMs;
+}
+
+export function hydrateAuthUser(user: AuthUser) {
+  const current = useAuthStore.getState();
+  if (
+    !current.ready ||
+    !current.authenticated ||
+    current.user?.id !== user.id ||
+    current.user?.email !== user.email
+  ) {
+    current.setUser(user);
+  }
+  lastCheckedAt = Date.now();
+}
 
 export function restoreSession() {
   restoring ??= (async () => {
     try {
       const user = await authApi.me();
       useAuthStore.getState().setUser(user);
+      lastCheckedAt = Date.now();
       if (typeof window !== "undefined") {
         try { localStorage.setItem("ecard_logged_in", "1"); } catch {}
       }
     } catch {
       useAuthStore.getState().setUser(null);
+      lastCheckedAt = Date.now();
       if (typeof window !== "undefined") {
         try { localStorage.removeItem("ecard_logged_in"); } catch {}
       }
@@ -31,6 +61,7 @@ export async function login(email: string, password: string) {
   return withAuthLock(async () => {
     const user = await authApi.login(email, password);
     useAuthStore.getState().setUser(user);
+    lastCheckedAt = Date.now();
     if (typeof window !== "undefined") {
       try { localStorage.setItem("ecard_logged_in", "1"); } catch {}
     }
@@ -44,19 +75,12 @@ export async function logout() {
       try { localStorage.removeItem("ecard_logged_in"); } catch {}
     }
     await authApi.logout();
+    lastCheckedAt = 0;
     useAuthStore.getState().setUser(null);
   });
 }
 
 export function useAuth() {
   const { ready, authenticated, user } = useAuthStore();
-  useEffect(() => {
-    if (!useAuthStore.getState().ready) void restoreSession();
-    const checkSession = () => {
-      if (document.visibilityState === "visible") void restoreSession();
-    };
-    document.addEventListener("visibilitychange", checkSession);
-    return () => document.removeEventListener("visibilitychange", checkSession);
-  }, []);
   return { ready, authenticated, user, restore: restoreSession, login, logout };
 }

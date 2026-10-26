@@ -11,7 +11,6 @@ import {
   EyeOff,
 } from "lucide-react";
 import { useAuth } from "@/client/hooks/useAuth";
-import { useAos } from "@/client/hooks/useAos";
 import { useToast } from "@/client/components/ui/Toast";
 import { Alert } from "@/client/components/ui/Alert";
 import { authApi } from "@/api/auth.api";
@@ -20,7 +19,6 @@ import { PasswordMatchMeter } from "@/client/components/auth/PasswordMatchMeter"
 
 export function AdminProfileView() {
   const { ready, user } = useAuth();
-  useAos(ready);
   const toast = useToast();
 
   const [currentPassword, setCurrentPassword] = useState("");
@@ -76,8 +74,8 @@ export function AdminProfileView() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-[1000px] space-y-6">
-      <div className="page-heading" data-aos="fade-up" data-aos-delay="50">
+    <div className="admin-fade-in mx-auto w-full max-w-[1000px] space-y-6">
+      <div className="page-heading">
         <div>
           <div className="eyebrow mb-2">QTM MEDIATECH PLATFORM</div>
           <h1>
@@ -87,7 +85,7 @@ export function AdminProfileView() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-12" data-aos="fade-up" data-aos-delay="100">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
         {/* Panel Thông tin tài khoản */}
         <section className="panel md:col-span-5">
           <div className="panel-heading mb-4 flex items-center gap-2 border-b border-white/10 pb-3">

@@ -8,8 +8,22 @@ import { ACCESS_COOKIE, assertSameOrigin, authHandler } from "@/server/auth/http
 // Tương đương JwtAuthGuard: mọi API admin phải kiểm tra JWT và phiên DB ở đây.
 export function adminHandler(request: NextRequest, action: () => Promise<NextResponse>) {
   return authHandler(async () => {
-    await serverAuth.currentUser(request.cookies.get(ACCESS_COOKIE)?.value ?? "");
-    if (request.method !== "GET") assertSameOrigin(request);
+    const token = request.cookies.get(ACCESS_COOKIE)?.value ?? "";
+    if (request.method === "GET") {
+      // Chạy song song xác thực và truy vấn đọc; chỉ trả kết quả khi auth thành công.
+      // Nếu auth thất bại, hủy bỏ kết quả action và luôn ưu tiên lỗi 401 từ auth.
+      const [, outcome] = await Promise.all([
+        serverAuth.currentUser(token),
+        (async () => action())().then(
+          (response) => ({ ok: true as const, response }),
+          (error: unknown) => ({ ok: false as const, error }),
+        ),
+      ]);
+      if (!outcome.ok) throw outcome.error;
+      return outcome.response;
+    }
+    await serverAuth.currentUser(token);
+    assertSameOrigin(request);
     return action();
   });
 }

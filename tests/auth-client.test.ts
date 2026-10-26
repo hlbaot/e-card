@@ -1,7 +1,15 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { useAuthStore } from "../src/client/store/auth.store";
-import { restoreSession, login, logout } from "../src/client/hooks/useAuth";
+import {
+  hydrateAuthUser,
+  markSessionChecked,
+  restoreSession,
+  SESSION_CHECK_THROTTLE_MS,
+  shouldCheckSessionOnVisibility,
+  login,
+  logout,
+} from "../src/client/hooks/useAuth";
 import { apiFetch, authApi } from "../src/api";
 const user = { id: "test-admin", email: "admin@example.com" };
 const json = (body: unknown, status = 200) => Response.json(body, { status });
@@ -126,4 +134,21 @@ test("logout waits for an in-flight refresh and leaves the client signed out", a
     assert.deepEqual(events, ["refresh", "logout"]);
     assert.equal(useAuthStore.getState().authenticated, false);
   } finally { globalThis.fetch = originalFetch; }
+});
+
+test("hydrateAuthUser sets initialUser synchronously and throttles visibility session checks for 60s", () => {
+  useAuthStore.setState({ ready: false, authenticated: false, user: null });
+  markSessionChecked(0);
+  assert.equal(shouldCheckSessionOnVisibility(10_000), true);
+
+  hydrateAuthUser(user);
+  const state = useAuthStore.getState();
+  assert.equal(state.ready, true);
+  assert.equal(state.authenticated, true);
+  assert.deepEqual(state.user, user);
+
+  const now = Date.now();
+  assert.equal(shouldCheckSessionOnVisibility(now + 10_000), false);
+  assert.equal(shouldCheckSessionOnVisibility(now + SESSION_CHECK_THROTTLE_MS - 1), false);
+  assert.equal(shouldCheckSessionOnVisibility(now + SESSION_CHECK_THROTTLE_MS), true);
 });

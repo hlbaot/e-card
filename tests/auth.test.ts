@@ -227,3 +227,71 @@ test("HTTP endpoints: cookies, CSRF, validation, session rotation, logout and sa
   const newLogin = await login(request("login", { email: "admin@example.com", password: "new-secret-password-123" }));
   assert.equal(newLogin.status, 200);
 });
+
+test("in-memory LRU cache serves repeated currentUser lookups and invalidates on password change, logout or revoke", async () => {
+  let byIdCalls = 0;
+  let admin: AdminRecord | null = {
+    id: "211cb740-bad0-4940-9c21-859b6c580434",
+    email: "admin@example.com",
+    passwordHash: await hash("correct-password"),
+    refreshTokenHash: null,
+    refreshExpiresAt: null,
+  };
+  const repo: AuthRepository = {
+    async byEmail(email) { return admin && email === admin.email ? { ...admin } : null; },
+    async byId(id) {
+      byIdCalls++;
+      return admin && id === admin.id ? { ...admin } : null;
+    },
+    async byRefreshHash(value) { return admin && value === admin.refreshTokenHash ? { ...admin } : null; },
+    async startSession(_id, refreshTokenHash, refreshExpiresAt) {
+      if (admin) admin = { ...admin, refreshTokenHash, refreshExpiresAt };
+    },
+    async rotateSession(id, previousHash, refreshTokenHash, refreshExpiresAt) {
+      if (!admin || id !== admin.id || previousHash !== admin.refreshTokenHash || !admin.refreshExpiresAt || admin.refreshExpiresAt <= new Date()) return false;
+      admin = { ...admin, refreshTokenHash, refreshExpiresAt };
+      return true;
+    },
+    async endSession(value) {
+      if (admin && admin.refreshTokenHash === value) admin = { ...admin, refreshTokenHash: null, refreshExpiresAt: null };
+    },
+    async updatePassword(id, previousHash, sessionHash, passwordHash) {
+      if (!admin || id !== admin.id || previousHash !== admin.passwordHash || sessionHash !== admin.refreshTokenHash || !admin.refreshExpiresAt || admin.refreshExpiresAt <= new Date()) return false;
+      admin = { ...admin, passwordHash, refreshTokenHash: null, refreshExpiresAt: null };
+      return true;
+    },
+  };
+
+  const auth = createAuthService(repo, secret, { cacheTtlMs: 12_000, cacheMaxEntries: 2 });
+
+  // 1. Repeated currentUser calls hit the in-memory cache without re-querying repo.byId
+  const session1 = await auth.login("admin@example.com", "correct-password");
+  assert.equal(byIdCalls, 0);
+  assert.deepEqual(await auth.currentUser(session1.accessToken), session1.user);
+  assert.equal(byIdCalls, 1);
+  assert.deepEqual(await auth.currentUser(session1.accessToken), session1.user);
+  assert.deepEqual(await auth.currentUser(session1.accessToken), session1.user);
+  assert.equal(byIdCalls, 1);
+
+  // 2. Logout invalidates the cache immediately
+  await auth.logout(session1.refreshToken);
+  await assert.rejects(auth.currentUser(session1.accessToken));
+  assert.equal(byIdCalls, 2);
+
+  // 3. Password change invalidates the cache immediately
+  const session2 = await auth.login("admin@example.com", "correct-password");
+  await auth.currentUser(session2.accessToken);
+  const callsBeforePwChange = byIdCalls;
+  await auth.changePassword(session2.accessToken, "correct-password", "updated-password-123");
+  await assert.rejects(auth.currentUser(session2.accessToken));
+  assert.ok(byIdCalls > callsBeforePwChange);
+
+  // 4. Account disable / manual cache invalidation drops cached record immediately
+  const session3 = await auth.login("admin@example.com", "updated-password-123");
+  await auth.currentUser(session3.accessToken);
+  const callsAfterWarm = byIdCalls;
+  admin = null; // Simulate account disabled/deleted in DB
+  auth.invalidateUserCache(session3.user.id);
+  await assert.rejects(auth.currentUser(session3.accessToken));
+  assert.equal(byIdCalls, callsAfterWarm + 1);
+});

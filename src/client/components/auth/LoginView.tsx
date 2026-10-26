@@ -4,7 +4,8 @@ import { useState, useEffect, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Eye, EyeOff } from "lucide-react";
-import { useAuth } from "@/client/hooks/useAuth";
+import { restoreSession, useAuth } from "@/client/hooks/useAuth";
+import { useAuthStore } from "@/client/store/auth.store";
 import { useAos } from "@/client/hooks/useAos";
 import { Brand } from "@/client/components/layout/PublicHeader";
 import { Badge } from "@/client/components/ui/Badge";
@@ -36,6 +37,16 @@ export function LoginView() {
     },
     () => false,
   );
+
+  useEffect(() => {
+    if (!useAuthStore.getState().ready) {
+      if (hasHint) {
+        void restoreSession();
+      } else {
+        useAuthStore.getState().setUser(null);
+      }
+    }
+  }, [hasHint]);
 
   useEffect(() => {
     if (ready && authenticated) router.replace("/admin");

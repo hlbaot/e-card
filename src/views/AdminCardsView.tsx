@@ -1,4 +1,5 @@
 "use client";
+import { useDeferredValue, useMemo } from "react";
 import { useEmployeeStore } from "@/client/store/employee.store";
 import Link from "next/link";
 import { Search, Plus, ContactRound, ArrowRight } from "lucide-react";
@@ -11,8 +12,19 @@ export function AdminCardsView() {
   const { employees, ready, error } = useEmployees();
   const search = useEmployeeStore(state => state.cardSearch);
   const setSearch = useEmployeeStore(state => state.setCardSearch);
-  const filtered = employees.filter((e) =>
-    slugify(`${e.fullName} ${e.position}`).includes(slugify(search)),
+  const deferredSearch = useDeferredValue(search);
+  const normalizedSearch = useMemo(
+    () => slugify(deferredSearch),
+    [deferredSearch],
+  );
+  const filtered = useMemo(
+    () =>
+      !normalizedSearch
+        ? employees
+        : employees.filter((e) =>
+            slugify(`${e.fullName} ${e.position}`).includes(normalizedSearch),
+          ),
+    [employees, normalizedSearch],
   );
   return (
     <div className="admin-fade-in">

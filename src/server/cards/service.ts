@@ -1,16 +1,18 @@
+import type { employeeCardSelect } from "./select";
 import type { Prisma } from "@prisma/client";
 import { z } from "zod";
-import { DEFAULT_PUBLIC_FIELDS, type Employee } from "@/shared/types/employee";
+import { DEFAULT_PUBLIC_FIELDS } from "@/shared/types";
+import type { Employee } from "@/shared/types";
 import { localizeEmployee } from "@/shared/utils/localize";
 
-export type CardRecord = Prisma.EmployeeGetPayload<{ include: { theme: true } }>;
+export type CardRecord = Prisma.EmployeeGetPayload<{ select: typeof employeeCardSelect }>;
 export interface CardsRepository {
   list(): Promise<CardRecord[]>;
   bySlug(slug: string): Promise<CardRecord | null>;
 }
 const offices = z.array(z.object({ label: z.string(), address: z.string() }));
 const template = z.enum(["bubble-blue", "minimal-line", "dark-tech", "editorial", "aurora", "luxury", "botanical", "creative"]);
-const decor = z.array(z.enum(["blobs", "circles", "skyline", "waves", "bokeh"]));
+const decor = z.array(z.enum(["blobs", "circles", "skyline", "waves", "bokeh", "leaves", "network", "geometry"]));
 
 // DTO chỉ chứa dữ liệu public, không đưa deletedAt hoặc khóa quan hệ theme ra JSON.
 export function toPublicCard(record: CardRecord): Employee {
@@ -31,9 +33,9 @@ export function toPublicCard(record: CardRecord): Employee {
       decor: decor.parse(theme.decor), shapes: z.record(z.string(), z.boolean()).parse(theme.shapes),
       showDecor: theme.showDecor, decorOpacity: theme.decorOpacity,
     } : {
-      templateId: "bubble-blue", backgroundId: "sky-soft", primaryColor: "#0F4C75",
+      templateId: "bubble-blue", backgroundId: "white-clean", primaryColor: "#0F4C75",
       avatarSize: "lg", avatarShape: "circle", buttonStyle: "soft",
-      decor: ["blobs", "skyline"], shapes: {}, showDecor: true, decorOpacity: 65,
+      decor: ["blobs"], shapes: {}, showDecor: true, decorOpacity: 35,
     },
   });
 }

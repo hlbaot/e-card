@@ -1,5 +1,6 @@
 import axios, { AxiosError, type AxiosRequestConfig, type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
-import { useAuthStore, type AuthUser } from "@/client/store/auth.store";
+import { useAuthStore } from "@/client/store/auth.store";
+import type { AuthUser } from "@/shared/types";
 import { withAuthLock } from "@/client/auth/session-lock";
 
 // Adapter fetch tùy biến tương thích cả browser, Next.js và test runner
@@ -28,7 +29,10 @@ const fetchAdapter = async (config: InternalAxiosRequestConfig) => {
   const init: RequestInit = {
     headers,
     credentials: config.withCredentials ? "same-origin" : "omit",
-    cache: "no-store",
+    cache: (!config.method || config.method.toUpperCase() === "GET") &&
+      /^\/api\/(?:admin\/(?:employees|stats)(?:\/|$)|cards(?:\/|$))/.test(url)
+      ? "no-cache" : "no-store",
+    signal: config.signal as AbortSignal | undefined,
   };
 
   if (config.method && config.method.toUpperCase() !== "GET") {
@@ -54,7 +58,7 @@ const fetchAdapter = async (config: InternalAxiosRequestConfig) => {
     data,
     status: res.status,
     statusText: res.statusText,
-    headers: {},
+    headers: Object.fromEntries(res.headers.entries()),
     config,
     request: {},
   };

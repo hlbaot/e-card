@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEmployeeStore } from "@/client/store/employee.store";
 import Link from "next/link";
 import { Search, Plus, ContactRound, ArrowRight } from "lucide-react";
 import { useEmployees } from "@/client/hooks/useEmployees";
@@ -11,7 +11,8 @@ import { slugify } from "@/shared/utils/slugify";
 export function AdminCardsView() {
   const { employees, ready, error } = useEmployees();
   useAos(ready);
-  const [search, setSearch] = useState("");
+  const search = useEmployeeStore(state => state.cardSearch);
+  const setSearch = useEmployeeStore(state => state.setCardSearch);
   const filtered = employees.filter((e) =>
     slugify(`${e.fullName} ${e.position}`).includes(slugify(search)),
   );

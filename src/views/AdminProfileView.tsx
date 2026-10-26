@@ -9,12 +9,11 @@ import {
   Lock,
   Eye,
   EyeOff,
-  CheckCircle,
-  AlertCircle,
 } from "lucide-react";
 import { useAuth } from "@/client/hooks/useAuth";
 import { useAos } from "@/client/hooks/useAos";
 import { useToast } from "@/client/components/ui/Toast";
+import { Alert } from "@/client/components/ui/Alert";
 import { authApi } from "@/api/auth.api";
 import { Skeleton } from "@/client/components/ui/Skeleton";
 import { PasswordMatchMeter } from "@/client/components/auth/PasswordMatchMeter";
@@ -68,7 +67,9 @@ export function AdminProfileView() {
       setNewPassword("");
       setConfirmPassword("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Không thể đổi mật khẩu.");
+      const msg = err instanceof Error ? err.message : "Không thể đổi mật khẩu.";
+      setError(msg);
+      toast(msg, "error");
     } finally {
       setLoading(false);
     }
@@ -144,17 +145,15 @@ export function AdminProfileView() {
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             {error && (
-              <div role="alert" className="flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-400">
-                <AlertCircle size={16} className="shrink-0" />
-                <span>{error}</span>
-              </div>
+              <Alert variant="error" onClose={() => setError("")}>
+                {error}
+              </Alert>
             )}
 
             {success && (
-              <div role="status" className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3 text-sm text-emerald-400">
-                <CheckCircle size={16} className="shrink-0" />
-                <span>{success}</span>
-              </div>
+              <Alert variant="success" onClose={() => setSuccess("")}>
+                {success}
+              </Alert>
             )}
 
             <div className="field">

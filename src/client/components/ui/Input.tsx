@@ -1,4 +1,4 @@
-import type { InputHTMLAttributes } from "react";
+import { useId, type InputHTMLAttributes } from "react";
 import { cn } from "@/shared/utils/cn";
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -9,21 +9,28 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 export function Input({
   label,
   error,
-  id,
+  id: explicitId,
   className,
   ...props
 }: InputProps) {
+  const generatedId = useId();
+  const id = explicitId || generatedId;
+  const errorId = error ? `${id}-error` : undefined;
+  const describedBy =
+    [props["aria-describedby"], errorId].filter(Boolean).join(" ") || undefined;
+
   return (
     <div className="field">
       {label && <label htmlFor={id}>{label}</label>}
       <input
         id={id}
         className={cn(className)}
-        aria-invalid={!!error}
+        aria-invalid={Boolean(error)}
+        aria-describedby={describedBy}
         {...props}
       />
       {error && (
-        <span role="alert" className="field-error">
+        <span id={errorId} role="alert" className="field-error">
           {error}
         </span>
       )}

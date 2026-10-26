@@ -7,18 +7,20 @@
     "build": "prisma generate && next build --webpack",
     "start": "next start",
     "lint": "eslint",
-    "test": "node scripts/smoke.cjs && pnpm test:auth && pnpm test:cards && pnpm test:admin",
+    "test": "node scripts/smoke.cjs && pnpm test:auth && pnpm test:cards && pnpm test:admin && pnpm test:cache",
     "test:admin": "node --conditions=react-server --import tsx --test tests/admin.test.ts tests/admin-client.test.ts",
     "test:cards": "node --conditions=react-server --import tsx --test tests/cards.test.ts",
     "test:auth": "node --conditions=react-server --import tsx --test tests/auth.test.ts tests/auth-client.test.ts",
     "db:validate": "prisma validate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate deploy",
-    "db:seed": "prisma db seed"
+    "db:seed": "prisma db seed",
+    "test:cache": "node --import tsx --test tests/cache-client.test.tsx && node --conditions=react-server --import tsx --test tests/http-cache.test.ts"
   },
   "dependencies": {
     "@node-rs/argon2": "^2.2.2",
     "@prisma/client": "^6.4.1",
+    "@tanstack/react-query": "^5.104.5",
     "aos": "^2.3.4",
     "axios": "^1.20.0",
     "bcryptjs": "^3.0.3",
@@ -35,6 +37,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
+    "@tanstack/react-query-devtools": "^5.104.5",
     "@types/bcryptjs": "^3.0.0",
     "@types/node": "^20",
     "@types/react": "^19",

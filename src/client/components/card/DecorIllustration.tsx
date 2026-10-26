@@ -1,17 +1,36 @@
-import type { DecorKey } from "@/shared/types/employee";
+import type { DecorKey } from "@/shared/types";
 
 /** Shared vector drawings: the selector and the profile use the same artwork. */
 export function DecorIllustration({ decor, variant = "halo" }: { decor: DecorKey; variant?: "halo" | "edge" }) {
   switch (decor) {
     case "blobs":
-      return <g fill="currentColor">
-        {variant === "edge" ? <path d="M92 3C66-1 54 13 56 29C58 43 39 42 28 47C7 57 17 84 37 87C53 89 53 96 77 96C104 97 118 80 118 53C118 27 113 5 92 3Z" opacity=".26" /> : <>
-          <path d="M52 18C62 9 78 12 84 23C88 29 92 27 91 19C89 8 97 3 103 9C110 16 105 27 99 34C94 41 98 47 105 45C118 41 120 56 109 61C99 66 94 71 100 80C108 93 92 102 85 89C81 82 76 83 70 89C60 101 45 95 39 86C33 77 28 73 20 79C9 87 0 74 9 64C15 58 23 61 26 52C30 42 28 30 39 24C43 21 47 21 52 18Z" opacity=".26" />
-          <ellipse cx="63" cy="55" rx="34" ry="35" opacity=".07" />
-          <circle cx="9" cy="23" r="4" opacity=".23" />
-          <circle cx="113" cy="84" r="3.5" opacity=".2" />
-        </>}
-      </g>;
+      return (
+        <g fill="currentColor">
+          {variant === "edge" ? (
+            <path
+              d="M96 6C70 2 54 18 58 35C62 50 40 52 30 58C8 70 18 92 40 94C58 95 62 100 84 98C108 96 118 78 118 52C118 26 114 8 96 6Z"
+              opacity=".25"
+            />
+          ) : (
+            <>
+              {/* Soft organic primary blob */}
+              <path
+                d="M60 18C82 15 104 30 108 52C112 74 95 90 74 93C52 96 30 84 22 66C14 46 36 21 60 18Z"
+                opacity=".35"
+              />
+              {/* Soft inner curve contour */}
+              <path
+                d="M58 28C74 26 92 38 95 54C98 70 85 82 70 84C54 86 38 78 32 64C26 48 42 30 58 28Z"
+                opacity=".20"
+              />
+              {/* Accent dots */}
+              <circle cx="106" cy="32" r="3.5" opacity=".45" />
+              <circle cx="20" cy="74" r="3" opacity=".40" />
+              <circle cx="88" cy="84" r="2.5" opacity=".35" />
+            </>
+          )}
+        </g>
+      );
     case "circles":
       return <g transform="translate(60 50) scale(1.18) translate(-60 -50)" fill="none" stroke="currentColor" strokeWidth="1.5">
         <circle cx="52" cy="49" r="34" opacity=".5" />

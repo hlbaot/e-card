@@ -3,13 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Pencil, Trash2, ArrowUpRight } from "lucide-react";
-import type { Employee } from "@/shared/types/employee";
+import type { Employee } from "@/shared/types";
 import { Avatar } from "@/client/components/ui/Avatar";
 import { Switch } from "@/client/components/ui/Switch";
 import { Badge } from "@/client/components/ui/Badge";
 import { Modal } from "@/client/components/ui/Modal";
 import { useToast } from "@/client/components/ui/Toast";
-import { employeeService } from "@/client/services/employee.service";
+import { useEmployeeMutations } from "@/client/hooks/useEmployeeMutations";
 import { routes } from "@/shared/constants/routes";
 import { TeamRowCard } from "./TeamRowCard";
 
@@ -25,15 +25,15 @@ export function TeamTable({
   showPanelHeader = true,
 }: TeamTableProps) {
   const [deleting, setDeleting] = useState<Employee | null>(null);
-  const { remove, toggleActive } = employeeService;
+  const { remove, toggleActive, isToggling } = useEmployeeMutations();
   const toast = useToast();
 
   const handleToggle = async (e: Employee) => {
     try {
       await toggleActive(e.id);
       toast(e.isActive ? "Đã tắt danh thiếp" : "Đã bật danh thiếp");
-    } catch {
-      toast("Không thể đổi trạng thái");
+    } catch (err) {
+      toast(err instanceof Error ? err.message : "Không thể đổi trạng thái", "error");
     }
   };
 
@@ -137,6 +137,7 @@ export function TeamTable({
                     <div className="inline-flex items-center gap-2.5">
                       <Switch
                         checked={e.isActive}
+                      disabled={isToggling(e.id)}
                         label={`Bật danh thiếp của ${e.fullName}`}
                         onChange={() => handleToggle(e)}
                       />
@@ -195,6 +196,7 @@ export function TeamTable({
               key={e.id}
               employee={e}
               onToggleActive={handleToggle}
+              toggling={isToggling(e.id)}
               onDeleteRequest={setDeleting}
             />
           ))}
@@ -229,8 +231,8 @@ export function TeamTable({
                   await remove(deleting.id);
                   setDeleting(null);
                   toast("Đã xóa nhân viên");
-                } catch {
-                  toast("Không thể xóa nhân viên");
+                } catch (err) {
+                  toast(err instanceof Error ? err.message : "Không thể xóa nhân viên", "error");
                 }
               }}
             >

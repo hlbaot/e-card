@@ -14,16 +14,15 @@ import {
   QrCode,
   ShieldCheck,
 } from "lucide-react";
-import {
-  DEFAULT_PUBLIC_FIELDS,
-  getPublicFields,
-  type Employee,
-} from "@/shared/types/employee";
-import { employeeService, type EmployeeInput } from "@/client/services/employee.service";
+import { DEFAULT_PUBLIC_FIELDS, getPublicFields } from "@/shared/types";
+import type { Employee } from "@/shared/types";
+import { useEmployeeMutations } from "@/client/hooks/useEmployeeMutations";
+import type { EmployeeInput } from "@/shared/types";
 import { QRPanel } from "@/client/components/card/QRPanel";
 import { Avatar } from "@/client/components/ui/Avatar";
 import { Switch } from "@/client/components/ui/Switch";
 import { useToast } from "@/client/components/ui/Toast";
+import { Alert } from "@/client/components/ui/Alert";
 import { ThemeCustomizer } from "./ThemeCustomizer";
 import { EmployeeFormLayout } from "./EmployeeFormLayout";
 import { LivePreviewPanel } from "./LivePreviewPanel";
@@ -47,9 +46,9 @@ const blank: EmployeeInput = {
   publicFields: { ...DEFAULT_PUBLIC_FIELDS },
   offices: [],
   theme: {
-    templateId: "bubble-blue", backgroundId: "sky-soft", primaryColor: "#0F4C75",
+    templateId: "bubble-blue", backgroundId: "white-clean", primaryColor: "#0F4C75",
     avatarSize: "lg", avatarShape: "circle", buttonStyle: "soft",
-    decor: ["blobs", "skyline"], shapes: {}, showDecor: true, decorOpacity: 65,
+    decor: ["blobs"], shapes: {}, showDecor: true, decorOpacity: 35,
   },
 };
 
@@ -64,6 +63,8 @@ type TextField =
   | "website"
   | "slogan";
 
+const requiredFields: readonly TextField[] = ["fullName", "phone", "email"];
+
 export function EmployeeForm({ employee }: { employee?: Employee }) {
   const [form, setForm] = useState<EmployeeInput>(() => {
     const source = structuredClone(employee || blank);
@@ -75,6 +76,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
     };
   });
   const [errors, setErrors] = useState<Partial<Record<TextField, string>>>({});
+  const [formError, setFormError] = useState("");
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
@@ -83,14 +85,24 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
   const mobileFabRef = useRef<HTMLButtonElement>(null);
   const lastTriggerRef = useRef<HTMLElement | null>(null);
 
-  const { create, update } = employeeService;
+  const { create, update, uploadAvatar } = useEmployeeMutations();
   const toast = useToast();
   const router = useRouter();
 
   const set = <K extends keyof EmployeeInput>(
     key: K,
     value: EmployeeInput[K],
-  ) => setForm((f) => ({ ...f, [key]: value }));
+  ) => {
+    setForm((f) => ({ ...f, [key]: value }));
+    if (formError) setFormError("");
+    if (errors[key as TextField]) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next[key as TextField];
+        return next;
+      });
+    }
+  };
 
   const preview: Employee = {
     ...form,
@@ -110,11 +122,17 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
     <div className={`field ${full ? "full" : ""}`}>
       <label htmlFor={key}>
         {label}
-        {key === "fullName" && <span className="text-red-500"> *</span>}
+        {requiredFields.includes(key) && (
+          <>
+            <span className="text-red-500" aria-hidden="true"> *</span>
+            <span className="sr-only"> (bắt buộc)</span>
+          </>
+        )}
       </label>
       <input
         id={key}
         type={type}
+        required={requiredFields.includes(key)}
         value={form[key]}
         placeholder={placeholder}
         onChange={(e) => set(key, e.target.value)}
@@ -131,6 +149,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
 
   async function submit(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
+    setFormError("");
     const next: Partial<Record<TextField, string>> = {};
     if (!form.fullName.trim()) next.fullName = "Vui lòng nhập họ tên.";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()))
@@ -145,7 +164,9 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
     setErrors(next);
     if (Object.keys(next).length) {
       document.getElementById(Object.keys(next)[0])?.focus();
-      toast("Vui lòng kiểm tra các trường được đánh dấu");
+      const msg = "Vui lòng kiểm tra và điền đầy đủ các thông tin bắt buộc.";
+      setFormError(msg);
+      toast(msg, "error");
       return;
     }
     setBusy(true);
@@ -162,13 +183,18 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
         : await create(clean);
       toast(
         employee
-          ? "Đã lưu thay đổi nhân viên"
-          : "Đã tạo nhân viên và danh thiếp",
+          ? "Đã lưu thay đổi nhân viên thành công"
+          : "Đã tạo nhân viên và danh thiếp thành công",
       );
       router.push(`/admin/employees/${saved.id}`);
       router.refresh();
     } catch (err) {
-      toast(err instanceof Error ? err.message : "Không thể lưu dữ liệu");
+      const msg =
+        err instanceof Error
+          ? err.message
+          : "Không thể lưu dữ liệu. Vui lòng thử lại.";
+      setFormError(msg);
+      toast(msg, "error");
     } finally {
       setBusy(false);
     }
@@ -196,6 +222,15 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
 
   const formSections = (
     <>
+      {formError && (
+        <Alert
+          variant="error"
+          className="mb-5"
+          onClose={() => setFormError("")}
+        >
+          {formError}
+        </Alert>
+      )}
       <section className="panel form-section">
         <h2>
           <UserRound size={18} />
@@ -226,16 +261,16 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
                     ) ||
                     file.size > 2 * 1024 * 1024
                   ) {
-                    toast("Chọn ảnh JPG, PNG hoặc WebP tối đa 2 MB");
+                    toast("Chọn ảnh JPG, PNG hoặc WebP tối đa 2 MB", "error");
                     return;
                   }
                   const input = e.currentTarget;
                   setUploading(true);
                   try {
-                    set("avatarUrl", await employeeService.uploadAvatar(file));
+                    set("avatarUrl", await uploadAvatar(file));
                     toast("Đã tải ảnh lên");
                   } catch (error) {
-                    toast(error instanceof Error ? error.message : "Không thể tải ảnh");
+                    toast(error instanceof Error ? error.message : "Không thể tải ảnh", "error");
                   } finally { setUploading(false); input.value = ""; }
                 }}
               />

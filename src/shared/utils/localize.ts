@@ -1,5 +1,6 @@
 import { migrateCardTheme } from "./migrate-theme";
-import { getPublicFields, type Employee } from "@/shared/types/employee";
+import { getPublicFields } from "@/shared/types";
+import type { Employee } from "@/shared/types";
 // Giữ nguyên nội dung người dùng, chỉ chuẩn hóa cấu hình theme/publicFields.
 export function localizeEmployee(e: Employee): Employee {
   return {

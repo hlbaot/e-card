@@ -8,16 +8,25 @@ const safeImage = text(2048).refine((value) => {
   if (value.startsWith("/images/")) return !value.includes("\\") && !value.includes("..");
   try { return new URL(value).protocol === "https:"; } catch { return false; }
 }, "Ảnh phải là URL HTTPS hoặc đường dẫn /images/.");
+const styleIds = ["bubble-blue", "minimal-line", "dark-tech", "editorial", "aurora", "luxury", "botanical", "creative"] as const;
 export const themeInput = z.object({
-  templateId: z.enum(["bubble-blue", "minimal-line", "dark-tech", "editorial", "aurora", "luxury", "botanical", "creative"]),
+  templateId: z.enum(styleIds),
+  styleId: z.enum(styleIds).optional(),
+  paletteId: text(64).optional(),
   backgroundId: text(32).refine((value) => backgrounds.some((background) => background.id === value), "Nền không hợp lệ."),
-  primaryColor: z.string().regex(/^#[a-fA-F0-9]{6}$/),
+  primaryColor: z.string().regex(/^#[a-fA-F0-9]{6}$/, "Mã màu không hợp lệ."),
   avatarSize: z.enum(["sm", "md", "lg"]), avatarShape: z.enum(["circle", "rounded"]),
   buttonStyle: z.enum(["filled", "soft", "outline"]),
-  decor: z.array(z.enum(["blobs", "circles", "skyline", "waves", "bokeh"])).max(5),
+  decor: z.array(z.enum(["blobs", "circles", "skyline", "waves", "bokeh", "leaves", "network", "geometry"])).max(8),
   shapes: z.record(z.string().max(64), z.boolean()).refine((value) => Object.keys(value).length <= 32),
-  showDecor: z.boolean().default(true), decorOpacity: z.number().int().min(0).max(100).default(65),
-}).strict();
+  showDecor: z.boolean().default(true), decorOpacity: z.number().int().min(0).max(100).default(35),
+}).strict().transform(({ styleId, paletteId: _paletteId, ...rest }) => {
+  void _paletteId;
+  return {
+    ...rest,
+    templateId: rest.templateId || styleId || "bubble-blue",
+  };
+});
 export const employeeInput = z.object({
   fullName: text(150).min(1, "Vui lòng nhập họ tên."), position: text(150),
   company: text(255), companyShort: text(150),

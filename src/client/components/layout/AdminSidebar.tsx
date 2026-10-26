@@ -1,9 +1,11 @@
 "use client";
+import { useQueryClient } from "@tanstack/react-query";
+import { useAuthStore } from "@/client/store/auth.store";
+import { employeesOptions, statsOptions } from "@/client/queries/employees";
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Home,
   LayoutDashboard,
   Users,
   ContactRound,
@@ -13,16 +15,22 @@ import {
   X,
 } from "lucide-react";
 import { Brand } from "./PublicHeader";
-import { Avatar } from "@/client/components/ui/Avatar";
 import { useAuth } from "@/client/hooks/useAuth";
 import { cn } from "@/shared/utils/cn";
 import { routes } from "@/shared/constants/routes";
 import { useToast } from "@/client/components/ui/Toast";
 
 export function AdminSidebar({ children }: { children: React.ReactNode }) {
+  const client = useQueryClient();
+  const userId = useAuthStore(state => state.user?.id);
+  const prefetch = (href: string) => {
+    if (!userId) return;
+    if ([routes.admin, routes.employees, routes.cards].includes(href)) void client.prefetchQuery(employeesOptions(userId));
+    if (href === routes.admin) void client.prefetchQuery(statsOptions(userId));
+  };
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const { logout, user } = useAuth();
+  const { logout } = useAuth();
   const toast = useToast();
   const router = useRouter();
   const nav = [
@@ -73,6 +81,9 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
             <Link
               href={href}
               key={href}
+              onMouseEnter={() => prefetch(href)}
+              onFocus={() => prefetch(href)}
+              onTouchStart={() => prefetch(href)}
               onClick={() => setOpen(false)}
               className={cn(
                 (href === routes.admin
@@ -93,10 +104,11 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
             onClick={async () => {
               try {
                 await logout();
+                client.clear();
                 router.replace(routes.login);
                 router.refresh();
               } catch {
-                toast("Chưa thể đăng xuất. Vui lòng thử lại.");
+                toast("Chưa thể đăng xuất. Vui lòng thử lại.", "error");
               }
             }}
           >
@@ -106,52 +118,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      {/* Thanh header bar quản trị ở trên cùng */}
-      <header className="admin-header">
-        <button
-          className="icon-button mobile-menu"
-          aria-label="Mở menu"
-          aria-expanded={open}
-          onClick={() => setOpen(true)}
-        >
-          <Menu size={20} />
-        </button>
-        <p className="admin-context">
-          Không gian làm việc <span className="mx-2">/</span>
-          <strong>QTM MediaTech</strong>
-        </p>
-        <div className="admin-user">
-          <Link href={routes.home} className="btn btn-ghost admin-home-link" aria-label="Về trang chủ">
-            <Home size={16} aria-hidden="true" />
-            <span>Trang chủ</span>
-          </Link>
-          <Link
-            href={routes.profile}
-            className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-white/5"
-            title="Xem hồ sơ & đổi mật khẩu"
-          >
-            <Avatar name="Quản trị QTM" src="" size={32} color="#387c83" />
-            <div className="admin-user-info">
-              Quản trị viên<span>{user?.email}</span>
-            </div>
-          </Link>
-          <button
-            className="btn btn-ghost"
-            onClick={async () => {
-              try {
-                await logout();
-                router.replace(routes.login);
-                router.refresh();
-              } catch {
-                toast("Chưa thể đăng xuất. Vui lòng thử lại.");
-              }
-            }}
-          >
-            <LogOut size={16} />
-            Đăng xuất
-          </button>
-        </div>
-      </header>
+
 
       <main className="admin-content">{children}</main>
     </div>

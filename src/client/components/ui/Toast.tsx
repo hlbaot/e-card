@@ -7,34 +7,55 @@ import {
   useRef,
   useEffect,
 } from "react";
-import { CheckCircle2 } from "lucide-react";
-const ToastContext = createContext<(message: string) => void>(() => {});
-const ToastMessageContext = createContext("");
+import { AlertCircle, CheckCircle2 } from "lucide-react";
+
+export type ToastVariant = "success" | "error";
+type ToastFn = (message: string, variant?: ToastVariant) => void;
+
+const ToastContext = createContext<ToastFn>(() => {});
+const ToastMessageContext = createContext<{ message: string; variant: ToastVariant }>({
+  message: "",
+  variant: "success",
+});
 export const useToast = () => useContext(ToastContext);
+
+function inferToastVariant(message: string, explicit?: ToastVariant): ToastVariant {
+  if (explicit) return explicit;
+  return /^(không thể|chưa thể|lỗi|vui lòng|chọn ảnh|đã có lỗi|yêu cầu thất bại)/i.test(
+    message.trim(),
+  )
+    ? "error"
+    : "success";
+}
+
 export function ToastViewport() {
-  const message = useContext(ToastMessageContext);
+  const { message, variant } = useContext(ToastMessageContext);
+  const isError = variant === "error";
   return (
     <div
-      role="status"
-      aria-live="polite"
-      className={message ? "toast" : "sr-only"}
+      role={isError ? "alert" : "status"}
+      aria-live={isError ? "assertive" : "polite"}
+      className={message ? `toast ${isError ? "toast-error" : "toast-success"}` : "sr-only"}
     >
       {message && (
         <>
-          <CheckCircle2 size={19} />
-          {message}
+          {isError ? <AlertCircle size={19} /> : <CheckCircle2 size={19} />}
+          <span>{message}</span>
         </>
       )}
     </div>
   );
 }
 export function ToastProvider({ children }: { children: React.ReactNode }) {
-  const [message, setMessage] = useState("");
+  const [state, setState] = useState<{ message: string; variant: ToastVariant }>({
+    message: "",
+    variant: "success",
+  });
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const toast = useCallback((value: string) => {
-    setMessage(value);
+  const toast = useCallback((value: string, variant?: ToastVariant) => {
+    setState({ message: value, variant: inferToastVariant(value, variant) });
     if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => setMessage(""), 3500);
+    timer.current = setTimeout(() => setState((prev) => ({ ...prev, message: "" })), 3500);
   }, []);
   useEffect(
     () => () => {
@@ -44,7 +65,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   );
   return (
     <ToastContext.Provider value={toast}>
-      <ToastMessageContext.Provider value={message}>
+      <ToastMessageContext.Provider value={state}>
         {children}
         <ToastViewport />
       </ToastMessageContext.Provider>

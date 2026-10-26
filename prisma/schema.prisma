@@ -64,7 +64,8 @@ model Employee {
   deletedAt     DateTime?  @map("deleted_at") @db.Timestamptz(6)
   theme         CardTheme?
 
-  @@index([isActive, deletedAt], map: "idx_employees_public_list")
+  @@index([isActive, deletedAt, createdAt, id], map: "idx_employees_public_list")
+  @@index([deletedAt, createdAt(sort: Desc), id], map: "idx_employees_admin_order")
   @@map("employees")
 }
 

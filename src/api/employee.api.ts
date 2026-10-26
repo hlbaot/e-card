@@ -1,14 +1,6 @@
 import { apiClient } from "./client";
-import { useEmployeeStore } from "@/client/store/employee.store";
-import type { Employee } from "@/shared/types/employee";
+import type { Employee, EmployeeInput, EmployeeStats, EmployeeResponse, EmployeesResponse, AvatarUploadResponse } from "@/shared/types";
 import { AxiosError } from "axios";
-
-export type EmployeeInput = Omit<Employee, "id" | "slug" | "createdAt" | "updatedAt">;
-export interface EmployeeStats {
-  total: number;
-  active: number;
-  inactive: number;
-}
 
 export class EmployeeApiError extends Error {
   constructor(message: string, public status: number) {
@@ -26,6 +18,34 @@ function handleAxiosError(err: unknown, defaultMessage = "Không thể tải d�
   if (err instanceof EmployeeApiError) throw err;
   if (err instanceof Error) throw new EmployeeApiError(err.message, 500);
   throw new EmployeeApiError(defaultMessage, 500);
+}
+
+function sanitizeTheme(theme: EmployeeInput["theme"]) {
+  const {
+    templateId,
+    styleId,
+    backgroundId,
+    primaryColor,
+    avatarSize,
+    avatarShape,
+    buttonStyle,
+    decor,
+    shapes,
+    showDecor,
+    decorOpacity,
+  } = theme;
+  return {
+    templateId: templateId || styleId || "bubble-blue",
+    backgroundId,
+    primaryColor,
+    avatarSize,
+    avatarShape,
+    buttonStyle,
+    decor,
+    shapes: shapes ?? {},
+    ...(showDecor !== undefined ? { showDecor } : {}),
+    ...(decorOpacity !== undefined ? { decorOpacity: Math.round(decorOpacity) } : {}),
+  };
 }
 
 // Bỏ metadata có thể tồn tại trong state form edit trước khi gửi DTO lên server.
@@ -56,35 +76,31 @@ function sanitizeInput(input: EmployeeInput) {
     phone,
     zalo,
     website,
-    offices,
+    offices: (offices ?? []).map(({ label, address }) => ({ label, address })),
     slogan,
     avatarUrl,
     isActive,
     allowIndexing,
     publicFields,
-    theme,
+    theme: sanitizeTheme(theme),
   };
-}
-
-function changed() {
-  useEmployeeStore.getState().invalidate();
 }
 
 const root = "/api/admin/employees";
 
 export const employeeApi = {
-  async getAll(): Promise<Employee[]> {
+  async getAll(signal?: AbortSignal): Promise<Employee[]> {
     try {
-      const res = await apiClient.get<{ employees: Employee[] }>(root);
+      const res = await apiClient.get<EmployeesResponse>(root, { signal });
       return res.data.employees;
     } catch (err) {
       return handleAxiosError(err);
     }
   },
 
-  async getById(id: string): Promise<Employee> {
+  async getById(id: string, signal?: AbortSignal): Promise<Employee> {
     try {
-      const res = await apiClient.get<{ employee: Employee }>(`${root}/${encodeURIComponent(id)}`);
+      const res = await apiClient.get<EmployeeResponse>(`${root}/${encodeURIComponent(id)}`, { signal });
       return res.data.employee;
     } catch (err) {
       return handleAxiosError(err);
@@ -93,8 +109,7 @@ export const employeeApi = {
 
   async create(input: EmployeeInput): Promise<Employee> {
     try {
-      const res = await apiClient.post<{ employee: Employee }>(root, sanitizeInput(input));
-      changed();
+      const res = await apiClient.post<EmployeeResponse>(root, sanitizeInput(input));
       return res.data.employee;
     } catch (err) {
       return handleAxiosError(err);
@@ -103,11 +118,10 @@ export const employeeApi = {
 
   async update(id: string, input: EmployeeInput): Promise<Employee> {
     try {
-      const res = await apiClient.patch<{ employee: Employee }>(
+      const res = await apiClient.patch<EmployeeResponse>(
         `${root}/${encodeURIComponent(id)}`,
         sanitizeInput(input)
       );
-      changed();
       return res.data.employee;
     } catch (err) {
       return handleAxiosError(err);
@@ -117,7 +131,6 @@ export const employeeApi = {
   async remove(id: string): Promise<void> {
     try {
       await apiClient.delete(`${root}/${encodeURIComponent(id)}`);
-      changed();
     } catch (err) {
       return handleAxiosError(err);
     }
@@ -125,17 +138,16 @@ export const employeeApi = {
 
   async toggleActive(id: string): Promise<Employee> {
     try {
-      const res = await apiClient.patch<{ employee: Employee }>(`${root}/${encodeURIComponent(id)}/active`);
-      changed();
+      const res = await apiClient.patch<EmployeeResponse>(`${root}/${encodeURIComponent(id)}/active`);
       return res.data.employee;
     } catch (err) {
       return handleAxiosError(err);
     }
   },
 
-  async getStats(): Promise<EmployeeStats> {
+  async getStats(signal?: AbortSignal): Promise<EmployeeStats> {
     try {
-      const res = await apiClient.get<EmployeeStats>("/api/admin/stats");
+      const res = await apiClient.get<EmployeeStats>("/api/admin/stats", { signal });
       return res.data;
     } catch (err) {
       return handleAxiosError(err);
@@ -146,7 +158,7 @@ export const employeeApi = {
     try {
       const body = new FormData();
       body.set("file", file);
-      const res = await apiClient.post<{ url: string }>("/api/admin/uploads/avatar", body);
+      const res = await apiClient.post<AvatarUploadResponse>("/api/admin/uploads/avatar", body);
       return res.data.url;
     } catch (err) {
       return handleAxiosError(err, "Không thể tải ảnh lên. Vui lòng thử lại.");

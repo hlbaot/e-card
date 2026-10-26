@@ -18,7 +18,7 @@ export function CopyButton({
           await navigator.clipboard.writeText(value);
           toast("Đã sao chép liên kết");
         } catch {
-          toast("Không thể sao chép. Hãy chọn và sao chép liên kết.");
+          toast("Không thể sao chép. Hãy chọn và sao chép liên kết.", "error");
         }
       }}
     >

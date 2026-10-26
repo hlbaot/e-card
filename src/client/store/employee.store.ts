@@ -1,7 +1,10 @@
 import { create } from "zustand";
 
-// Chỉ thông báo các view đọc lại API, không lưu dữ liệu nhân viên vào localStorage.
-export const useEmployeeStore = create<{ revision: number; invalidate: () => void }>((set) => ({
-  revision: 0,
-  invalidate: () => set((state) => ({ revision: state.revision + 1 })),
+// UI state only. Employee records, loading and freshness live in React Query.
+export const useEmployeeStore = create<{
+  employeeSearch: string; cardSearch: string;
+  setEmployeeSearch: (value: string) => void; setCardSearch: (value: string) => void;
+}>(set => ({ employeeSearch: "", cardSearch: "",
+  setEmployeeSearch: employeeSearch => set({ employeeSearch }),
+  setCardSearch: cardSearch => set({ cardSearch }),
 }));

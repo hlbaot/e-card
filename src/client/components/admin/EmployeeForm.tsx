@@ -1,6 +1,13 @@
 "use client";
 import { migrateCardTheme } from "@/shared/utils/migrate-theme";
-import { useRef, useState } from "react";
+import {
+  useCallback,
+  useDeferredValue,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -15,20 +22,30 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { DEFAULT_PUBLIC_FIELDS, getPublicFields } from "@/shared/types";
-import type { Employee } from "@/shared/types";
+import type { CardTheme, Employee, EmployeeInput } from "@/shared/types";
 import { useEmployeeMutations } from "@/client/hooks/useEmployeeMutations";
-import type { EmployeeInput } from "@/shared/types";
-import { QRPanel } from "@/client/components/card/QRPanel";
 import { Avatar } from "@/client/components/ui/Avatar";
 import { Switch } from "@/client/components/ui/Switch";
 import { useToast } from "@/client/components/ui/Toast";
 import { Alert } from "@/client/components/ui/Alert";
-import { ThemeCustomizer } from "./ThemeCustomizer";
 import { EmployeeFormLayout } from "./EmployeeFormLayout";
-import { LivePreviewPanel } from "./LivePreviewPanel";
-import { PreviewModal } from "./PreviewModal";
 import { PreviewToggleButton } from "./PreviewToggleButton";
 import { websiteUrl } from "@/shared/utils/vcard";
+
+const ThemeCustomizer = dynamic(() =>
+  import("./ThemeCustomizer").then((m) => m.ThemeCustomizer),
+);
+const LivePreviewPanel = dynamic(() =>
+  import("./LivePreviewPanel").then((m) => m.LivePreviewPanel),
+);
+const PreviewModal = dynamic(
+  () => import("./PreviewModal").then((m) => m.PreviewModal),
+  { ssr: false },
+);
+const QRPanel = dynamic(
+  () => import("@/client/components/card/QRPanel").then((m) => m.QRPanel),
+  { ssr: false },
+);
 
 const blank: EmployeeInput = {
   company: "",
@@ -104,13 +121,35 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
     }
   };
 
-  const preview: Employee = {
-    ...form,
-    id: employee?.id || "preview",
-    slug: employee?.slug || "xem-truoc",
-    createdAt: employee?.createdAt || "",
-    updatedAt: employee?.updatedAt || "",
-  };
+  const handleThemeChange = useCallback((theme: CardTheme) => {
+    setForm((f) => ({ ...f, theme }));
+  }, []);
+
+  const handleOpenDesktopPreview = useCallback(() => {
+    lastTriggerRef.current = desktopToggleRef.current;
+    setPreviewModalOpen(true);
+  }, []);
+
+  const handleOpenMobilePreview = useCallback(() => {
+    lastTriggerRef.current = mobileFabRef.current;
+    setPreviewModalOpen(true);
+  }, []);
+
+  const handleClosePreviewModal = useCallback(() => {
+    setPreviewModalOpen(false);
+  }, []);
+
+  const preview: Employee = useMemo(
+    () => ({
+      ...form,
+      id: employee?.id || "preview",
+      slug: employee?.slug || "xem-truoc",
+      createdAt: employee?.createdAt || "",
+      updatedAt: employee?.updatedAt || "",
+    }),
+    [form, employee?.id, employee?.slug, employee?.createdAt, employee?.updatedAt],
+  );
+  const deferredPreview = useDeferredValue(preview);
 
   const input = (
     key: TextField,
@@ -409,7 +448,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
 
       <ThemeCustomizer
         theme={form.theme}
-        onChange={(theme) => set("theme", theme)}
+        onChange={handleThemeChange}
       />
 
       <section className="panel form-section">
@@ -467,12 +506,9 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
         actionBar={actionBar}
         previewPanel={
           <LivePreviewPanel
-            employee={preview}
+            employee={deferredPreview}
             toggleButtonRef={desktopToggleRef}
-            onOpenModal={() => {
-              lastTriggerRef.current = desktopToggleRef.current;
-              setPreviewModalOpen(true);
-            }}
+            onOpenModal={handleOpenDesktopPreview}
           />
         }
         mobileFab={
@@ -480,21 +516,20 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
             ref={mobileFabRef}
             variant="fab"
             label="Xem trước"
-            onClick={() => {
-              lastTriggerRef.current = mobileFabRef.current;
-              setPreviewModalOpen(true);
-            }}
+            onClick={handleOpenMobilePreview}
           />
         }
         onSubmit={submit}
       />
 
-      <PreviewModal
-        open={previewModalOpen}
-        onClose={() => setPreviewModalOpen(false)}
-        employee={preview}
-        returnFocusRef={lastTriggerRef}
-      />
+      {previewModalOpen && (
+        <PreviewModal
+          open={previewModalOpen}
+          onClose={handleClosePreviewModal}
+          employee={deferredPreview}
+          returnFocusRef={lastTriggerRef}
+        />
+      )}
     </>
   );
 }

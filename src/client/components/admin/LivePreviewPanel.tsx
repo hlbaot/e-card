@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import type { Employee } from "@/shared/types";
 import { ECard } from "@/client/components/card/ECard";
 import { PreviewToggleButton } from "./PreviewToggleButton";
@@ -95,7 +95,7 @@ export interface LivePreviewPanelProps {
   toggleButtonRef?: React.RefObject<HTMLButtonElement | null>;
 }
 
-export function LivePreviewPanel({
+export const LivePreviewPanel = memo(function LivePreviewPanel({
   employee,
   onOpenModal,
   toggleButtonRef,
@@ -130,4 +130,4 @@ export function LivePreviewPanel({
       </p>
     </aside>
   );
-}
+});

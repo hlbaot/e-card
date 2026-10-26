@@ -51,7 +51,12 @@ export function CardListContent({
 }
 export function CardListItem({ employee }: { employee: Employee }) {
   return (
-    <Link href={routes.card(employee.slug)} className="employee-card">
+    <Link
+      href={routes.card(employee.slug)}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="employee-card"
+    >
       <CardListContent employee={employee} />
     </Link>
   );

@@ -13,7 +13,13 @@ import type { Employee } from "@/shared/types";
 import { saveContact, websiteUrl } from "@/shared/utils/vcard";
 import { useToast } from "@/client/components/ui/Toast";
 
-export function CardActions({ employee: e }: { employee: Employee }) {
+export function CardActions({
+  employee: e,
+  animate = false,
+}: {
+  employee: Employee;
+  animate?: boolean;
+}) {
   const toast = useToast();
   const pf = getPublicFields(e);
   const actions = [
@@ -76,14 +82,21 @@ export function CardActions({ employee: e }: { employee: Employee }) {
 
   return (
     <div className="card-actions actions-outline">
-      {actions.map(({ label, icon: Icon, href, external }, index) =>
-        href ? (
+      {actions.map(({ label, icon: Icon, href, external }, index) => {
+        const aosProps = animate
+          ? {
+              "data-aos": "zoom-in-up",
+              "data-aos-delay": String(300 + index * 55),
+            }
+          : {};
+        return href ? (
           <a
             key={label}
             href={href}
             className={index === 0 ? "action-primary" : undefined}
             target={external ? "_blank" : undefined}
             rel={external ? "noopener noreferrer" : undefined}
+            {...aosProps}
           >
             <span className="action-btn-content">
               <Icon size={16} />
@@ -102,6 +115,7 @@ export function CardActions({ employee: e }: { employee: Employee }) {
               saveContact(e);
               toast("Đã tải danh bạ vCard");
             }}
+            {...aosProps}
           >
             <span className="action-btn-content">
               <Icon size={16} />
@@ -109,8 +123,8 @@ export function CardActions({ employee: e }: { employee: Employee }) {
             </span>
             <ChevronRight size={13} className="action-btn-chevron" />
           </button>
-        ),
-      )}
+        );
+      })}
     </div>
   );
 }

@@ -8,7 +8,7 @@ import {
   Building2,
   Plus,
   Trash2,
-  Upload,
+  Pencil,
   Save,
   ArrowLeft,
   QrCode,
@@ -237,16 +237,32 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
           <span>01</span>Thông tin nhân viên
         </h2>
         <div className="avatar-upload">
-          <Avatar
-            name={form.fullName}
-            src={form.avatarUrl}
-            color={form.theme.primaryColor}
-            size={65}
-          />
-          <div>
-            <label className="btn btn-secondary file-label">
-              <Upload size={14} />
-              {uploading ? "Đang tải ảnh…" : "Tải ảnh lên"}
+          <div className="relative inline-flex items-center">
+            <label
+              className="group relative inline-flex cursor-pointer rounded-full focus-within:ring-2 focus-within:ring-cyan-400 focus-within:ring-offset-2 focus-within:ring-offset-[#071026]"
+              title={uploading ? "Đang tải ảnh…" : "Nhấn để tải hoặc đổi ảnh đại diện"}
+              aria-label={uploading ? "Đang tải ảnh…" : "Tải hoặc đổi ảnh đại diện"}
+            >
+              <Avatar
+                name={form.fullName}
+                src={form.avatarUrl}
+                color={form.theme.primaryColor}
+                size={72}
+              />
+              <span
+                aria-hidden="true"
+                className={`absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-white transition-opacity duration-200 ${
+                  uploading
+                    ? "opacity-100"
+                    : "opacity-0 group-hover:opacity-100 group-focus-within:opacity-100"
+                }`}
+              >
+                {uploading ? (
+                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                ) : (
+                  <Pencil size={20} className="drop-shadow" />
+                )}
+              </span>
               <input
                 className="sr-only"
                 type="file"
@@ -270,20 +286,33 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
                     set("avatarUrl", await uploadAvatar(file));
                     toast("Đã tải ảnh lên");
                   } catch (error) {
-                    toast(error instanceof Error ? error.message : "Không thể tải ảnh", "error");
-                  } finally { setUploading(false); input.value = ""; }
+                    toast(
+                      error instanceof Error ? error.message : "Không thể tải ảnh",
+                      "error",
+                    );
+                  } finally {
+                    setUploading(false);
+                    input.value = "";
+                  }
                 }}
               />
             </label>
             {form.avatarUrl && (
               <button
                 type="button"
-                className="btn btn-ghost"
+                aria-label="Xóa ảnh đại diện"
+                title="Xóa ảnh đại diện"
                 onClick={() => set("avatarUrl", "")}
+                className="ml-3 inline-flex h-9 w-9 items-center justify-center rounded-xl border border-rose-500/35 bg-rose-500/12 text-rose-400 transition-all hover:border-rose-400/60 hover:bg-rose-500/22 hover:text-rose-300 cursor-pointer"
               >
-                Xóa ảnh
+                <Trash2 size={16} />
               </button>
             )}
+          </div>
+          <div>
+            <p className="!mt-0 text-xs font-medium text-slate-300">
+              Ảnh đại diện
+            </p>
             <p>JPG, PNG hoặc WebP · Tối đa 2 MB</p>
           </div>
         </div>

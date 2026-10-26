@@ -76,7 +76,7 @@ export function ScaledECardViewport({
         >
           {mode === "desktop" ? (
             <div className="qtm-desktop-stage w-full h-full">
-              <ECard employee={employee} variant="profile" />
+              <ECard employee={employee} variant="preview" />
             </div>
           ) : (
             <div className="qtm-preview-device">

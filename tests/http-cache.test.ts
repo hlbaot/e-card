@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { conditionalJson } from "../src/server/http-cache";
+import {
+  buildCollectionEtag,
+  buildEntityEtag,
+  conditionalJson,
+  matchesIfNoneMatch,
+  notModifiedResponse,
+} from "../src/server/http-cache";
 
 test("ETag supports weak/strong validators, lists and wildcard; changed JSON returns 200", async () => {
   const data = { employees: [{ id: "one", updatedAt: "first" }] };
@@ -18,4 +24,16 @@ test("ETag supports weak/strong validators, lists and wildcard; changed JSON ret
   }
   const publicRead = conditionalJson(undefined, data, "public");
   assert.equal(publicRead.headers.get("cache-control"), "public, max-age=0, must-revalidate");
+
+  const vTag1 = buildCollectionEtag({ count: 3, maxUpdatedAt: "2026-10-26T00:00:00.000Z" });
+  const vTag2 = buildCollectionEtag({ count: 3, maxUpdatedAt: "2026-10-26T00:00:01.000Z" });
+  assert.notEqual(vTag1, vTag2);
+  const vReq = new Request("http://localhost/api/admin/employees", { headers: { "If-None-Match": vTag1 } });
+  assert.equal(matchesIfNoneMatch(vReq, vTag1), true);
+  assert.equal(matchesIfNoneMatch(vReq, vTag2), false);
+  assert.equal(notModifiedResponse(vTag1, "private").status, 304);
+  assert.notEqual(
+    buildEntityEtag("id-1", "2026-10-26T00:00:00.000Z", true),
+    buildEntityEtag("id-1", "2026-10-26T00:00:00.000Z", false),
+  );
 });

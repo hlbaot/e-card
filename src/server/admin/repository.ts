@@ -7,7 +7,9 @@ import type { CardRecord } from "@/server/cards/service";
 
 export interface AdminEmployeesRepository {
   list(): Promise<CardRecord[]>;
+  listVersion?(): Promise<{ count: number; maxUpdatedAt: Date | null }>;
   byId(id: string): Promise<CardRecord | null>;
+  byIdVersion?(id: string): Promise<{ id: string; updatedAt: Date; isActive: boolean } | null>;
   create(input: EmployeeCreate, slug: string): Promise<CardRecord>;
   update(id: string, input: EmployeePatch): Promise<CardRecord>;
   toggle(id: string): Promise<CardRecord | null>;
@@ -16,7 +18,20 @@ export interface AdminEmployeesRepository {
 }
 export const adminEmployeesRepository: AdminEmployeesRepository = {
   list: () => prisma.employee.findMany({ where: { deletedAt: null }, select: employeeCardSelect, orderBy: [{ createdAt: "desc" }, { id: "asc" }] }),
+  async listVersion() {
+    const agg = await prisma.employee.aggregate({
+      where: { deletedAt: null },
+      _count: { _all: true },
+      _max: { updatedAt: true },
+    });
+    return { count: agg._count._all, maxUpdatedAt: agg._max.updatedAt };
+  },
   byId: (id) => prisma.employee.findFirst({ where: { id, deletedAt: null }, select: employeeCardSelect }),
+  byIdVersion: (id) =>
+    prisma.employee.findFirst({
+      where: { id, deletedAt: null },
+      select: { id: true, updatedAt: true, isActive: true },
+    }),
   create(input, slug) {
     const { theme, publicFields, ...data } = input;
     void publicFields; // DTO tương thích FE, schema hiện công khai mọi trường liên hệ.

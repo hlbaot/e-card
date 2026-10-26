@@ -74,18 +74,25 @@ test("public routes need no token, return 404 for unavailable cards and sanitize
 });
 
 
-test("cached public profile checks visibility before reading persistent content", async () => {
+test("public detail reads current visibility and content in one repository query", async () => {
   process.env.DATABASE_URL = "postgresql://localhost:5432/cards_tests_never_connected";
   process.env.JWT_SECRET = "test-only-secret-with-at-least-32-bytes";
   const { cardsRepository } = await import("../src/server/cards/repository");
   const { cachedPublicCards } = await import("../src/server/cards/cache");
-  const original = cardsRepository.isVisible;
-  let checks = 0;
-  cardsRepository.isVisible = async () => { checks++; return false; };
+  const original = cardsRepository.bySlug;
+  let reads = 0;
+  let current = { ...card };
+  cardsRepository.bySlug = async () => { reads++; return current; };
   try {
+    assert.equal((await cachedPublicCards.bySlug(card.slug))?.slug, card.slug);
+    assert.equal(reads, 1);
+    current = { ...card, isActive: false };
     assert.equal(await cachedPublicCards.bySlug("hidden"), null);
-    assert.equal(checks, 1);
+    assert.equal(reads, 2);
+    current = { ...card, deletedAt: new Date() };
+    assert.equal(await cachedPublicCards.bySlug("deleted"), null);
+    assert.equal(reads, 3);
     assert.equal(await cachedPublicCards.bySlug(""), null);
-    assert.equal(checks, 1);
-  } finally { cardsRepository.isVisible = original; }
+    assert.equal(reads, 3);
+  } finally { cardsRepository.bySlug = original; }
 });

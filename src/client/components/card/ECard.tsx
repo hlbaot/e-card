@@ -14,7 +14,7 @@ import { useAuthStore } from "@/client/store/auth.store";
 import { routes } from "@/shared/constants/routes";
 import { QtmBrand } from "./QtmBrand";
 import { CardActions } from "./CardActions";
-import { ProfileDecorations, ProfileFooterDecorations } from "./ProfileDecorations";
+import { ProfileConnectionArtwork, ProfileDecorations, ProfileFooterDecorations } from "./ProfileDecorations";
 import "./professional-card.css";
 import "./card-styles.css";
 
@@ -35,7 +35,11 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
   const Name = variant === "profile" ? "h1" : "h2";
   const isProfile = variant === "profile";
   const aos = (type: string, delay: number) =>
-    isProfile ? { "data-aos": type, "data-aos-delay": String(delay) } : {};
+    isProfile ? {
+      "data-aos": type,
+      "data-aos-delay": String(Math.min(Math.round(delay / 50) * 50, 350)),
+      "data-aos-duration": "500",
+    } : {};
   const slogan = e.slogan?.trim() || "Let's Create a Brighter Tomorrow Together";
   const authenticated = useAuthStore((state) => state.authenticated);
   const rows = [
@@ -96,6 +100,7 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
               ))}
             </section>
             <CardActions employee={e} animate={isProfile} />
+            <ProfileConnectionArtwork theme={theme} />
             <footer className="qtm-profile-footer" {...aos("fade-up", 420)}>
               <div className="qtm-footer-row">
                 <div className="qtm-profile-slogan-wrap">

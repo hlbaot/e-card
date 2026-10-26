@@ -150,6 +150,10 @@ async function main() {
     ProfilePage,
   } = require("../src/client/components/card/ProfilePage.tsx");
   const { ECard } = require("../src/client/components/card/ECard.tsx");
+  const { CardListItem } = require("../src/client/components/card/CardListItem.tsx");
+  const cardLink = renderToStaticMarkup(createElement(CardListItem, { employee: localized }));
+  assert.ok(cardLink.includes('target="_blank"'), "Card detail must open in a new tab");
+  assert.ok(cardLink.includes('rel="noopener noreferrer"'));
   for (const template of templates) {
     const employee = {
       ...localized,

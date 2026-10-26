@@ -4067,6 +4067,36 @@ body:has(dialog[open]) > .toast {
 /* ==========================================================================
    AOS CUSTOM OVERRIDES & FULL-VIEWPORT QTM E-CARD PROFILE VIEW (/card/[slug])
    ========================================================================== */
+/* Server-rendered content stays readable while the animation module loads. */
+[data-aos][data-aos]:not(.aos-init) {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+/* Set the entrance starting styles instantly; animating this preparation
+   would reverse the reveal before the element has visibly moved. */
+[data-aos].aos-preparing {
+  transition: none !important;
+}
+
+/* The public card starts at the entrance state in the server HTML too.
+   Otherwise its complete contents flash before hydration restarts AOS. */
+@media (prefers-reduced-motion: no-preference) {
+  .qtm-public-profile [data-aos][data-aos]:not(.aos-animate) {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-aos][data-aos][data-aos] {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: none;
+  }
+}
+
 [data-aos="fade-up"]:not(.aos-animate) {
   transform: translate3d(0, 24px, 0);
 }

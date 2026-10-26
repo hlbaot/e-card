@@ -1,6 +1,5 @@
-import { apiClient } from "./client";
+import { ApiClientError, apiClient } from "./client";
 import type { Employee, EmployeeInput, EmployeeStats, EmployeeResponse, EmployeesResponse, AvatarUploadResponse } from "@/shared/types";
-import { AxiosError } from "axios";
 
 export class EmployeeApiError extends Error {
   constructor(message: string, public status: number) {
@@ -9,8 +8,8 @@ export class EmployeeApiError extends Error {
   }
 }
 
-function handleAxiosError(err: unknown, defaultMessage = "Không thể tải dữ liệu nhân viên."): never {
-  if (err instanceof AxiosError) {
+function handleApiError(err: unknown, defaultMessage = "Không thể tải dữ liệu nhân viên."): never {
+  if (err instanceof ApiClientError) {
     const message = err.response?.data?.error || err.message || defaultMessage;
     const status = err.response?.status || 500;
     throw new EmployeeApiError(message, status);
@@ -94,7 +93,7 @@ export const employeeApi = {
       const res = await apiClient.get<EmployeesResponse>(root, { signal });
       return res.data.employees;
     } catch (err) {
-      return handleAxiosError(err);
+      return handleApiError(err);
     }
   },
 
@@ -103,7 +102,7 @@ export const employeeApi = {
       const res = await apiClient.get<EmployeeResponse>(`${root}/${encodeURIComponent(id)}`, { signal });
       return res.data.employee;
     } catch (err) {
-      return handleAxiosError(err);
+      return handleApiError(err);
     }
   },
 
@@ -112,7 +111,7 @@ export const employeeApi = {
       const res = await apiClient.post<EmployeeResponse>(root, sanitizeInput(input));
       return res.data.employee;
     } catch (err) {
-      return handleAxiosError(err);
+      return handleApiError(err);
     }
   },
 
@@ -124,7 +123,7 @@ export const employeeApi = {
       );
       return res.data.employee;
     } catch (err) {
-      return handleAxiosError(err);
+      return handleApiError(err);
     }
   },
 
@@ -132,7 +131,7 @@ export const employeeApi = {
     try {
       await apiClient.delete(`${root}/${encodeURIComponent(id)}`);
     } catch (err) {
-      return handleAxiosError(err);
+      return handleApiError(err);
     }
   },
 
@@ -141,7 +140,7 @@ export const employeeApi = {
       const res = await apiClient.patch<EmployeeResponse>(`${root}/${encodeURIComponent(id)}/active`);
       return res.data.employee;
     } catch (err) {
-      return handleAxiosError(err);
+      return handleApiError(err);
     }
   },
 
@@ -150,7 +149,7 @@ export const employeeApi = {
       const res = await apiClient.get<EmployeeStats>("/api/admin/stats", { signal });
       return res.data;
     } catch (err) {
-      return handleAxiosError(err);
+      return handleApiError(err);
     }
   },
 
@@ -161,7 +160,7 @@ export const employeeApi = {
       const res = await apiClient.post<AvatarUploadResponse>("/api/admin/uploads/avatar", body);
       return res.data.url;
     } catch (err) {
-      return handleAxiosError(err, "Không thể tải ảnh lên. Vui lòng thử lại.");
+      return handleApiError(err, "Không thể tải ảnh lên. Vui lòng thử lại.");
     }
   },
 };

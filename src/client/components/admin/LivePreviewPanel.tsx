@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import type { Employee } from "@/shared/types";
 import { ECard } from "@/client/components/card/ECard";
 import { PreviewToggleButton } from "./PreviewToggleButton";
@@ -76,7 +76,7 @@ export function ScaledECardViewport({
         >
           {mode === "desktop" ? (
             <div className="qtm-desktop-stage w-full h-full">
-              <ECard employee={employee} variant="profile" />
+              <ECard employee={employee} variant="preview" />
             </div>
           ) : (
             <div className="qtm-preview-device">
@@ -95,7 +95,7 @@ export interface LivePreviewPanelProps {
   toggleButtonRef?: React.RefObject<HTMLButtonElement | null>;
 }
 
-export function LivePreviewPanel({
+export const LivePreviewPanel = memo(function LivePreviewPanel({
   employee,
   onOpenModal,
   toggleButtonRef,
@@ -130,4 +130,4 @@ export function LivePreviewPanel({
       </p>
     </aside>
   );
-}
+});

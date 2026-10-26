@@ -7,7 +7,9 @@ import type { CardRecord } from "@/server/cards/service";
 
 export interface AdminEmployeesRepository {
   list(): Promise<CardRecord[]>;
+  listVersion?(): Promise<{ count: number; maxUpdatedAt: Date | null }>;
   byId(id: string): Promise<CardRecord | null>;
+  byIdVersion?(id: string): Promise<{ id: string; updatedAt: Date; isActive: boolean } | null>;
   create(input: EmployeeCreate, slug: string): Promise<CardRecord>;
   update(id: string, input: EmployeePatch): Promise<CardRecord>;
   toggle(id: string): Promise<CardRecord | null>;
@@ -16,34 +18,46 @@ export interface AdminEmployeesRepository {
 }
 export const adminEmployeesRepository: AdminEmployeesRepository = {
   list: () => prisma.employee.findMany({ where: { deletedAt: null }, select: employeeCardSelect, orderBy: [{ createdAt: "desc" }, { id: "asc" }] }),
+  async listVersion() {
+    const agg = await prisma.employee.aggregate({
+      where: { deletedAt: null },
+      _count: { _all: true },
+      _max: { updatedAt: true },
+    });
+    return { count: agg._count._all, maxUpdatedAt: agg._max.updatedAt };
+  },
   byId: (id) => prisma.employee.findFirst({ where: { id, deletedAt: null }, select: employeeCardSelect }),
+  byIdVersion: (id) =>
+    prisma.employee.findFirst({
+      where: { id, deletedAt: null },
+      select: { id: true, updatedAt: true, isActive: true },
+    }),
   create(input, slug) {
     const { theme, publicFields, ...data } = input;
     void publicFields; // DTO tương thích FE, schema hiện công khai mọi trường liên hệ.
-    // Nested write và offices JSON nằm trong một transaction: không tạo card dở dang.
-    return prisma.$transaction((tx) => tx.employee.create({
+    return prisma.employee.create({
       data: { ...data, slug, theme: { create: theme } }, select: employeeCardSelect,
-    }));
+    });
   },
   update(id, input) {
     const { theme, publicFields, ...data } = input;
     void publicFields; // DTO tương thích FE, schema hiện công khai mọi trường liên hệ.
     // Chỉ cập nhật bản chưa xóa; slug không nằm trong DTO nên luôn được giữ nguyên.
-    return prisma.$transaction((tx) => tx.employee.update({
+    return prisma.employee.update({
       where: { id, deletedAt: null },
       data: { ...data, ...(theme ? { theme: { upsert: { create: theme, update: theme } } } : {}) },
       select: employeeCardSelect,
-    }));
-  },
-  toggle(id) {
-    return prisma.$transaction(async (tx) => {
-      // Đảo boolean ngay trong SQL để hai request đồng thời không ghi cùng giá trị cũ.
-      const rows = await tx.$queryRaw<{ id: string }[]>`
-        UPDATE employees SET is_active = NOT is_active, updated_at = NOW()
-        WHERE id = ${id}::uuid AND deleted_at IS NULL RETURNING id
-      `;
-      return rows.length ? tx.employee.findUnique({ where: { id }, select: employeeCardSelect }) : null;
     });
+  },
+  async toggle(id) {
+    // Đảo boolean trực tiếp bằng 1 câu UPDATE ... RETURNING, bỏ interactive transaction (BEGIN/COMMIT) để giảm round-trip.
+    const rows = await prisma.$queryRaw<{ id: string }[]>`
+      UPDATE employees SET is_active = NOT is_active, updated_at = NOW()
+      WHERE id = ${id}::uuid AND deleted_at IS NULL RETURNING id
+    `;
+    return rows.length
+      ? prisma.employee.findUnique({ where: { id }, select: employeeCardSelect })
+      : null;
   },
   async remove(id) {
     const result = await prisma.employee.updateMany({

@@ -1,10 +1,36 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { QueryProvider } from "@/client/providers/QueryProvider";
 import { ToastProvider } from "@/client/components/ui/Toast";
 import { PageBackground } from "@/client/components/ui/PageBackground";
 import { absoluteUrl, siteConfig } from "@/config/site";
 import "./globals.css";
+
+const plusJakarta = localFont({
+  src: [
+    {
+      path: "../../public/fonts/plus-jakarta/vietnamese.woff2",
+      weight: "400 800",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/plus-jakarta/latin-ext.woff2",
+      weight: "400 800",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/plus-jakarta/latin.woff2",
+      weight: "400 800",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/plus-jakarta/cyrillic-ext.woff2",
+      weight: "400 800",
+      style: "normal",
+    },
+  ],
+  variable: "--font-jakarta-sans",
+  display: "swap",
+});
 
 const handwriting = localFont({
   src: "./fonts/dancing-script.ttf",
@@ -68,10 +94,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi" className={`${handwriting.variable} dark`}>
+    <html lang="vi" className={`${plusJakarta.variable} ${handwriting.variable} dark`}>
       <body>
         <PageBackground />
-        <QueryProvider><ToastProvider>{children}</ToastProvider></QueryProvider>
+        <ToastProvider>{children}</ToastProvider>
       </body>
     </html>
   );

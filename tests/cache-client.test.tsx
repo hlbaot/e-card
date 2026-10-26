@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { createQueryClient, bindQuerySession } from "../src/client/queries/client";
-import { employeesOptions } from "../src/client/queries/employees";
+import { employeeOptions, employeesOptions } from "../src/client/queries/employees";
 import { optimisticToggle } from "../src/client/queries/employee-cache";
 import { queryKeys } from "../src/client/queries/keys";
 import { useAuthStore } from "../src/client/store/auth.store";
@@ -31,6 +31,9 @@ test("fresh navigation reuses one query; stale background fetch keeps data; defa
     assert.equal(client.getQueryData<Employee[]>(options.queryKey)?.[0].fullName, "Test");
     finish([{ ...employee, fullName: "Changed" }]); await pending;
     assert.equal(client.getQueryData<Employee[]>(options.queryKey)?.[0].fullName, "Changed");
+    const detailOpts = employeeOptions(user.id, "one", client);
+    assert.equal(typeof detailOpts.initialData === "function" ? detailOpts.initialData()?.fullName : undefined, "Changed");
+    assert.equal(typeof detailOpts.initialDataUpdatedAt === "function" ? detailOpts.initialDataUpdatedAt() : undefined, client.getQueryState(options.queryKey)?.dataUpdatedAt);
     assert.equal(client.getQueryData(queryKeys.employees.list("another-admin")), undefined);
   } finally { client.clear(); }
 });

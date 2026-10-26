@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, type CSSProperties } from "react";
-import { MapPin, Phone, Mail, Globe, QrCode, Share2, ArrowLeft, Pencil } from "lucide-react";
+import { MapPin, Phone, Mail, Globe, QrCode, Share2, Pencil } from "lucide-react";
 import { getPublicFields } from "@/shared/types";
 import type { Employee } from "@/shared/types";
 import { getTemplate, getThemeBackgroundCss } from "@/config/card-themes";
@@ -33,6 +33,9 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
   const scrollRef = useRef<HTMLDivElement>(null);
   const accent = readableAccent(theme.primaryColor || template.defaultColor, false, "#E0E0E0");
   const Name = variant === "profile" ? "h1" : "h2";
+  const isProfile = variant === "profile";
+  const aos = (type: string, delay: number) =>
+    isProfile ? { "data-aos": type, "data-aos-delay": String(delay) } : {};
   const slogan = e.slogan?.trim() || "Let's Create a Brighter Tomorrow Together";
   const authenticated = useAuthStore((state) => state.authenticated);
   const rows = [
@@ -59,15 +62,14 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
         <ProfileDecorations theme={theme} />
         <div className="qtm-card-scroll" ref={scrollRef}>
           <div className="qtm-card-layout">
-            <header className="qtm-profile-brand">
+            <header className="qtm-profile-brand" {...aos("fade-down", 50)}>
               <QtmBrand />
               <div className="qtm-culture">CULTURE<br />TECHNOLOGY<br />MEDIA<br />EVENT</div>
             </header>
-            <div className="qtm-portrait">
-              <p className="qtm-creative"><strong>QTM<br />MEDIATECH</strong><br />CREATIVE<br />+ AI TECH<span /></p>
-              <Avatar name={e.fullName} src={e.avatarUrl} color={accent} size={130} />
-              <div className="qtm-profile-tools">
-                {onOpenQr && <Link href="/" aria-label="Về trang chủ"><ArrowLeft /></Link>}
+            <div className="qtm-portrait" {...aos("zoom-in", 100)}>
+              <p className="qtm-creative" {...aos("fade-right", 160)}><strong>QTM<br />MEDIATECH</strong><br />CREATIVE<br />+ AI TECH<span /></p>
+              <Avatar name={e.fullName} src={e.avatarUrl} color={accent} size={130} priority={isProfile} />
+              <div className="qtm-profile-tools" {...aos("fade-left", 160)}>
                 {onOpenQr && <button type="button" aria-label="Mở mã QR" onClick={onOpenQr}><QrCode /></button>}
                 {onShare && <button type="button" aria-label="Chia sẻ hồ sơ" onClick={onShare}><Share2 /></button>}
                 {variant === "profile" && authenticated && (
@@ -77,7 +79,7 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
                 )}
               </div>
             </div>
-            <section className="qtm-profile-identity" aria-label="Thông tin cá nhân">
+            <section className="qtm-profile-identity" aria-label="Thông tin cá nhân" {...aos("fade-up", 180)}>
               <Name>{e.fullName || "HỌ TÊN NHÂN VIÊN"}</Name>
               <p className="qtm-position">{e.position || "Chức vụ"}</p>
               <span className="qtm-identity-rule" aria-hidden="true" />
@@ -85,16 +87,16 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
               <p className="qtm-company-short">{e.companyShort || "QTM MEDIATECH.,JSC"}</p>
             </section>
             <section className="qtm-profile-contacts" aria-label="Thông tin liên hệ">
-              {rows.map(({ key, Icon, label, value, href }) => (
-                <div className="qtm-contact" key={key}>
+              {rows.map(({ key, Icon, label, value, href }, index) => (
+                <div className="qtm-contact" key={key} {...aos("fade-left", 220 + index * 60)}>
                   <span className="qtm-contact-icon"><Icon aria-hidden="true" /></span>
                   <strong>{label}</strong>
                   {key.startsWith("office-") && onOpenAddresses ? <button className="qtm-contact-value" type="button" onClick={onOpenAddresses}>{value}</button> : href ? <a href={href} target={key === "website" ? "_blank" : undefined} rel={key === "website" ? "noopener noreferrer" : undefined}>{value}</a> : <span>{value}</span>}
                 </div>
               ))}
             </section>
-            <CardActions employee={e} />
-            <footer className="qtm-profile-footer">
+            <CardActions employee={e} animate={isProfile} />
+            <footer className="qtm-profile-footer" {...aos("fade-up", 420)}>
               <div className="qtm-footer-row">
                 <div className="qtm-profile-slogan-wrap">
                   <p className="qtm-profile-slogan">{slogan}</p>

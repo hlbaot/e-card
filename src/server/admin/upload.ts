@@ -3,19 +3,55 @@ import type { NextRequest } from "next/server";
 import type { AvatarUploadResponse } from "@/shared/types";
 import { AuthError } from "@/server/auth/service";
 import { authJson } from "@/server/auth/http";
-import { adminHandler, readBody } from "./http";
+import { adminHandler } from "./http";
 
 export const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
+const ALLOWED_AVATAR_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+const PNG_MAGIC = [137, 80, 78, 71, 13, 10, 26, 10] as const;
+
+function hasValidMagicBytes(type: string, header: Uint8Array): boolean {
+  if (type === "image/jpeg") {
+    return header.length >= 3 && header[0] === 0xff && header[1] === 0xd8 && header[2] === 0xff;
+  }
+  if (type === "image/png") {
+    return header.length >= 8 && PNG_MAGIC.every((byte, idx) => header[idx] === byte);
+  }
+  if (type === "image/webp") {
+    return (
+      header.length >= 12 &&
+      header[0] === 0x52 && // R
+      header[1] === 0x49 && // I
+      header[2] === 0x46 && // F
+      header[3] === 0x46 && // F
+      header[8] === 0x57 && // W
+      header[9] === 0x45 && // E
+      header[10] === 0x42 && // B
+      header[11] === 0x50 // P
+    );
+  }
+  return false;
+}
+
 // Đối chiếu cả MIME lẫn chữ ký file; không nhận SVG/HTML đổi đuôi thành ảnh.
 export function validateAvatar(type: string, bytes: Uint8Array) {
   if (!bytes.length) throw new AuthError("File ảnh đang trống.", 400);
   if (bytes.length > MAX_AVATAR_BYTES) throw new AuthError("Ảnh tối đa 2 MB.", 413);
-  const buffer = Buffer.from(bytes);
-  const valid = type === "image/jpeg" ? buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff
-    : type === "image/png" ? buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
-    : type === "image/webp" ? buffer.length >= 12 && buffer.toString("ascii", 0, 4) === "RIFF" && buffer.toString("ascii", 8, 12) === "WEBP"
-    : false;
-  if (!valid) throw new AuthError("Chỉ nhận ảnh JPG, PNG hoặc WebP hợp lệ.", 415);
+  if (!ALLOWED_AVATAR_TYPES.has(type) || !hasValidMagicBytes(type, bytes.subarray(0, 12))) {
+    throw new AuthError("Chỉ nhận ảnh JPG, PNG hoặc WebP hợp lệ.", 415);
+  }
+}
+
+export async function validateAvatarFile(file: File) {
+  if (file.size === 0) throw new AuthError("File ảnh đang trống.", 400);
+  if (file.size > MAX_AVATAR_BYTES) throw new AuthError("Ảnh tối đa 2 MB.", 413);
+  if (!ALLOWED_AVATAR_TYPES.has(file.type)) {
+    throw new AuthError("Chỉ nhận ảnh JPG, PNG hoặc WebP hợp lệ.", 415);
+  }
+  // Chỉ đọc 12 byte đầu để kiểm tra magic signature thay vì nạp toàn bộ file 2 MB vào RAM.
+  const header = new Uint8Array(await file.slice(0, 12).arrayBuffer());
+  if (!hasValidMagicBytes(file.type, header)) {
+    throw new AuthError("Chỉ nhận ảnh JPG, PNG hoặc WebP hợp lệ.", 415);
+  }
 }
 export const avatarStorage = {
   async upload(file: File): Promise<string> {
@@ -56,17 +92,26 @@ export const avatarStorage = {
     return result.secure_url;
   },
 };
+// Parse multipart một lần trực tiếp qua request.formData() và chỉ đọc 12 byte magic header
+// thay vì đọc toàn bộ body vào Uint8Array rồi tạo lại Request/FormData trong RAM.
+// (Nếu về sau bổ sung CLOUDINARY_API_SECRET, có thể cấp chữ ký để client upload thẳng lên Cloudinary).
 export const uploadAvatar = (request: NextRequest) => adminHandler(request, async () => {
   const type = request.headers.get("content-type") ?? "";
   if (!type.startsWith("multipart/form-data;")) throw new AuthError("Yêu cầu phải là multipart/form-data.", 415);
-  // Giới hạn cả request trước khi parse multipart để không nạp file lớn vào bộ nhớ.
-  const bytes = await readBody(request, MAX_AVATAR_BYTES + 64 * 1024);
+  if (Number(request.headers.get("content-length")) > MAX_AVATAR_BYTES + 64 * 1024) {
+    throw new AuthError("Ảnh tối đa 2 MB.", 413);
+  }
   let form: FormData;
-  try { form = await new Request("http://localhost/upload", { method: "POST", headers: { "content-type": type }, body: bytes }).formData(); }
-  catch { throw new AuthError("Dữ liệu upload không hợp lệ.", 400); }
+  try {
+    form = await request.formData();
+  } catch {
+    throw new AuthError("Dữ liệu upload không hợp lệ.", 400);
+  }
   const files = form.getAll("file");
-  if (files.length !== 1 || !(files[0] instanceof File) || [...form.keys()].some((key) => key !== "file")) throw new AuthError("Vui lòng gửi một ảnh trong trường file.", 400);
+  if (files.length !== 1 || !(files[0] instanceof File) || [...form.keys()].some((key) => key !== "file")) {
+    throw new AuthError("Vui lòng gửi một ảnh trong trường file.", 400);
+  }
   const file = files[0];
-  validateAvatar(file.type, new Uint8Array(await file.arrayBuffer()));
+  await validateAvatarFile(file);
   return authJson({ url: await avatarStorage.upload(file) } satisfies AvatarUploadResponse, 201);
 });

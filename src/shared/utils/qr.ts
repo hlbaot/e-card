@@ -14,3 +14,47 @@ export function downloadQR(canvas: HTMLCanvasElement | null, slug: string) {
   a.download = `qr-${slug}.png`;
   a.click();
 }
+
+export async function downloadQrBySlug(slug: string, value = cardUrl(slug)) {
+  const [{ createElement }, { flushSync }, { createRoot }, { QRCodeCanvas }] =
+    await Promise.all([
+      import("react"),
+      import("react-dom"),
+      import("react-dom/client"),
+      import("qrcode.react"),
+    ]);
+
+  const container = document.createElement("div");
+  container.style.position = "fixed";
+  container.style.left = "-9999px";
+  container.style.top = "-9999px";
+  container.style.pointerEvents = "none";
+  container.setAttribute("aria-hidden", "true");
+  document.body.appendChild(container);
+
+  const root = createRoot(container);
+  try {
+    flushSync(() => {
+      root.render(
+        createElement(QRCodeCanvas, {
+          value,
+          size: 512,
+          level: "H",
+          marginSize: 4,
+        }),
+      );
+    });
+    await new Promise<void>((resolve) => {
+      if (typeof requestAnimationFrame === "function") {
+        requestAnimationFrame(() => resolve());
+      } else {
+        setTimeout(resolve, 0);
+      }
+    });
+    const canvas = container.querySelector("canvas");
+    downloadQR(canvas, slug);
+  } finally {
+    root.unmount();
+    container.remove();
+  }
+}

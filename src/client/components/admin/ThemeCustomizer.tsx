@@ -1,6 +1,6 @@
 "use client";
 import "@/client/components/card/card-styles.css";
-import { useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { migrateCardTheme } from "@/shared/utils/migrate-theme";
 import { Palette, Check, Sparkles } from "lucide-react";
 import {
@@ -16,7 +16,84 @@ import { DecorSwatch } from "@/client/components/card/DecorIllustration";
 import { cn } from "@/shared/utils/cn";
 import { contrastText } from "@/shared/utils/color";
 
-export function ThemeCustomizer({
+type TemplateItem = (typeof templates)[number];
+
+const THUMB_THEMES: Record<string, CardTheme> = Object.fromEntries(
+  templates.map((t) => [
+    t.id,
+    {
+      templateId: t.id,
+      styleId: t.id,
+      backgroundId: "white-clean",
+      decor: [...t.defaultDecor],
+      primaryColor: "#475569",
+      shapes: Object.fromEntries(
+        t.shapes.map((s) => [s.id, s.id === "editorial-frame"]),
+      ),
+      avatarSize: "md",
+      avatarShape: "circle",
+      buttonStyle: "soft",
+      showDecor: true,
+      decorOpacity: t.defaultDecorOpacity,
+    } satisfies CardTheme,
+  ]),
+);
+
+const THUMB_STYLE = {
+  background: "#FFFFFF",
+  "--card-background": "#FFFFFF",
+  "--card-accent": "#475569",
+  "--thumb-color": "#475569",
+} as React.CSSProperties;
+
+const TemplateThumbnailTile = memo(function TemplateThumbnailTile({
+  template: t,
+  selected,
+  onSelect,
+}: {
+  template: TemplateItem;
+  selected: boolean;
+  onSelect: (template: TemplateItem) => void;
+}) {
+  const thumbTheme = THUMB_THEMES[t.id];
+  return (
+    <button
+      type="button"
+      aria-pressed={selected}
+      className={cn("template-tile", selected && "selected")}
+      onClick={() => onSelect(t)}
+    >
+      <span
+        className={`template-art qtm-art-${t.id}`}
+        aria-hidden="true"
+        style={THUMB_STYLE}
+      >
+        <CardDecorations theme={thumbTheme} variant="thumb" />
+        <span className="art-brand">QTM</span>
+        <i className="art-avatar" />
+        <span className="art-name">NGUYỄN MINH AN</span>
+        <i className="art-rule" />
+        <span className="art-role">Chuyên viên phát triển</span>
+        <span className="art-buttons">
+          <i />
+          <i />
+          <i />
+        </span>
+      </span>
+      <span className="template-tile-caption">
+        <strong>{t.name}</strong>
+        <small>{t.description}</small>
+      </span>
+      {selected && (
+        <span className="template-selected">
+          <Check size={12} />
+        </span>
+      )}
+    </button>
+  );
+});
+
+export const ThemeCustomizer = memo(function ThemeCustomizer({
   theme: rawTheme,
   onChange,
 }: {
@@ -27,13 +104,34 @@ export function ThemeCustomizer({
   const [hexDraft, setHexDraft] = useState(theme.primaryColor);
   const [hexError, setHexError] = useState("");
 
-  const set = (patch: Partial<CardTheme>) => {
-    if (patch.primaryColor) {
-      setHexDraft(patch.primaryColor);
-      setHexError("");
-    }
-    onChange({ ...theme, ...patch });
-  };
+  const set = useCallback(
+    (patch: Partial<CardTheme>) => {
+      if (patch.primaryColor) {
+        setHexDraft(patch.primaryColor);
+        setHexError("");
+      }
+      onChange({ ...migrateCardTheme(rawTheme), ...patch });
+    },
+    [onChange, rawTheme],
+  );
+
+  const handleSelectTemplate = useCallback(
+    (t: TemplateItem) => {
+      const current = migrateCardTheme(rawTheme);
+      set({
+        templateId: t.id,
+        styleId: t.id,
+        backgroundId: t.defaultBackgroundId || current.backgroundId,
+        decor: [...t.defaultDecor],
+        showDecor: true,
+        decorOpacity: t.defaultDecorOpacity,
+        shapes: Object.fromEntries(
+          t.shapes.map((s) => [s.id, s.id === "editorial-frame"]),
+        ),
+      });
+    },
+    [rawTheme, set],
+  );
 
   const template = getTemplate(theme.templateId);
   const decorOpacity = theme.decorOpacity ?? template.defaultDecorOpacity;
@@ -57,77 +155,14 @@ export function ThemeCustomizer({
         Phong cách quyết định cấu trúc, hình dạng nút, kiểu chữ, khung ảnh và đường kẻ (nền trắng &amp; màu trung tính).
       </p>
       <div className="template-gallery">
-        {templates.map((t) => {
-          const thumbTheme: CardTheme = {
-            templateId: t.id,
-            styleId: t.id,
-            backgroundId: "white-clean",
-            decor: [...t.defaultDecor],
-            primaryColor: "#475569",
-            shapes: Object.fromEntries(t.shapes.map((s) => [s.id, s.id === "editorial-frame"])),
-            avatarSize: "md",
-            avatarShape: "circle",
-            buttonStyle: "soft",
-            showDecor: true,
-            decorOpacity: t.defaultDecorOpacity,
-          };
-          return (
-            <button
-              type="button"
-              key={t.id}
-              aria-pressed={theme.templateId === t.id}
-              className={cn(
-                "template-tile",
-                theme.templateId === t.id && "selected",
-              )}
-              onClick={() =>
-                set({
-                  templateId: t.id,
-                  styleId: t.id,
-                  backgroundId: t.defaultBackgroundId || theme.backgroundId,
-                  decor: [...t.defaultDecor],
-                  showDecor: true,
-                  decorOpacity: t.defaultDecorOpacity,
-                  shapes: Object.fromEntries(t.shapes.map((s) => [s.id, s.id === "editorial-frame"])),
-                })
-              }
-            >
-              <span
-                className={`template-art qtm-art-${t.id}`}
-                aria-hidden="true"
-                style={
-                  {
-                    background: "#FFFFFF",
-                    "--card-background": "#FFFFFF",
-                    "--card-accent": "#475569",
-                    "--thumb-color": "#475569",
-                  } as React.CSSProperties
-                }
-              >
-                <CardDecorations theme={thumbTheme} variant="thumb" />
-                <span className="art-brand">QTM</span>
-                <i className="art-avatar" />
-                <span className="art-name">NGUYỄN MINH AN</span>
-                <i className="art-rule" />
-                <span className="art-role">Chuyên viên phát triển</span>
-                <span className="art-buttons">
-                  <i />
-                  <i />
-                  <i />
-                </span>
-              </span>
-              <span className="template-tile-caption">
-                <strong>{t.name}</strong>
-                <small>{t.description}</small>
-              </span>
-              {theme.templateId === t.id && (
-                <span className="template-selected">
-                  <Check size={12} />
-                </span>
-              )}
-            </button>
-          );
-        })}
+        {templates.map((t) => (
+          <TemplateThumbnailTile
+            key={t.id}
+            template={t}
+            selected={theme.templateId === t.id}
+            onSelect={handleSelectTemplate}
+          />
+        ))}
       </div>
 
       {/* BƯỚC: BỘ PHỐI MÀU (PALETTE) */}
@@ -351,4 +386,4 @@ export function ThemeCustomizer({
 
     </section>
   );
-}
+});

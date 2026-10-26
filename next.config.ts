@@ -5,6 +5,15 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: process.env.NEXT_PUBLIC_SITE_URL
     ? [new URL(process.env.NEXT_PUBLIC_SITE_URL).hostname]
     : [],
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/**",
+      },
+    ],
+  },
   async headers() {
     return [
       {

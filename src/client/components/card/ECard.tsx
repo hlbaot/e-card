@@ -68,7 +68,7 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
             </header>
             <div className="qtm-portrait" {...aos("zoom-in", 100)}>
               <p className="qtm-creative" {...aos("fade-right", 160)}><strong>QTM<br />MEDIATECH</strong><br />CREATIVE<br />+ AI TECH<span /></p>
-              <Avatar name={e.fullName} src={e.avatarUrl} color={accent} size={130} />
+              <Avatar name={e.fullName} src={e.avatarUrl} color={accent} size={130} priority={isProfile} />
               <div className="qtm-profile-tools" {...aos("fade-left", 160)}>
                 {onOpenQr && <button type="button" aria-label="Mở mã QR" onClick={onOpenQr}><QrCode /></button>}
                 {onShare && <button type="button" aria-label="Chia sẻ hồ sơ" onClick={onShare}><Share2 /></button>}

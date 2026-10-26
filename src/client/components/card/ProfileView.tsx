@@ -12,7 +12,7 @@ import { migrateCardTheme } from "@/shared/utils/migrate-theme";
 import { ECard } from "./ECard";
 
 export function ProfileView({ employee }: { employee: Employee }) {
-  useAos(true);
+  useAos(true, employee.slug);
   const e = { ...employee, theme: migrateCardTheme(employee.theme) };
 
   const [qrModalOpen, setQrModalOpen] = useState(false);
@@ -83,6 +83,9 @@ export function ProfileView({ employee }: { employee: Employee }) {
 
   return (
     <main className="qtm-public-profile">
+      <noscript>
+        <style>{`.qtm-public-profile [data-aos] { opacity: 1 !important; transform: none !important; }`}</style>
+      </noscript>
       <ECard employee={e} variant="profile" onOpenQr={() => setQrModalOpen(true)} onShare={handleShare} onOpenAddresses={() => setAddressModalOpen(true)} />
       <div className="sr-only" aria-hidden="true">
         <QRCodeCanvas ref={qrCanvasRef} value={url} size={512} level="H" marginSize={4} />

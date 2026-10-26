@@ -12,7 +12,7 @@ export const cardsRepository = {
     where: visible, select: employeeCardSelect,
     orderBy: [{ createdAt: "asc" }, { id: "asc" }],
   }),
-  bySlug: (slug: string) => prisma.employee.findFirst({
+  bySlug: async (slug: string) => prisma.employee.findFirst({
     where: { ...visible, slug }, select: employeeCardSelect,
   }),
 };

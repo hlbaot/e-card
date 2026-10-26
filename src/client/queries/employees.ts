@@ -17,6 +17,7 @@ function hasEmployeeFormFields(candidate: Employee | undefined): candidate is Em
 export const employeesOptions = (userId: string) => queryOptions({
   queryKey: queryKeys.employees.list(userId),
   queryFn: ({ signal }) => employeeApi.getAll(signal),
+  staleTime: 60_000,
   // A filter/page key may change; never borrow data from another account.
   placeholderData: (previous, query) => query?.queryKey[1] === userId ? keepPreviousData(previous) : undefined,
 });

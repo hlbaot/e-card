@@ -1,31 +1,49 @@
 /* Scoped independently from the retired template composition rules. All eight
    templates share these dimensions; only the inline visual tokens change. */
-@keyframes qtmProfilePageEnter {
-  0% {
-    opacity: 0;
-    transform: translateY(14px) scale(0.992);
-    filter: blur(4px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
-  }
-}
 .qtm-public-profile {
   min-height: 100dvh;
   background: transparent;
-  animation: qtmProfilePageEnter 580ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .qtm-profile-surface { container-type: inline-size; width: 100%; max-width: 460px; margin-inline: auto; color: #17394b; }
 .qtm-professional-card { position: relative; isolation: isolate; overflow: hidden; width: 100%; height: calc(var(--qtm-unit, 1cqw) * 177.9487); background: var(--card-background); font-family: var(--font-body), Arial, sans-serif; color: #17394b; }
 .qtm-card-scroll { position: relative; z-index: 1; width: 100%; height: 100%; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: var(--card-accent) transparent; }
 .qtm-card-layout { min-height: calc(var(--qtm-unit, 1cqw) * 177.9487); padding: calc(var(--qtm-unit, 1cqw) * 3.0) calc(var(--qtm-unit, 1cqw) * 3.2); display: flex; flex-direction: column; gap: calc(var(--qtm-unit, 1cqw) * 1.5); box-sizing: border-box; position: relative; z-index: 1; }
 .qtm-safe-decor { position: absolute; inset: 0; z-index: 0; pointer-events: none; width: 100%; height: 100%; overflow: hidden; color: var(--card-accent); opacity: var(--motif-opacity); transition: opacity 180ms ease, color 180ms ease; }
-.qtm-profile-brand { display: flex; align-items: flex-start; justify-content: space-between; }
-.qtm-profile-brand .qtm-card-brand { gap: calc(var(--qtm-unit, 1cqw) * 1.3); color: var(--card-accent); }
-.qtm-profile-brand .qtm-card-brand img { width: calc(var(--qtm-unit, 1cqw) * 8.72); height: calc(var(--qtm-unit, 1cqw) * 8.72); object-fit: contain; }
-.qtm-profile-brand .qtm-card-brand strong { font-size: calc(var(--qtm-unit, 1cqw) * 7.69); line-height: 1.15; letter-spacing: -.05em; color: var(--card-accent); }
+.qtm-ambient-decor {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  color: var(--card-accent);
+  opacity: var(--motif-opacity);
+}
+.qtm-ambient-cluster { position: absolute; width: clamp(72px, 14%, 220px); height: auto; }
+.qtm-ambient-cluster--top-left { left: -28px; top: 8%; transform: rotate(-12deg); }
+.qtm-ambient-cluster--top-right { right: -22px; top: 24%; transform: rotate(14deg) scaleX(-1); }
+.qtm-ambient-cluster--bottom-left { left: -12px; bottom: 8%; transform: rotate(18deg); }
+.qtm-ambient-cluster--bottom-right { right: -28px; bottom: 4%; transform: rotate(-18deg) scaleX(-1); }
+.qtm-ambient-waves { position: absolute; left: 12%; bottom: 12%; width: 76%; height: clamp(30px, 9%, 100px); }
+.qtm-connection-art {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
+  color: var(--card-accent);
+  opacity: var(--motif-opacity);
+  pointer-events: none;
+}
+.qtm-connection-art svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.qtm-desktop-stage .qtm-connection-art { display: none; }
+.qtm-profile-brand { display: flex; justify-content: space-between; align-items: center; }
+.qtm-profile-brand .qtm-card-brand { display: flex; align-items: center; gap: calc(var(--qtm-unit, 1cqw) * 1.5); color: var(--card-accent); }
+.qtm-profile-brand .qtm-card-brand img { width: calc(var(--qtm-unit, 1cqw) * 9.5); height: calc(var(--qtm-unit, 1cqw) * 9.5); object-fit: contain; }
+.qtm-profile-brand .qtm-card-brand strong { font-size: calc(var(--qtm-unit, 1cqw) * 8.5); line-height: 1.1; letter-spacing: -.045em; color: var(--card-accent); }
 .qtm-culture { border-left: calc(var(--qtm-unit, 1cqw) * .5) solid color-mix(in srgb,var(--card-accent) 28%,white); padding-left: calc(var(--qtm-unit, 1cqw) * 1.8); font-size: calc(var(--qtm-unit, 1cqw) * 2.05); line-height: 1.25; letter-spacing: .1em; color: #17394b; }
 .qtm-portrait { position: relative; display: flex; justify-content: center; align-items: center; margin-block: calc(var(--qtm-unit, 1cqw) * 0.6) calc(var(--qtm-unit, 1cqw) * 0.2); }
 .qtm-portrait .avatar { width: calc(var(--qtm-unit, 1cqw) * 35) !important; height: calc(var(--qtm-unit, 1cqw) * 35) !important; font-size: calc(var(--qtm-unit, 1cqw) * 10.5) !important; border: calc(var(--qtm-unit, 1cqw) * .65) solid white; border-radius: 50%; box-shadow: var(--style-avatar-shadow,0 calc(var(--qtm-unit, 1cqw) * 1.2) calc(var(--qtm-unit, 1cqw) * 4) color-mix(in srgb,var(--card-accent) 24%,transparent)); box-sizing: border-box; }
@@ -50,14 +68,12 @@
 .qtm-contact-icon { width: calc(var(--qtm-unit, 1cqw) * 6.5); height: calc(var(--qtm-unit, 1cqw) * 6.5); display: grid; place-items: center; border-radius: 50%; background: color-mix(in srgb,var(--card-accent) 12%,white); transition: border-radius 180ms ease; }
 .qtm-contact-icon svg { width: calc(var(--qtm-unit, 1cqw) * 3.8); height: calc(var(--qtm-unit, 1cqw) * 3.8); color: var(--card-accent); stroke-width: 2.3; }
 .qtm-professional-card .card-actions { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: calc(var(--qtm-unit, 1cqw) * 1.6); margin: 0; align-self: stretch; }
-.qtm-professional-card .card-actions a, .qtm-professional-card .card-actions button { display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap: calc(var(--qtm-unit, 1cqw) * 1); min-height: calc(var(--qtm-unit, 1cqw) * 8.4); padding: calc(var(--qtm-unit, 1cqw) * 1.4) calc(var(--qtm-unit, 1cqw) * 1.8); margin: 0; font-family: var(--style-font, inherit); background: var(--style-button-fill, color-mix(in srgb, var(--card-accent) 8%, #ffffff)); border: var(--style-button-width, 1px) var(--style-button-border-style, solid) var(--style-button-border, color-mix(in srgb, var(--card-accent) 22%, rgba(255, 255, 255, 0.85))); border-radius: var(--style-button-radius, calc(var(--qtm-unit, 1cqw) * 2.8)); color: var(--card-accent); font-size: calc(var(--qtm-unit, 1cqw) * 2.35); font-weight: 700; line-height: 1.25; box-shadow: var(--style-button-shadow, 0 calc(var(--qtm-unit, 1cqw) * .4) calc(var(--qtm-unit, 1cqw) * 1.2) rgba(15, 76, 117, 0.05)); cursor: pointer; box-sizing: border-box; }
+.qtm-professional-card .card-actions a, .qtm-professional-card .card-actions button { display: flex; flex-direction: row; justify-content: center; align-items: center; gap: calc(var(--qtm-unit, 1cqw) * 1); min-height: calc(var(--qtm-unit, 1cqw) * 8.4); padding: calc(var(--qtm-unit, 1cqw) * 1.4) calc(var(--qtm-unit, 1cqw) * 1.8); margin: 0; font-family: var(--style-font, inherit); background: var(--style-button-fill, color-mix(in srgb, var(--card-accent) 8%, #ffffff)); border: var(--style-button-width, 1px) var(--style-button-border-style, solid) var(--style-button-border, color-mix(in srgb, var(--card-accent) 22%, rgba(255, 255, 255, 0.85))); border-radius: var(--style-button-radius, calc(var(--qtm-unit, 1cqw) * 2.8)); color: var(--card-accent); font-size: calc(var(--qtm-unit, 1cqw) * 2.5); font-weight: 700; line-height: 1.25; box-shadow: var(--style-button-shadow, 0 calc(var(--qtm-unit, 1cqw) * .4) calc(var(--qtm-unit, 1cqw) * 1.2) rgba(15, 76, 117, 0.05)); cursor: pointer; box-sizing: border-box; }
 .qtm-professional-card .card-actions :is(a, button):not([data-aos]) { transition: all 180ms ease; }
-.qtm-professional-card .card-actions .action-btn-content { display: flex; align-items: center; gap: calc(var(--qtm-unit, 1cqw) * 1); min-width: 0; }
-.qtm-professional-card .card-actions .action-btn-content svg { width: calc(var(--qtm-unit, 1cqw) * 3.8); height: calc(var(--qtm-unit, 1cqw) * 3.8); flex-shrink: 0; stroke-width: 2.2; }
-.qtm-professional-card .card-actions .action-btn-chevron { width: calc(var(--qtm-unit, 1cqw) * 3); height: calc(var(--qtm-unit, 1cqw) * 3); flex-shrink: 0; opacity: 0.65; }
+.qtm-professional-card .card-actions .action-btn-content { display: flex; align-items: center; justify-content: center; gap: calc(var(--qtm-unit, 1cqw) * 1.3); min-width: 0; text-align: center; }
+.qtm-professional-card .card-actions .action-btn-content svg { width: calc(var(--qtm-unit, 1cqw) * 4); height: calc(var(--qtm-unit, 1cqw) * 4); flex-shrink: 0; stroke-width: 1.8; }
 .qtm-professional-card .card-actions .action-primary { background: var(--card-accent) !important; color: #ffffff !important; border: var(--style-button-width, 1px) var(--style-button-border-style, solid) var(--card-accent) !important; border-radius: var(--style-button-radius, calc(var(--qtm-unit, 1cqw) * 2.8)) !important; box-shadow: var(--style-button-primary-shadow, 0 calc(var(--qtm-unit, 1cqw) * 0.8) calc(var(--qtm-unit, 1cqw) * 2.4) color-mix(in srgb, var(--card-accent) 35%, transparent)) !important; }
 .qtm-professional-card .card-actions .action-primary svg { color: #ffffff !important; }
-.qtm-professional-card .card-actions .action-primary .action-btn-chevron { opacity: 0.9; }
 .qtm-professional-card .card-actions :is(a,button):hover { filter: brightness(.97); background: color-mix(in srgb, var(--card-accent) 14%, #ffffff); }
 .qtm-professional-card :is(a,button):focus-visible { outline: 2px solid var(--card-accent); outline-offset: 2px; }
 .qtm-profile-footer { margin-top: auto; position: relative; display: flex; flex-direction: column; padding-top: calc(var(--qtm-unit, 1cqw) * 1.2); padding-bottom: calc(var(--qtm-unit, 1cqw) * 0.8); }
@@ -127,8 +143,8 @@
 .qtm-desktop-stage .qtm-profile-brand {
   grid-area: brand;
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   padding-bottom: 12px;
   border-bottom: 1px solid rgba(15, 76, 117, 0.08);
 }
@@ -141,13 +157,13 @@
 }
 
 .qtm-desktop-stage .qtm-profile-brand .qtm-card-brand img {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   object-fit: contain;
 }
 
 .qtm-desktop-stage .qtm-profile-brand .qtm-card-brand strong {
-  font-size: 30px;
+  font-size: 36px;
   line-height: 1.15;
   letter-spacing: -0.05em;
   color: var(--card-accent);
@@ -340,8 +356,8 @@
 }
 
 .qtm-desktop-stage .card-actions :is(a, button) {
-  min-height: 48px;
-  font-size: 12.5px;
+  min-height: 52px;
+  font-size: 13px;
   padding: 10px 10px;
 }
 
@@ -442,7 +458,7 @@
 .qtm-public-profile .qtm-profile-slogan { max-height: none; overflow: visible; }
 .qtm-public-profile .qtm-contact { font-size: clamp(12px, calc(var(--qtm-unit) * 2.56), 15px); }
 .qtm-public-profile .qtm-contact strong { font-size: clamp(11px, calc(var(--qtm-unit) * 2.4), 14px); overflow-wrap: anywhere; }
-.qtm-public-profile .card-actions :is(a,button) { min-height: 44px; font-size: clamp(11px, calc(var(--qtm-unit) * 2.4), 13px); }
+.qtm-public-profile .card-actions :is(a,button) { min-height: 44px; font-size: clamp(12px, calc(var(--qtm-unit) * 2.5), 13px); }
 
 @media (max-width: 959px) {
   .qtm-public-profile .qtm-portrait .avatar,
@@ -452,6 +468,7 @@
 /* Public desktop uses the whole viewport; editor previews keep the mobile card.
    A bounded design unit preserves template details without scaling with the screen. */
 @media (min-width: 960px) {
+  .qtm-public-profile .qtm-connection-art { display: none; }
   .qtm-public-profile > .qtm-profile-surface {
     --qtm-unit: 4.6px;
   }
@@ -494,7 +511,8 @@
   }
   .qtm-public-profile .qtm-contact strong { font-size: 14px; }
   .qtm-public-profile .card-actions { grid-area: actions; align-self: start; gap: 12px; }
-  .qtm-public-profile .card-actions :is(a,button) { min-height: 56px; font-size: 13px; padding: 12px 8px; }
+  .qtm-public-profile .card-actions :is(a,button) { min-height: 52px; font-size: 14px; padding: 10px 12px; }
+  .qtm-public-profile .card-actions .action-btn-content svg { width: 17px; height: 17px; }
   .qtm-public-profile .qtm-profile-footer {
     grid-area: footer; min-height: 90px; margin-top: 16px; padding-top: 16px; display: flex; flex-direction: column;
   }

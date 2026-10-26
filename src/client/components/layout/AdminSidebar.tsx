@@ -1,8 +1,8 @@
 "use client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/client/store/auth.store";
-import { employeesOptions } from "@/client/queries/employees";
-import { useState } from "react";
+import { createAdminNavigationPrefetcher } from "@/client/queries/admin-navigation";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -23,15 +23,17 @@ import { useToast } from "@/client/components/ui/Toast";
 export function AdminSidebar({ children }: { children: React.ReactNode }) {
   const client = useQueryClient();
   const userId = useAuthStore(state => state.user?.id);
-  const prefetch = (href: string) => {
-    if (!userId) return;
-    if ([routes.admin, routes.employees, routes.cards].includes(href)) void client.prefetchQuery(employeesOptions(userId));
-  };
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const { logout } = useAuth();
+  const { logout, authenticated } = useAuth();
   const toast = useToast();
   const router = useRouter();
+  const prefetch = useMemo(
+    () => authenticated && userId
+      ? createAdminNavigationPrefetcher(client, router)
+      : () => Promise.resolve(),
+    [client, router, userId, authenticated],
+  );
   const nav = [
     { href: routes.admin, label: "Tổng quan", icon: LayoutDashboard },
     { href: routes.employees, label: "Nhân viên", icon: Users },
@@ -80,9 +82,10 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
             <Link
               href={href}
               key={href}
-              onMouseEnter={() => prefetch(href)}
-              onFocus={() => prefetch(href)}
-              onTouchStart={() => prefetch(href)}
+              prefetch={false}
+              onMouseEnter={() => { void prefetch(href); }}
+              onFocus={() => { void prefetch(href); }}
+              onTouchStart={() => { void prefetch(href); }}
               onClick={() => setOpen(false)}
               className={cn(
                 (href === routes.admin

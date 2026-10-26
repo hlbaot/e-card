@@ -55,6 +55,7 @@ export function CardListItem({ employee }: { employee: Employee }) {
       href={routes.card(employee.slug)}
       target="_blank"
       rel="noopener noreferrer"
+      prefetch={false}
       className="employee-card"
     >
       <CardListContent employee={employee} />

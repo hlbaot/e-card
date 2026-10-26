@@ -43,6 +43,7 @@ export const AdminCardItem = memo(function AdminCardItem({
         href={`/card/${e.slug}`}
         target="_blank"
         rel="noopener noreferrer"
+        prefetch={false}
       >
         <CardListContent employee={e} showFooter={false} />
       </Link>
@@ -63,6 +64,7 @@ export const AdminCardItem = memo(function AdminCardItem({
             href={`/card/${e.slug}`}
             target="_blank"
             rel="noopener noreferrer"
+            prefetch={false}
           >
             <Eye size={13} />
             Xem hồ sơ

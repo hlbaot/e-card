@@ -1,5 +1,6 @@
 import { absoluteUrl, siteConfig } from "@/config/site";
-import { getPublicFields, type Employee } from "@/shared/types/employee";
+import { getPublicFields } from "@/shared/types";
+import type { Employee } from "@/shared/types";
 import { websiteUrl } from "@/shared/utils/vcard";
 import { ProfilePage } from "@/client/components/card/ProfilePage";
 

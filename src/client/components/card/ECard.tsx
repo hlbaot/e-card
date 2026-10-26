@@ -2,21 +2,24 @@
 
 import Link from "next/link";
 import { useEffect, useRef, type CSSProperties } from "react";
-import { MapPin, Phone, Mail, Globe, QrCode, Share2, ArrowLeft } from "lucide-react";
-import { getPublicFields, type Employee } from "@/shared/types/employee";
+import { MapPin, Phone, Mail, Globe, QrCode, Share2, ArrowLeft, Pencil } from "lucide-react";
+import { getPublicFields } from "@/shared/types";
+import type { Employee } from "@/shared/types";
 import { getTemplate, getThemeBackgroundCss } from "@/config/card-themes";
 import { readableAccent } from "@/shared/utils/color";
 import { Avatar } from "@/client/components/ui/Avatar";
 import { migrateCardTheme } from "@/shared/utils/migrate-theme";
 import { websiteUrl } from "@/shared/utils/vcard";
+import { useAuthStore } from "@/client/store/auth.store";
+import { routes } from "@/shared/constants/routes";
 import { QtmBrand } from "./QtmBrand";
 import { CardActions } from "./CardActions";
 import { ProfileDecorations, ProfileFooterDecorations } from "./ProfileDecorations";
 import "./professional-card.css";
 import "./card-styles.css";
 
-/** One layout for the public profile, live panel and every preview size.
- * Template differences are deliberately limited to visual tokens. */
+/** Mobile composition is shared with previews; public desktop expands to two columns.
+ * Templates retain their typography, decorations and action treatments. */
 export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onOpenAddresses }: {
   employee: Employee;
   variant?: "preview" | "profile";
@@ -30,8 +33,8 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
   const scrollRef = useRef<HTMLDivElement>(null);
   const accent = readableAccent(theme.primaryColor || template.defaultColor, false, "#E0E0E0");
   const Name = variant === "profile" ? "h1" : "h2";
-  const slogan = !e.slogan || e.slogan.trim().toLowerCase() === "let's create a brighter tomorrow together"
-    ? "Cùng nhau kiến tạo một tương lai tươi sáng" : e.slogan;
+  const slogan = e.slogan?.trim() || "Let's Create a Brighter Tomorrow Together";
+  const authenticated = useAuthStore((state) => state.authenticated);
   const rows = [
     ...(pf.offices ? e.offices.map((office, index) => ({
       key: `office-${index}`, Icon: MapPin,
@@ -47,13 +50,14 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
   return (
     <div className="qtm-profile-surface" style={{
       "--card-accent": accent,
+      "--card-primary": accent,
       "--card-background": getThemeBackgroundCss(theme),
-      "--card-font": template.fontStyle === "serif" ? "Georgia, serif" : template.fontStyle === "mono" ? "\"Courier New\", monospace" : "var(--font-body), Arial, sans-serif",
-      "--motif-opacity": (theme.showDecor === false ? 0 : (theme.decorOpacity ?? 65)) / 100,
+      "--card-font": template.fontFamily || (template.fontStyle === "serif" ? "Georgia, serif" : template.fontStyle === "mono" ? "\"Courier New\", monospace" : "var(--font-body), Arial, sans-serif"),
+      "--motif-opacity": (theme.showDecor === false ? 0 : (theme.decorOpacity ?? 35)) / 100,
     } as CSSProperties}>
       <article className={`qtm-professional-card qtm-template-${theme.templateId}`} aria-label={`Hồ sơ của ${e.fullName || "nhân viên"}`}>
+        <ProfileDecorations theme={theme} />
         <div className="qtm-card-scroll" ref={scrollRef}>
-          <ProfileDecorations theme={theme} />
           <div className="qtm-card-layout">
             <header className="qtm-profile-brand">
               <QtmBrand />
@@ -66,6 +70,11 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
                 {onOpenQr && <Link href="/" aria-label="Về trang chủ"><ArrowLeft /></Link>}
                 {onOpenQr && <button type="button" aria-label="Mở mã QR" onClick={onOpenQr}><QrCode /></button>}
                 {onShare && <button type="button" aria-label="Chia sẻ hồ sơ" onClick={onShare}><Share2 /></button>}
+                {variant === "profile" && authenticated && (
+                  <Link href={routes.employee(e.id)} aria-label="Tuỳ chỉnh danh thiếp" title="Tuỳ chỉnh danh thiếp">
+                    <Pencil size={18} />
+                  </Link>
+                )}
               </div>
             </div>
             <section className="qtm-profile-identity" aria-label="Thông tin cá nhân">
@@ -86,8 +95,13 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
             </section>
             <CardActions employee={e} />
             <footer className="qtm-profile-footer">
-              <ProfileFooterDecorations theme={theme} />
-              <p className="qtm-profile-slogan">{slogan}</p>
+              <div className="qtm-footer-row">
+                <div className="qtm-profile-slogan-wrap">
+                  <p className="qtm-profile-slogan">{slogan}</p>
+                  <span className="qtm-slogan-line" aria-hidden="true" />
+                </div>
+                <ProfileFooterDecorations theme={theme} />
+              </div>
               <p className="qtm-profile-motto">QUALITY - TECHNOLOGY - MINDSET</p>
             </footer>
           </div>

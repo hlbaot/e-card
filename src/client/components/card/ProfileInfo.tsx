@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import type { Employee } from "@/shared/types/employee";
+import type { Employee } from "@/shared/types";
 import { cn } from "@/shared/utils/cn";
 
 export function ProfileInfo({ employee: e }: { employee: Employee }) {

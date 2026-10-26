@@ -1,5 +1,6 @@
 import "server-only";
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
+import type { AuthResponse, ApiStatusResponse } from "@/shared/types";
 import { serverAuth } from "./runtime";
 import { AuthError } from "./service";
 import { changePasswordInput, loginInput } from "./dto";
@@ -20,7 +21,7 @@ export async function login(request: NextRequest) {
     limitLogin(data.email);
     const result = await serverAuth.login(data.email, data.password);
     resetLoginLimit(data.email);
-    const response = setAuthCookies(authJson({ user: result.user }), result);
+    const response = setAuthCookies(authJson({ user: result.user } satisfies AuthResponse), result);
     response.headers.set("Server-Timing", Object.entries(result.timings)
       .map(([name, duration]) => `${name};dur=${duration}`).join(", "));
     return response;
@@ -35,15 +36,17 @@ export async function refresh(request: NextRequest) {
     // Chỉ nhận refresh token từ cookie HttpOnly; token thiếu/sai/hết hạn sẽ bị từ chối.
     const result = await serverAuth.refresh(request.cookies.get(REFRESH_COOKIE)?.value ?? "");
     // Ghi đè cả hai cookie bằng token mới. JSON chỉ trả user, không lộ token cho JS.
-    return setAuthCookies(authJson({ user: result.user }), result);
+    return setAuthCookies(authJson({ user: result.user } satisfies AuthResponse), result);
   });
 }
 
 export async function logout(request: NextRequest) {
   return authHandler(async () => {
     assertSameOrigin(request);
-    await serverAuth.logout(request.cookies.get(REFRESH_COOKIE)?.value ?? "");
-    return clearAuthCookies(authJson({ success: true }));
+    const refreshToken = request.cookies.get(REFRESH_COOKIE)?.value;
+    const accessToken = request.cookies.get(ACCESS_COOKIE)?.value;
+    await serverAuth.logout(refreshToken || accessToken || "");
+    return clearAuthCookies(authJson({ success: true } satisfies ApiStatusResponse));
   });
 }
 
@@ -53,7 +56,7 @@ export async function me(request: NextRequest) {
     // Thiếu cookie hoặc phiên không hợp lệ sẽ được authHandler chuyển thành 401.
     const user = await serverAuth.currentUser(request.cookies.get(ACCESS_COOKIE)?.value ?? "");
     // Chỉ trả id/email/createdAt, không trả passwordHash hoặc token. authJson đặt no-store.
-    return authJson({ user });
+    return authJson({ user } satisfies AuthResponse);
   });
 }
 

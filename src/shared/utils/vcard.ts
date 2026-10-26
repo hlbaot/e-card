@@ -1,4 +1,5 @@
-import { getPublicFields, type Employee } from "@/shared/types/employee";
+import { getPublicFields } from "@/shared/types";
+import type { Employee } from "@/shared/types";
 
 const escape = (value: string) =>
   value

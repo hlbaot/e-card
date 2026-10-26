@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import type { CardTheme, DecorKey } from "@/shared/types/employee";
+import type { CardTheme, DecorKey } from "@/shared/types";
 import { getThemeBackgroundCss } from "@/config/card-themes";
 import { migrateCardTheme } from "@/shared/utils/migrate-theme";
 import { DecorIllustration } from "./DecorIllustration";
@@ -51,7 +51,7 @@ export interface CardDecorationsProps {
 
 export function CardDecorations({ theme: rawTheme, showDecor, opacity, variant = "preview", className }: CardDecorationsProps) {
   const theme = migrateCardTheme(rawTheme);
-  const scale = Math.max(0, Math.min(100, opacity ?? theme.decorOpacity ?? 65)) / 100;
+  const scale = Math.max(0, Math.min(60, opacity ?? theme.decorOpacity ?? 35)) / 100;
   const fields = theme.decor.filter(key => key !== "skyline" && key !== "waves");
   const shapes = theme.shapes;
   const frame = shapes["editorial-frame"] || shapes["gold-frame"];
@@ -61,6 +61,7 @@ export function CardDecorations({ theme: rawTheme, showDecor, opacity, variant =
       style={{ background: getThemeBackgroundCss(theme), "--decor-accent": theme.primaryColor, color: "var(--decor-accent)" } as CSSProperties}>
       <div className="decor-motifs" style={{ opacity: scale }}>
         {theme.decor.map((decor) => <DecorArtwork key={decor} decor={decor} seed={theme.templateId} fieldIndex={fields.findIndex(key => key === decor)} fieldCount={fields.length} />)}
+        <DecorArtwork decor="skyline" className="permanent-skyline" />
         {(showDecor ?? theme.showDecor ?? true) && <>
           {frame && <div className="decor-single-frame" />}
           {details.map(([key], index) => <svg key={key} className="decor-detail" style={{ top: index * 24 }} viewBox="0 0 400 60" preserveAspectRatio="none" fill="none">

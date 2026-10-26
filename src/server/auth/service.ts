@@ -111,7 +111,18 @@ export function createAuthService(repo: AuthRepository, secret: string) {
       return { success: true };
     },
     async logout(token: string) {
-      if (validRefresh(token)) await repo.endSession(tokenHash(token));
+      if (validRefresh(token)) {
+        await repo.endSession(tokenHash(token));
+      } else if (token) {
+        try {
+          const { payload } = await jwtVerify(token, key, { algorithms: ["HS256"], issuer, audience });
+          if (typeof payload.session === "string") {
+            await repo.endSession(payload.session);
+          }
+        } catch {
+          // Ignore invalid token
+        }
+      }
     },
   };
 }

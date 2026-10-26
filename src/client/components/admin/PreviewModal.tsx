@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { X, Smartphone, Monitor, Eye } from "lucide-react";
-import type { Employee } from "@/shared/types/employee";
+import type { Employee } from "@/shared/types";
 import { ScaledECardViewport } from "./LivePreviewPanel";
 import { cn } from "@/shared/utils/cn";
 

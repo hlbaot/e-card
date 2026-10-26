@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { Employee } from "@/shared/types/employee";
+import type { Employee } from "@/shared/types";
 import { ECard } from "@/client/components/card/ECard";
 import { PreviewToggleButton } from "./PreviewToggleButton";
+import { cn } from "@/shared/utils/cn";
 
 export interface ScaledECardViewportProps {
   employee: Employee;
@@ -60,7 +61,12 @@ export function ScaledECardViewport({
         }}
       >
         <div
-          className="qtm-preview-frame absolute top-0 left-0 shrink-0"
+          className={cn(
+            "absolute top-0 left-0 shrink-0 overflow-hidden",
+            mode === "desktop"
+              ? "qtm-preview-frame-desktop rounded-2xl shadow-[0_24px_70px_rgba(0,0,0,0.55)] border border-white/15"
+              : "qtm-preview-frame rounded-[36px] shadow-2xl",
+          )}
           style={{
             width: baseWidth,
             height: baseHeight,
@@ -68,9 +74,15 @@ export function ScaledECardViewport({
             transformOrigin: "top left",
           }}
         >
-          <div className="qtm-preview-device">
-            <ECard employee={employee} variant="preview" />
-          </div>
+          {mode === "desktop" ? (
+            <div className="qtm-desktop-stage w-full h-full">
+              <ECard employee={employee} variant="profile" />
+            </div>
+          ) : (
+            <div className="qtm-preview-device">
+              <ECard employee={employee} variant="preview" />
+            </div>
+          )}
         </div>
       </div>
     </div>

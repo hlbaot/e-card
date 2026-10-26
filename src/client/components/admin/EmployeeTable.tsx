@@ -2,16 +2,16 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Pencil, Trash2 } from "lucide-react";
-import type { Employee } from "@/shared/types/employee";
+import type { Employee } from "@/shared/types";
 import { Avatar } from "@/client/components/ui/Avatar";
 import { Switch } from "@/client/components/ui/Switch";
 import { Modal } from "@/client/components/ui/Modal";
 import { useToast } from "@/client/components/ui/Toast";
-import { employeeService } from "@/client/services/employee.service";
+import { useEmployeeMutations } from "@/client/hooks/useEmployeeMutations";
 import { routes } from "@/shared/constants/routes";
 export function EmployeeTable({ employees }: { employees: Employee[] }) {
   const [deleting, setDeleting] = useState<Employee | null>(null);
-  const { remove, toggleActive } = employeeService;
+  const { remove, toggleActive, isToggling } = useEmployeeMutations();
   const toast = useToast();
   return (
     <>
@@ -52,6 +52,7 @@ export function EmployeeTable({ employees }: { employees: Employee[] }) {
                   <div className="button-row">
                     <Switch
                       checked={e.isActive}
+                      disabled={isToggling(e.id)}
                       label={`Bật danh thiếp của ${e.fullName}`}
                       onChange={async () => {
                         try {
@@ -61,8 +62,11 @@ export function EmployeeTable({ employees }: { employees: Employee[] }) {
                               ? "Đã tắt danh thiếp"
                               : "Đã bật danh thiếp",
                           );
-                        } catch {
-                          toast("Không thể đổi trạng thái");
+                        } catch (err) {
+                          toast(
+                            err instanceof Error ? err.message : "Không thể đổi trạng thái",
+                            "error",
+                          );
                         }
                       }}
                     />
@@ -117,8 +121,11 @@ export function EmployeeTable({ employees }: { employees: Employee[] }) {
                   await remove(deleting.id);
                   setDeleting(null);
                   toast("Đã xóa nhân viên");
-                } catch {
-                  toast("Không thể xóa nhân viên");
+                } catch (err) {
+                  toast(
+                    err instanceof Error ? err.message : "Không thể xóa nhân viên",
+                    "error",
+                  );
                 }
               }}
             >

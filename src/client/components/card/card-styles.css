@@ -1,118 +1,354 @@
 /* Visual languages shared by each profile and its selector thumbnail.
-   These tokens never change the shared grid, avatar dimensions or spacing. */
+   These tokens never change the shared grid, avatar dimensions or spacing.
+   Styles are purely structural and do not contain hardcoded colors. */
+
+/* ==========================================================================
+   1. KẾT NỐI (bubble-blue): Nút dạng viên pill đặc bo tròn, chữ sans đậm
+   ========================================================================== */
 .qtm-template-bubble-blue, .qtm-art-bubble-blue {
-  --style-font: "Trebuchet MS", Arial, sans-serif;
+  --style-font: "Trebuchet MS", var(--font-body), Arial, sans-serif;
   --style-weight: 800; --style-tracking: -.025em;
-  --style-button-radius: 5cqw; --style-mini-radius: 12px;
-  --style-avatar-shadow: 0 1.2cqw 4cqw color-mix(in srgb,var(--card-accent) 24%,transparent);
+  --style-button-radius: 999px; --style-mini-radius: 12px;
+  --style-button-fill: rgba(255, 255, 255, 0.95);
+  --style-button-border: color-mix(in srgb,var(--card-accent) 25%,rgba(255, 255, 255, 0.7));
+  --style-button-width: 1px; --style-button-border-style: solid;
+  --style-button-shadow: 0 calc(var(--qtm-unit, 1cqw) * .4) calc(var(--qtm-unit, 1cqw) * 1.4) color-mix(in srgb,var(--card-accent) 12%,transparent);
+  --style-avatar-shadow: 0 calc(var(--qtm-unit, 1cqw) * 1.2) calc(var(--qtm-unit, 1cqw) * 4) color-mix(in srgb,var(--card-accent) 24%,transparent);
   --style-mini-shadow: 0 3px 10px color-mix(in srgb,var(--card-accent) 25%,transparent);
-  --style-rule-width: 8cqw; --style-rule-height: .8cqw;
+  --style-rule-width: calc(var(--qtm-unit, 1cqw) * 8); --style-rule-height: calc(var(--qtm-unit, 1cqw) * .8);
+  --style-rule-radius: 999px;
 }
-.qtm-template-minimal-line, .qtm-art-minimal-line {
-  --style-font: Arial, sans-serif; --style-weight: 500; --style-tracking: .07em;
-  --style-button-radius: .6cqw; --style-mini-radius: 1px;
-  --style-button-fill: transparent; --style-button-shadow: none;
-  --style-button-border: var(--card-accent); --style-button-width: 1px;
-  --style-avatar-shadow: 0 0 0 1px var(--card-accent); --style-mini-shadow: 0 0 0 1px var(--card-accent);
-  --style-icon-fill: transparent; --style-icon-radius: 0;
-  --style-rule-width: 17cqw; --style-rule-height: 1px;
+.qtm-template-bubble-blue .card-actions :is(a, button) {
+  border-radius: 999px !important;
+  font-family: "Trebuchet MS", var(--font-body), Arial, sans-serif;
+  font-weight: 800;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--card-accent) 14%, transparent) !important;
 }
-.qtm-template-dark-tech, .qtm-art-dark-tech {
-  --style-font: "Courier New", monospace; --style-weight: 800; --style-tracking: -.04em;
-  --style-button-radius: .7cqw; --style-mini-radius: 1px;
-  --style-button-fill: color-mix(in srgb,var(--card-accent) 5%,white);
-  --style-button-shadow: inset 0 -2px var(--card-accent);
-  --style-avatar-shadow: 0 0 0 1cqw color-mix(in srgb,var(--card-accent) 13%,transparent),0 0 0 1px var(--card-accent);
-  --style-mini-shadow: 0 0 0 3px color-mix(in srgb,var(--card-accent) 16%,transparent);
-  --style-icon-radius: 15%; --style-rule-width: 19cqw; --style-rule-height: .5cqw;
+.qtm-template-bubble-blue .card-actions .action-primary {
+  border-radius: 999px !important;
 }
-.qtm-template-editorial, .qtm-art-editorial {
-  --style-font: Georgia, "Times New Roman", serif; --style-weight: 800; --style-tracking: -.04em;
-  --style-button-radius: 0; --style-mini-radius: 0;
-  --style-button-fill: transparent; --style-button-shadow: 0 2px 0 var(--card-accent);
-  --style-button-border: transparent;
-  --style-avatar-shadow: none; --style-mini-shadow: none;
-  --style-icon-radius: 0; --style-icon-fill: transparent;
-  --style-rule-width: 26cqw; --style-rule-height: 2px;
-}
-.qtm-template-aurora, .qtm-art-aurora {
-  --style-font: "Trebuchet MS", Arial, sans-serif; --style-weight: 600; --style-tracking: .03em;
-  --style-button-radius: 3cqw; --style-mini-radius: 7px;
-  --style-button-fill: linear-gradient(120deg,#f0edff,#ecfbff);
-  --style-button-shadow: 0 .7cqw 2cqw #7867c51c;
-  --style-avatar-shadow: -1cqw .4cqw 3cqw #a78bfa60,1cqw -.4cqw 3cqw #67e8f960;
-  --style-mini-shadow: -3px 0 8px #a78bfa80,3px 0 8px #67e8f980;
-  --style-icon-fill: linear-gradient(135deg,#ede9fe,#e0f7fa);
-  --style-rule-width: 12cqw; --style-rule-height: .8cqw;
-}
-.qtm-template-luxury, .qtm-art-luxury {
-  --style-font: Georgia, "Times New Roman", serif; --style-weight: 500; --style-tracking: .09em;
-  --style-button-radius: .8cqw; --style-mini-radius: 2px;
-  --style-button-fill: transparent; --style-button-border: var(--card-accent);
-  --style-button-width: 3px; --style-button-border-style: double;
-  --style-button-shadow: none;
-  --style-avatar-shadow: 0 0 0 .65cqw #fff,0 0 0 .95cqw var(--card-accent);
-  --style-mini-shadow: 0 0 0 2px white,0 0 0 3px var(--card-accent);
-  --style-rule-width: 22cqw; --style-rule-height: 1px;
-}
-.qtm-template-botanical, .qtm-art-botanical {
-  --style-font: Palatino, "Palatino Linotype", Georgia, serif; --style-weight: 700; --style-tracking: 0;
-  --style-button-radius: 4cqw 1cqw 4cqw 1cqw; --style-mini-radius: 9px 2px 9px 2px;
-  --style-button-fill: color-mix(in srgb,var(--card-accent) 7%,white);
-  --style-button-shadow: none; --style-icon-radius: 50% 15% 50% 15%;
-  --style-avatar-shadow: 0 0 0 .7cqw color-mix(in srgb,var(--card-accent) 17%,transparent);
-  --style-mini-shadow: 0 0 0 3px color-mix(in srgb,var(--card-accent) 18%,transparent);
-  --style-rule-width: 13cqw; --style-rule-height: .7cqw;
-}
-.qtm-template-creative, .qtm-art-creative {
-  --style-font: Verdana, Arial, sans-serif; --style-weight: 900; --style-tracking: -.045em;
-  --style-button-radius: 1.6cqw; --style-mini-radius: 4px;
-  --style-button-fill: color-mix(in srgb,var(--card-accent) 4%,white);
-  --style-button-border: var(--card-accent);
-  --style-button-shadow: .7cqw .7cqw 0 color-mix(in srgb,var(--card-accent) 20%,transparent);
-  --style-avatar-shadow: 1.3cqw 1cqw 0 color-mix(in srgb,var(--card-accent) 23%,transparent);
-  --style-mini-shadow: 4px 3px 0 color-mix(in srgb,var(--card-accent) 25%,transparent);
-  --style-icon-radius: 25%; --style-rule-width: 16cqw; --style-rule-height: 1cqw;
+.qtm-template-bubble-blue .qtm-profile-contacts {
+  border-radius: calc(var(--qtm-unit, 1cqw) * 4.5);
 }
 
-/* Signature details sit entirely in the portrait and divider spaces. */
+/* ==========================================================================
+   2. TINH GIẢN (minimal-line): Nút ô vuông viền mảnh phẳng, chữ thanh
+   ========================================================================== */
+.qtm-template-minimal-line, .qtm-art-minimal-line {
+  --style-font: Arial, var(--font-body), sans-serif; --style-weight: 400; --style-tracking: .08em;
+  --style-button-radius: 2px; --style-mini-radius: 1px;
+  --style-button-fill: transparent; --style-button-shadow: none;
+  --style-button-border: var(--card-accent); --style-button-width: 1px; --style-button-border-style: solid;
+  --style-avatar-shadow: 0 0 0 1px var(--card-accent); --style-mini-shadow: 0 0 0 1px var(--card-accent);
+  --style-icon-fill: transparent; --style-icon-radius: 0;
+  --style-rule-width: calc(var(--qtm-unit, 1cqw) * 24); --style-rule-height: 1px;
+  --style-rule-radius: 0;
+}
+.qtm-template-minimal-line .card-actions :is(a, button) {
+  border-radius: 2px !important;
+  border: 1px solid var(--card-accent) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-family: Arial, var(--font-body), sans-serif !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.05em !important;
+}
+.qtm-template-minimal-line .card-actions .action-primary {
+  background: var(--card-accent) !important;
+  color: #ffffff !important;
+  border-radius: 2px !important;
+  box-shadow: none !important;
+}
+.qtm-template-minimal-line .qtm-profile-contacts {
+  border-radius: 2px !important;
+  border: 1px solid color-mix(in srgb, var(--card-accent) 20%, #e2e8f0) !important;
+  box-shadow: none !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+}
+.qtm-template-minimal-line .qtm-position {
+  font-style: normal !important;
+  letter-spacing: 0.04em;
+}
+
+/* ==========================================================================
+   3. CÔNG NGHỆ (dark-tech): Nút vuông góc sắc nét, monospace kỹ thuật
+   ========================================================================== */
+.qtm-template-dark-tech, .qtm-art-dark-tech {
+  --style-font: "Courier New", monospace; --style-weight: 800; --style-tracking: -.04em;
+  --style-button-radius: 0px; --style-mini-radius: 0px;
+  --style-button-fill: rgba(255, 255, 255, 0.95);
+  --style-button-border: var(--card-accent); --style-button-width: 1px; --style-button-border-style: solid;
+  --style-button-shadow: inset 0 -2px var(--card-accent);
+  --style-avatar-shadow: 0 0 0 calc(var(--qtm-unit, 1cqw) * 1) color-mix(in srgb,var(--card-accent) 13%,transparent), 0 0 0 1px var(--card-accent);
+  --style-mini-shadow: 0 0 0 3px color-mix(in srgb,var(--card-accent) 16%,transparent);
+  --style-icon-radius: 0; --style-rule-width: calc(var(--qtm-unit, 1cqw) * 19); --style-rule-height: calc(var(--qtm-unit, 1cqw) * .5);
+  --style-rule-radius: 0;
+}
+.qtm-template-dark-tech .card-actions :is(a, button) {
+  border-radius: 0px !important;
+  border: 1px solid var(--card-accent) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: inset 0 -2px var(--card-accent), 0 2px 4px rgba(0, 0, 0, 0.06) !important;
+  font-family: "Courier New", monospace !important;
+  text-transform: uppercase !important;
+  font-weight: 800 !important;
+}
+.qtm-template-dark-tech .card-actions .action-primary {
+  background: var(--card-accent) !important;
+  color: #ffffff !important;
+  border-radius: 0px !important;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--card-accent) 30%, transparent) !important;
+}
+.qtm-template-dark-tech .qtm-profile-contacts {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border: 1px solid var(--card-accent) !important;
+  border-radius: 0px !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--card-accent) 25%, transparent), 0 4px 14px rgba(0, 0, 0, 0.05) !important;
+}
+.qtm-template-dark-tech .qtm-contact strong {
+  font-family: "Courier New", monospace !important;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+.qtm-template-dark-tech .qtm-company-short {
+  font-family: "Courier New", monospace !important;
+}
+
+/* ==========================================================================
+   4. BIÊN TẬP (editorial): Chữ serif đậm, nét kẻ tạp chí, nút vuông phẳng
+   ========================================================================== */
+.qtm-template-editorial, .qtm-art-editorial {
+  --style-font: Georgia, "Times New Roman", serif; --style-weight: 800; --style-tracking: -.04em;
+  --style-button-radius: 0px; --style-mini-radius: 0px;
+  --style-button-fill: rgba(255, 255, 255, 0.95); --style-button-shadow: 0 2px 0 var(--card-accent);
+  --style-button-border: var(--card-accent); --style-button-width: 1px; --style-button-border-style: solid;
+  --style-avatar-shadow: 0 0 0 1px var(--card-accent); --style-mini-shadow: 0 0 0 1px var(--card-accent);
+  --style-icon-radius: 0; --style-icon-fill: transparent;
+  --style-rule-width: calc(var(--qtm-unit, 1cqw) * 26); --style-rule-height: 2px;
+  --style-rule-radius: 0;
+}
+.qtm-template-editorial .card-actions :is(a, button) {
+  border-radius: 0px !important;
+  border: 1px solid var(--card-accent) !important;
+  background: #ffffff !important;
+  box-shadow: 0 2px 0 var(--card-accent) !important;
+  font-family: Georgia, serif !important;
+  font-weight: 700 !important;
+}
+.qtm-template-editorial .card-actions .action-primary {
+  background: var(--card-accent) !important;
+  color: #ffffff !important;
+  border-radius: 0px !important;
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--card-accent) 70%, black) !important;
+}
+.qtm-template-editorial .qtm-profile-contacts {
+  border-radius: 0px !important;
+  border-top: 2px solid var(--card-accent) !important;
+  border-bottom: 2px solid var(--card-accent) !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  box-shadow: none !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+}
+.qtm-template-editorial .qtm-profile-identity h3 {
+  font-family: Georgia, serif !important;
+}
+
+/* ==========================================================================
+   5. CỰC QUANG (aurora): Viền phát sáng, nút bo góc chuyển sắc (14px)
+   ========================================================================== */
+.qtm-template-aurora, .qtm-art-aurora {
+  --style-font: "Trebuchet MS", Arial, sans-serif; --style-weight: 600; --style-tracking: .03em;
+  --style-button-radius: 14px; --style-mini-radius: 7px;
+  --style-button-fill: color-mix(in srgb,var(--card-accent) 6%,white);
+  --style-button-border: color-mix(in srgb,var(--card-accent) 35%,rgba(255, 255, 255, 0.8));
+  --style-button-width: 1px; --style-button-border-style: solid;
+  --style-button-shadow: 0 2px 12px color-mix(in srgb,var(--card-accent) 20%,transparent);
+  --style-avatar-shadow: 0 0 calc(var(--qtm-unit, 1cqw) * 3) color-mix(in srgb,var(--card-accent) 40%,transparent), 0 0 0 2px color-mix(in srgb,var(--card-accent) 25%,white);
+  --style-mini-shadow: 0 0 8px color-mix(in srgb,var(--thumb-color) 45%,transparent);
+  --style-icon-fill: color-mix(in srgb,var(--card-accent) 12%,white);
+  --style-rule-width: calc(var(--qtm-unit, 1cqw) * 14); --style-rule-height: calc(var(--qtm-unit, 1cqw) * .8);
+  --style-rule-radius: 999px;
+}
+.qtm-template-aurora .card-actions :is(a, button) {
+  border-radius: 14px !important;
+  border: 1px solid color-mix(in srgb,var(--card-accent) 35%,rgba(255, 255, 255, 0.8)) !important;
+  background: color-mix(in srgb,var(--card-accent) 6%,white) !important;
+  box-shadow: 0 2px 12px color-mix(in srgb,var(--card-accent) 20%,transparent) !important;
+  font-family: "Trebuchet MS", sans-serif !important;
+}
+.qtm-template-aurora .card-actions .action-primary {
+  background: var(--card-accent) !important;
+  color: #ffffff !important;
+  border-radius: 14px !important;
+  box-shadow: 0 0 16px color-mix(in srgb, var(--card-accent) 40%, transparent) !important;
+}
+.qtm-template-aurora .qtm-profile-contacts {
+  border-radius: 18px !important;
+  border: 1px solid color-mix(in srgb, var(--card-accent) 30%, white) !important;
+  box-shadow: 0 0 20px color-mix(in srgb, var(--card-accent) 18%, transparent) !important;
+}
+
+/* ==========================================================================
+   6. SANG TRỌNG (luxury): Nút ô vuông viền đôi hoàng gia (3px double)
+   ========================================================================== */
+.qtm-template-luxury, .qtm-art-luxury {
+  --style-font: Georgia, "Times New Roman", serif; --style-weight: 500; --style-tracking: .09em;
+  --style-button-radius: 2px; --style-mini-radius: 2px;
+  --style-button-fill: rgba(255, 255, 255, 0.9); --style-button-border: var(--card-accent);
+  --style-button-width: 3px; --style-button-border-style: double;
+  --style-button-shadow: none;
+  --style-avatar-shadow: 0 0 0 calc(var(--qtm-unit, 1cqw) * .65) #fff, 0 0 0 calc(var(--qtm-unit, 1cqw) * .95) var(--card-accent);
+  --style-mini-shadow: 0 0 0 2px white, 0 0 0 3px var(--thumb-color);
+  --style-rule-width: calc(var(--qtm-unit, 1cqw) * 22); --style-rule-height: 1px;
+  --style-rule-radius: 0;
+}
+.qtm-template-luxury .card-actions :is(a, button) {
+  border-radius: 2px !important;
+  border: 3px double var(--card-accent) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: none !important;
+  font-family: Georgia, serif !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+}
+.qtm-template-luxury .card-actions .action-primary {
+  background: var(--card-accent) !important;
+  color: #ffffff !important;
+  border-radius: 2px !important;
+  border: 3px double #ffffff !important;
+}
+.qtm-template-luxury .qtm-profile-contacts {
+  border-radius: 2px !important;
+  border: 3px double var(--card-accent) !important;
+  box-shadow: none !important;
+}
+.qtm-template-luxury .qtm-company-short {
+  letter-spacing: .18em !important;
+}
+
+/* ==========================================================================
+   7. THIÊN NHIÊN (botanical): Bo góc hữu cơ bất đối xứng (18px 4px 18px 4px)
+   ========================================================================== */
+.qtm-template-botanical, .qtm-art-botanical {
+  --style-font: Palatino, "Palatino Linotype", Georgia, serif; --style-weight: 700; --style-tracking: 0;
+  --style-button-radius: 18px 4px 18px 4px;
+  --style-mini-radius: 9px 2px 9px 2px;
+  --style-button-fill: rgba(255, 255, 255, 0.9);
+  --style-button-border: color-mix(in srgb,var(--card-accent) 28%,rgba(255, 255, 255, 0.8));
+  --style-button-width: 1px; --style-button-border-style: solid;
+  --style-button-shadow: none; --style-icon-radius: 50% 15% 50% 15%;
+  --style-avatar-shadow: 0 0 0 calc(var(--qtm-unit, 1cqw) * .7) color-mix(in srgb,var(--card-accent) 20%,transparent);
+  --style-mini-shadow: 0 0 0 3px color-mix(in srgb,var(--thumb-color) 20%,transparent);
+  --style-rule-width: calc(var(--qtm-unit, 1cqw) * 13); --style-rule-height: calc(var(--qtm-unit, 1cqw) * .7);
+  --style-rule-radius: 999px;
+}
+.qtm-template-botanical .card-actions :is(a, button) {
+  border-radius: 18px 4px 18px 4px !important;
+  border: 1px solid color-mix(in srgb,var(--card-accent) 35%,rgba(255, 255, 255, 0.8)) !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  box-shadow: 0 2px 8px color-mix(in srgb,var(--card-accent) 12%,transparent) !important;
+  font-family: Palatino, Georgia, serif !important;
+  font-weight: 700 !important;
+}
+.qtm-template-botanical .card-actions .action-primary {
+  background: var(--card-accent) !important;
+  color: #ffffff !important;
+  border-radius: 18px 4px 18px 4px !important;
+}
+.qtm-template-botanical .qtm-profile-contacts {
+  border-radius: 24px 6px 24px 6px !important;
+  border: 1px solid color-mix(in srgb, var(--card-accent) 25%, #ffffff) !important;
+}
+.qtm-template-botanical .qtm-contact-icon {
+  border-radius: 50% 15% 50% 15% !important;
+}
+
+/* ==========================================================================
+   8. SÁNG TẠO (creative): Bo góc viền dày (2px) + đổ bóng lệch pop-art (3px 3px 0)
+   ========================================================================== */
+.qtm-template-creative, .qtm-art-creative {
+  --style-font: Verdana, Arial, sans-serif; --style-weight: 900; --style-tracking: -.045em;
+  --style-button-radius: 8px; --style-mini-radius: 4px;
+  --style-button-fill: #ffffff;
+  --style-button-border: var(--card-accent); --style-button-width: 2px; --style-button-border-style: solid;
+  --style-button-shadow: 3px 3px 0 var(--card-accent);
+  --style-avatar-shadow: 4px 4px 0 var(--card-accent);
+  --style-mini-shadow: 4px 3px 0 color-mix(in srgb,var(--thumb-color) 30%,transparent);
+  --style-icon-radius: 25%; --style-rule-width: calc(var(--qtm-unit, 1cqw) * 16); --style-rule-height: calc(var(--qtm-unit, 1cqw) * 1);
+  --style-rule-radius: 0;
+}
+.qtm-template-creative .card-actions :is(a, button) {
+  border-radius: 8px !important;
+  border: 2px solid var(--card-accent) !important;
+  background: #ffffff !important;
+  box-shadow: 3px 3px 0 var(--card-accent) !important;
+  font-family: Verdana, Arial, sans-serif !important;
+  font-weight: 800 !important;
+  transform: translate(-1px, -1px);
+}
+.qtm-template-creative .card-actions .action-primary {
+  background: var(--card-accent) !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+  border: 2px solid var(--card-accent) !important;
+  box-shadow: 3px 3px 0 color-mix(in srgb, var(--card-accent) 50%, black) !important;
+}
+.qtm-template-creative .qtm-profile-contacts {
+  border-radius: 12px !important;
+  border: 2px solid var(--card-accent) !important;
+  box-shadow: 4px 4px 0 color-mix(in srgb, var(--card-accent) 30%, transparent) !important;
+}
+
+/* ==========================================================================
+   Signature details: divider rules & avatar portrait effects
+   ========================================================================== */
 .qtm-template-dark-tech .qtm-portrait::after {
-  content: ""; position: absolute; pointer-events: none; width: 35cqw; height: 35cqw;
+  content: ""; position: absolute; pointer-events: none; width: calc(var(--qtm-unit, 1cqw) * 35); height: calc(var(--qtm-unit, 1cqw) * 35);
   left: 50%; top: 50%; transform: translate(-50%,-50%);
   border: 1px dashed var(--card-accent); border-radius: 50%; opacity: .5;
 }
 .qtm-template-editorial .qtm-identity-rule { border-radius: 0; }
-.qtm-template-aurora .qtm-identity-rule { background: linear-gradient(90deg,var(--card-accent),#22a8b5); }
+.qtm-template-aurora .qtm-identity-rule { background: linear-gradient(90deg,var(--card-accent),color-mix(in srgb,var(--card-accent) 40%,white)); }
 .qtm-template-luxury .qtm-identity-rule { position: relative; }
 .qtm-template-luxury .qtm-identity-rule::after {
-  content: ""; position: absolute; width: 1.4cqw; height: 1.4cqw; top: 50%; left: 50%;
+  content: ""; position: absolute; width: calc(var(--qtm-unit, 1cqw) * 1.4); height: calc(var(--qtm-unit, 1cqw) * 1.4); top: 50%; left: 50%;
   background: var(--card-accent); transform: translate(-50%,-50%) rotate(45deg);
 }
-.qtm-template-creative .qtm-identity-rule { border-radius: 0; background: linear-gradient(90deg,var(--card-accent) 65%,transparent 65%,transparent 73%,#d48c32 73%); }
-.qtm-template-minimal-line .qtm-position { font-style: normal; }
-.qtm-template-dark-tech .qtm-company-short { font-family: "Courier New",monospace; }
-.qtm-template-editorial .qtm-profile-identity h3 { font-family: Georgia,serif; }
-.qtm-template-luxury .qtm-company-short { letter-spacing: .18em; }
+.qtm-template-creative .qtm-identity-rule { border-radius: 0; background: linear-gradient(90deg,var(--card-accent) 65%,transparent 65%,transparent 73%,var(--card-accent) 73%); }
 
-/* Every thumbnail demonstrates the same treatments as its full profile. */
-.template-art { --card-accent: var(--thumb-color); }
+/* ==========================================================================
+   Thumbnails: purely structural comparison with pure white background and neutral slate shapes.
+   ========================================================================== */
+.template-art {
+  background: #ffffff !important;
+  --card-accent: #475569 !important;
+  --thumb-color: #475569 !important;
+}
 .template-art .art-avatar { box-shadow: var(--style-mini-shadow,none); border-radius: 50%; }
 .template-art .art-name { background: none; width: auto; height: auto; font-family: var(--style-font); font-weight: var(--style-weight); letter-spacing: var(--style-tracking); font-size: 10px; line-height: 1.25; color: var(--thumb-color); opacity: 1; }
 .template-art .art-role { background: none; width: auto; height: auto; font-size: 7px; line-height: 1.2; color: var(--thumb-color); opacity: .8; }
 .template-art .art-buttons i { border-radius: var(--style-mini-radius,3px); background: var(--style-button-fill,color-mix(in srgb,var(--thumb-color) 12%,white)); border: var(--style-button-width,1px) var(--style-button-border-style,solid) var(--style-button-border,color-mix(in srgb,var(--thumb-color) 45%,white)); opacity: 1; }
-.qtm-art-minimal-line .art-avatar { border: 3px solid white; }
+
+.qtm-art-bubble-blue .art-buttons i { border-radius: 999px !important; }
+.qtm-art-minimal-line .art-avatar { border: 2px solid var(--thumb-color); }
+.qtm-art-minimal-line .art-buttons i { border-radius: 1px !important; border: 1px solid var(--thumb-color) !important; background: transparent !important; }
 .qtm-art-dark-tech .art-avatar { outline: 1px dashed var(--thumb-color); outline-offset: 3px; }
+.qtm-art-dark-tech .art-buttons i { border-radius: 0px !important; border: 1px solid var(--thumb-color) !important; box-shadow: inset 0 -2px var(--thumb-color) !important; }
 .qtm-art-editorial .art-name { text-decoration: underline; text-underline-offset: 3px; }
-.qtm-art-aurora .art-buttons i { border-color: #c4b5fd; }
+.qtm-art-editorial .art-buttons i { border-radius: 0px !important; border: 1px solid var(--thumb-color) !important; box-shadow: 0 2px 0 var(--thumb-color) !important; }
+.qtm-art-aurora .art-buttons i { border-radius: 7px !important; border: 1px solid color-mix(in srgb,var(--thumb-color) 40%,white) !important; box-shadow: 0 0 6px color-mix(in srgb,var(--thumb-color) 40%,transparent) !important; }
 .qtm-art-luxury .art-brand { font-family: Georgia,serif; letter-spacing: 1px; font-style: normal; }
-.qtm-art-luxury .art-buttons i { border-width: 3px; border-style: double; }
-.qtm-art-creative .art-buttons i { box-shadow: 2px 2px 0 color-mix(in srgb,var(--thumb-color) 25%,transparent); }
+.qtm-art-luxury .art-buttons i { border-width: 3px !important; border-style: double !important; border-radius: 2px !important; }
+.qtm-art-botanical .art-buttons i { border-radius: 8px 2px 8px 2px !important; }
+.qtm-art-creative .art-buttons i { border-radius: 4px !important; border: 2px solid var(--thumb-color) !important; box-shadow: 2px 2px 0 var(--thumb-color) !important; }
 
 .template-art .art-rule { width: var(--style-mini-rule-width,28px); height: var(--style-mini-rule-height,2px); background: var(--thumb-color); border-radius: 3px; z-index: 1; flex-shrink: 0; }
 .qtm-art-minimal-line { --style-mini-rule-width: 52px; --style-mini-rule-height: 1px; }
 .qtm-art-dark-tech { --style-mini-rule-width: 64px; }
 .qtm-art-editorial { --style-mini-rule-width: 76px; --style-mini-rule-height: 1px; }
-.qtm-art-aurora .art-rule { width: 40px; background: linear-gradient(90deg,var(--thumb-color),#22a8b5); }
+.qtm-art-aurora .art-rule { width: 40px; background: linear-gradient(90deg,var(--thumb-color),color-mix(in srgb,var(--thumb-color) 40%,white)); }
 .qtm-art-luxury { --style-mini-rule-width: 60px; --style-mini-rule-height: 1px; }
 .qtm-art-botanical { --style-mini-rule-width: 42px; --style-mini-rule-height: 3px; }
-.qtm-art-creative .art-rule { width: 48px; height: 3px; border-radius: 0; background: linear-gradient(90deg,var(--thumb-color) 65%,transparent 65%,transparent 73%,#d48c32 73%); }
+.qtm-art-creative .art-rule { width: 48px; height: 3px; border-radius: 0; background: linear-gradient(90deg,var(--thumb-color) 65%,transparent 65%,transparent 73%,var(--thumb-color) 73%); }

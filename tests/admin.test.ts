@@ -24,7 +24,7 @@ function setup() {
       const id = randomUUID();
       const { theme, publicFields: ignored, ...fields } = data;
       void ignored;
-      const record: CardRecord = { ...fields, id, slug, theme: { ...theme, employeeId: id }, createdAt: new Date(), updatedAt: new Date(), deletedAt: null };
+      const record: CardRecord = { ...fields, id, slug, theme: { ...theme }, createdAt: new Date(), updatedAt: new Date(), deletedAt: null };
       rows.set(id, record);
       return record;
     },
@@ -33,7 +33,7 @@ function setup() {
       if (!record) throw { code: "P2025" };
       const { theme, publicFields: ignored, ...fields } = data;
       void ignored;
-      const next: CardRecord = { ...record, ...fields, ...(theme ? { theme: { ...theme, employeeId: id } } : {}), updatedAt: new Date() };
+      const next: CardRecord = { ...record, ...fields, ...(theme ? { theme: { ...theme } } : {}), updatedAt: new Date() };
       rows.set(id, next);
       return next;
     },
@@ -63,11 +63,11 @@ test("admin CRUD: unique slugs, nested replacement, immutable slug, active/inact
   const [first, second] = await Promise.all([service.create(input), service.create(input)]);
   assert.equal(first.slug, "dang-thi-anh");
   assert.match(second.slug, /^dang-thi-anh-[a-f0-9]{8}$/);
-  const changed = await service.update(first.id, employeePatch.parse({ fullName: "New Name", offices: [], theme: { ...input.theme, primaryColor: "#123456", decor: ["waves"] } }));
+  const changed = await service.update(first.id, employeePatch.parse({ fullName: "New Name", offices: [], theme: { ...input.theme, primaryColor: "#123456", decor: ["leaves"] } }));
   assert.equal(changed.slug, first.slug);
   assert.deepEqual(changed.offices, []);
   assert.equal(changed.theme.primaryColor, "#123456");
-  assert.deepEqual(changed.theme.decor, ["waves"]);
+  assert.deepEqual(changed.theme.decor, ["leaves"]);
   assert.equal((await service.byId(first.id)).fullName, "New Name");
   await service.toggle(first.id);
   assert.equal((await service.list()).length, 2);
@@ -87,6 +87,11 @@ test("DTO rejects metadata changes, invalid nested values, data URLs, oversized 
   for (const patch of [{ slug: "changed" }, { id: randomUUID() }, {}, { offices: Array(21).fill({ label: "", address: "" }) }, { avatarUrl: "data:image/png;base64,abc" }, { avatarUrl: "javascript:alert(1)" }, { theme: { ...input.theme, primaryColor: "red" } }, { theme: { ...input.theme, decorOpacity: 101 } }]) {
     assert.equal(employeePatch.safeParse(patch).success, false);
   }
+  const parsedWithUiThemeFields = employeePatch.parse({
+    theme: { ...input.theme, styleId: "editorial", paletteId: "brand-white" },
+  });
+  assert.equal("styleId" in parsedWithUiThemeFields.theme!, false);
+  assert.equal("paletteId" in parsedWithUiThemeFields.theme!, false);
 });
 
 test("all admin routes enforce auth, CSRF and input limits; CRUD and stats expose correct HTTP responses", async () => {
@@ -97,6 +102,10 @@ test("all admin routes enforce auth, CSRF and input limits; CRUD and stats expos
   const { serverAuth } = await import("../src/server/auth/runtime");
   const { adminEmployees } = await import("../src/server/admin/runtime");
   const { avatarStorage } = await import("../src/server/admin/upload");
+  const { publicCardCache } = await import("../src/server/cards/cache");
+  const originalInvalidate = publicCardCache.invalidate;
+  let invalidations = 0;
+  publicCardCache.invalidate = () => { invalidations++; };
   const originals = { auth: serverAuth.currentUser, service: { ...adminEmployees }, upload: avatarStorage.upload };
   const { service } = setup();
   Object.assign(adminEmployees, service);
@@ -131,11 +140,25 @@ test("all admin routes enforce auth, CSRF and input limits; CRUD and stats expos
     assert.deepEqual((await updated.json()).employee.offices, []);
     assert.equal((await active.PATCH(req("PATCH"), context(employee.id))).status, 200);
     const listed = await collection.GET(req());
-    assert.equal(listed.headers.get("cache-control"), "no-store");
+    assert.equal(listed.headers.get("cache-control"), "private, max-age=0, must-revalidate");
+    const conditional = req(); conditional.headers.set("if-none-match", listed.headers.get("etag")!);
+    const unchanged = await collection.GET(conditional);
+    assert.equal(unchanged.status, 304); assert.equal(await unchanged.text(), "");
+    const denied = req("GET", undefined, ""); denied.headers.set("if-none-match", listed.headers.get("etag")!);
+    assert.equal((await collection.GET(denied)).status, 401);
+    const detailRead = await item.GET(req(), context(employee.id));
+    const detailConditional = req(); detailConditional.headers.set("if-none-match", detailRead.headers.get("etag")!);
+    assert.equal((await item.GET(detailConditional, context(employee.id))).status, 304);
+    const statsRead = await stats.GET(req());
+    const statsConditional = req(); statsConditional.headers.set("if-none-match", statsRead.headers.get("etag")!);
+    assert.equal((await stats.GET(statsConditional)).status, 304);
     assert.equal((await listed.json()).employees[0].isActive, false);
     assert.deepEqual(await (await stats.GET(req())).json(), { total: 1, active: 0, inactive: 1 });
     assert.equal((await item.DELETE(req("DELETE"), context(employee.id))).status, 200);
     assert.equal((await item.GET(req(), context(employee.id))).status, 404);
+    assert.equal((await collection.GET(conditional)).status, 200);
+    assert.equal((await stats.GET(statsConditional)).status, 200);
+    assert.equal(invalidations, 4); // create, edit, toggle, delete; rejected writes do not invalidate.
     assert.equal((await item.GET(req(), context("not-uuid"))).status, 400);
     assert.deepEqual(await (await stats.GET(req())).json(), { total: 0, active: 0, inactive: 0 });
 
@@ -157,6 +180,7 @@ test("all admin routes enforce auth, CSRF and input limits; CRUD and stats expos
     assert.equal(failure.status, 503);
     assert.ok(!(await failure.text()).includes("sensitive"));
   } finally {
+    publicCardCache.invalidate = originalInvalidate;
     serverAuth.currentUser = originals.auth;
     Object.assign(adminEmployees, originals.service);
     avatarStorage.upload = originals.upload;

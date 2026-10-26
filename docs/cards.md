@@ -7,7 +7,7 @@ Không cần token. URL thực tế có tiền tố `/api`, giống các API aut
 | GET | `/api/cards` | `{ "cards": [...] }`, chỉ card active và chưa xóa mềm |
 | GET | `/api/cards/:slug` | `{ "card": {...} }`, kèm `offices`, `theme`, `company`, `companyShort`, `website` |
 
-Card bị ẩn (`isActive = false`), xóa mềm (`deletedAt != null`) hoặc không tồn tại đều trả `404` với cùng thông báo. Lỗi database trả `503`, không trả chi tiết lỗi nội bộ. Response dùng `Cache-Control: no-store`.
+Card bị ẩn (`isActive = false`), xóa mềm (`deletedAt != null`) hoặc không tồn tại đều trả `404` với cùng thông báo. Lỗi database trả `503`, không trả chi tiết lỗi nội bộ. GET thành công dùng ETag và `Cache-Control: public, max-age=0, must-revalidate`; `If-None-Match` khớp trả 304 không body. Response 404/lỗi vẫn `no-store`. Trang card Server Component dùng Data Cache 60 giây với tag `public-cards`, vô hiệu hóa khi admin ghi dữ liệu. Xem [kiểm tra cache](CLIENT-SERVER-CACHE.md).
 
 JSON dùng camelCase theo kiểu `Employee` của FE. Các trường liên hệ null được đổi thành chuỗi rỗng; card chưa có theme dùng theme mặc định. DTO không chứa `deletedAt` hoặc khóa ngoại theme.
 

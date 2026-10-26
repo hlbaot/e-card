@@ -1,5 +1,5 @@
 import { create } from "zustand";
-export interface AuthUser { id: string; email: string; createdAt?: string }
+import type { AuthUser } from "@/shared/types";
 export const useAuthStore = create<{
   authenticated: boolean;
   ready: boolean;

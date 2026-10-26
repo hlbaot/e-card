@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { Copy, Download, ExternalLink, MapPin, X } from "lucide-react";
-import { getPublicFields, type Employee } from "@/shared/types/employee";
+import { getPublicFields } from "@/shared/types";
+import type { Employee } from "@/shared/types";
 import { cardUrl, downloadQR } from "@/shared/utils/qr";
 import { useToast } from "@/client/components/ui/Toast";
 import { migrateCardTheme } from "@/shared/utils/migrate-theme";

@@ -1389,6 +1389,16 @@
 }
 .toast svg {
   color: var(--teal);
+  flex-shrink: 0;
+}
+.toast-error {
+  border-color: rgba(248, 113, 113, 0.55);
+  box-shadow:
+    0 12px 36px rgba(2, 6, 23, 0.75),
+    0 0 22px rgba(248, 113, 113, 0.28);
+}
+.toast-error svg {
+  color: #f87171;
 }
 .skeleton {
   display: grid;
@@ -2341,6 +2351,24 @@ tbody tr:last-child td {
   color: #fca5a5;
   font-size: 12px;
   margin-bottom: 15px;
+}
+@keyframes ui-alert-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.ui-alert {
+  animation: ui-alert-appear 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ui-alert {
+    animation: none;
+  }
 }
 /* Error pages inherit the same Plus Jakarta Sans typography as the site. */
 .not-found-page { position: relative; z-index: 1; min-height: 100dvh; display: flex; flex-direction: column; font-family: var(--font-jakarta); }

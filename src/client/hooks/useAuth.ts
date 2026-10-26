@@ -11,9 +11,16 @@ let restoring: Promise<void> | undefined;
 export function restoreSession() {
   restoring ??= (async () => {
     try {
-      useAuthStore.getState().setUser(await authApi.me());
+      const user = await authApi.me();
+      useAuthStore.getState().setUser(user);
+      if (typeof window !== "undefined") {
+        try { localStorage.setItem("ecard_logged_in", "1"); } catch {}
+      }
     } catch {
       useAuthStore.getState().setUser(null);
+      if (typeof window !== "undefined") {
+        try { localStorage.removeItem("ecard_logged_in"); } catch {}
+      }
     }
   })().finally(() => { restoring = undefined; });
   return restoring;
@@ -22,13 +29,20 @@ export function restoreSession() {
 export async function login(email: string, password: string) {
   if (restoring) await restoring;
   return withAuthLock(async () => {
-    useAuthStore.getState().setUser(await authApi.login(email, password));
+    const user = await authApi.login(email, password);
+    useAuthStore.getState().setUser(user);
+    if (typeof window !== "undefined") {
+      try { localStorage.setItem("ecard_logged_in", "1"); } catch {}
+    }
   });
 }
 
 export async function logout() {
   if (restoring) await restoring;
   return withAuthLock(async () => {
+    if (typeof window !== "undefined") {
+      try { localStorage.removeItem("ecard_logged_in"); } catch {}
+    }
     await authApi.logout();
     useAuthStore.getState().setUser(null);
   });

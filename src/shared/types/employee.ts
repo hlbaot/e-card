@@ -1,28 +1,5 @@
-export type TemplateId =
-  | "bubble-blue"
-  | "minimal-line"
-  | "dark-tech"
-  | "editorial"
-  | "aurora"
-  | "luxury"
-  | "botanical"
-  | "creative";
-export type AvatarSize = "sm" | "md" | "lg";
-export type AvatarShape = "circle" | "rounded";
-export type ButtonStyle = "filled" | "soft" | "outline";
-export type DecorKey = "blobs" | "circles" | "skyline" | "waves" | "bokeh" | "leaves" | "network" | "geometry";
-export interface CardTheme {
-  templateId: TemplateId;
-  backgroundId: string;
-  decor: DecorKey[];
-  shapes: Record<string, boolean>;
-  primaryColor: string;
-  avatarSize: AvatarSize;
-  avatarShape: AvatarShape;
-  buttonStyle: ButtonStyle;
-  showDecor?: boolean;
-  decorOpacity?: number;
-}
+import type { CardTheme } from "./card";
+
 export interface Office {
   label: string;
   address: string;
@@ -63,8 +40,16 @@ export interface Employee {
   updatedAt: string;
 }
 export function getPublicFields(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _employee?: Partial<Pick<Employee, "publicFields">> | null,
 ): PublicFields {
   // Every contact field is public.
   return { ...DEFAULT_PUBLIC_FIELDS };
+}
+
+export type EmployeeInput = Omit<Employee, "id" | "slug" | "createdAt" | "updatedAt">;
+export interface EmployeeStats {
+  total: number;
+  active: number;
+  inactive: number;
 }

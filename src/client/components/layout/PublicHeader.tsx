@@ -35,7 +35,18 @@ export function Brand() {
 export function PublicHeader() {
   const { ready, authenticated } = useAuth();
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
-  const isLoggedIn = mounted && ready && authenticated;
+  const hasLocalSession = useSyncExternalStore(
+    emptySubscribe,
+    () => {
+      try {
+        return localStorage.getItem("ecard_logged_in") === "1";
+      } catch {
+        return false;
+      }
+    },
+    () => false,
+  );
+  const isLoggedIn = mounted && (ready ? authenticated : hasLocalSession);
 
   return (
     <header className="public-header">
@@ -46,6 +57,7 @@ export function PublicHeader() {
           <Link
             className="qtm-header-cta group"
             href={isLoggedIn ? routes.admin : routes.login}
+            prefetch={true}
           >
             <span>{isLoggedIn ? "QUẢN TRỊ" : "ĐĂNG NHẬP"}</span>
             <ArrowRight

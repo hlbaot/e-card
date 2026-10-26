@@ -97,7 +97,7 @@ Danh thiếp điện tử chứa dữ liệu cá nhân nhạy cảm (SĐT, Email
   - **Lưu ý quan trọng**: Không chặn `/card/` trong `robots.txt` vì Googlebot cần truy cập được URL `/card/[slug]` để đọc thẻ `<meta name="robots" content="noindex">` của từng danh thiếp.
 - **`src/app/sitemap.ts`**:
   - Tự động làm mới mỗi giờ (`revalidate = 3600`).
-  - Chỉ đưa vào trang chủ `/` và các đường dẫn `/card/[slug]` thỏa mãn **đồng thời** `isActive === true` và `allowIndexing === true` thông qua hàm server `getIndexableEmployees()` tại [`src/server/employees.ts`](file:///Users/baotoan/Documents/e-card/src/server/employees.ts).
+  - Chỉ đưa vào trang chủ `/` và các đường dẫn `/card/[slug]` thỏa mãn **đồng thời** `isActive === true` và `allowIndexing === true` thông qua service `publicCards.list()` tại [`src/server/cards/runtime.ts`](src/server/cards/runtime.ts).
 
 ### 4.3. Hướng dẫn thiết lập Google Search Console (sau khi deploy domain thật)
 

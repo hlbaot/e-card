@@ -20,30 +20,29 @@ export const adminEmployeesRepository: AdminEmployeesRepository = {
   create(input, slug) {
     const { theme, publicFields, ...data } = input;
     void publicFields; // DTO tương thích FE, schema hiện công khai mọi trường liên hệ.
-    // Nested write và offices JSON nằm trong một transaction: không tạo card dở dang.
-    return prisma.$transaction((tx) => tx.employee.create({
+    return prisma.employee.create({
       data: { ...data, slug, theme: { create: theme } }, select: employeeCardSelect,
-    }));
+    });
   },
   update(id, input) {
     const { theme, publicFields, ...data } = input;
     void publicFields; // DTO tương thích FE, schema hiện công khai mọi trường liên hệ.
     // Chỉ cập nhật bản chưa xóa; slug không nằm trong DTO nên luôn được giữ nguyên.
-    return prisma.$transaction((tx) => tx.employee.update({
+    return prisma.employee.update({
       where: { id, deletedAt: null },
       data: { ...data, ...(theme ? { theme: { upsert: { create: theme, update: theme } } } : {}) },
       select: employeeCardSelect,
-    }));
-  },
-  toggle(id) {
-    return prisma.$transaction(async (tx) => {
-      // Đảo boolean ngay trong SQL để hai request đồng thời không ghi cùng giá trị cũ.
-      const rows = await tx.$queryRaw<{ id: string }[]>`
-        UPDATE employees SET is_active = NOT is_active, updated_at = NOW()
-        WHERE id = ${id}::uuid AND deleted_at IS NULL RETURNING id
-      `;
-      return rows.length ? tx.employee.findUnique({ where: { id }, select: employeeCardSelect }) : null;
     });
+  },
+  async toggle(id) {
+    // Đảo boolean trực tiếp bằng 1 câu UPDATE ... RETURNING, bỏ interactive transaction (BEGIN/COMMIT) để giảm round-trip.
+    const rows = await prisma.$queryRaw<{ id: string }[]>`
+      UPDATE employees SET is_active = NOT is_active, updated_at = NOW()
+      WHERE id = ${id}::uuid AND deleted_at IS NULL RETURNING id
+    `;
+    return rows.length
+      ? prisma.employee.findUnique({ where: { id }, select: employeeCardSelect })
+      : null;
   },
   async remove(id) {
     const result = await prisma.employee.updateMany({

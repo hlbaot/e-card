@@ -6,8 +6,10 @@ import {
   ContactRound,
   Globe,
   MapPin,
+  ChevronRight,
 } from "lucide-react";
-import { getPublicFields, type Employee } from "@/shared/types/employee";
+import { getPublicFields } from "@/shared/types";
+import type { Employee } from "@/shared/types";
 import { saveContact, websiteUrl } from "@/shared/utils/vcard";
 import { useToast } from "@/client/components/ui/Toast";
 
@@ -74,21 +76,26 @@ export function CardActions({ employee: e }: { employee: Employee }) {
 
   return (
     <div className="card-actions actions-outline">
-      {actions.map(({ label, icon: Icon, href, external }) =>
+      {actions.map(({ label, icon: Icon, href, external }, index) =>
         href ? (
           <a
             key={label}
             href={href}
+            className={index === 0 ? "action-primary" : undefined}
             target={external ? "_blank" : undefined}
             rel={external ? "noopener noreferrer" : undefined}
           >
-            <Icon size={19} />
-            <span>{label}</span>
+            <span className="action-btn-content">
+              <Icon size={16} />
+              <span>{label}</span>
+            </span>
+            <ChevronRight size={13} className="action-btn-chevron" />
           </a>
         ) : (
           <button
             key={label}
             type="button"
+            className={index === 0 ? "action-primary" : undefined}
             disabled={label !== "Lưu danh bạ"}
             title={label !== "Lưu danh bạ" ? "Chưa có thông tin" : undefined}
             onClick={() => {
@@ -96,8 +103,11 @@ export function CardActions({ employee: e }: { employee: Employee }) {
               toast("Đã tải danh bạ vCard");
             }}
           >
-            <Icon size={19} />
-            <span>{label}</span>
+            <span className="action-btn-content">
+              <Icon size={16} />
+              <span>{label}</span>
+            </span>
+            <ChevronRight size={13} className="action-btn-chevron" />
           </button>
         ),
       )}

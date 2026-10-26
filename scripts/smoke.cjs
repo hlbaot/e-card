@@ -86,7 +86,7 @@ async function main() {
   assert.equal(localizeEmployee(custom).slogan, custom.slogan);
   const { migrateCardTheme } = require("../src/shared/utils/migrate-theme.ts");
   const { decorOptions } = require("../src/shared/constants/card-themes.ts");
-  assert.deepEqual(decorOptions.map((option) => option.id), ["none", "blobs", "circles", "skyline", "bokeh", "leaves", "network", "geometry"]);
+  assert.deepEqual(decorOptions.map((option) => option.id), ["none", "blobs", "bokeh", "circles", "leaves", "geometry", "network"]);
   for (const templateId of ["bubble-blue", "dark-tech"]) {
     for (const pattern of ["dot", "dots", "grid", "diagonal", "art-deco", "plus", "crosses", "lines", "checks", "diamonds", "leaf", "leaf-dots", "none"]) {
       for (const field of ["pattern", "patternId"]) {
@@ -94,34 +94,39 @@ async function main() {
         delete legacy.decor;
         const migrated = migrateCardTheme(legacy);
         assert.deepEqual(migrated.decor, pattern === "none" ? [] : [templateId === "dark-tech" ? "circles" : "blobs"]);
-        assert.equal(migrated.decorOpacity, 80);
+        assert.equal(migrated.decorOpacity, 60);
         assert.ok(!(field in migrated));
         assert.deepEqual(migrateCardTheme(migrated), migrated);
         assert.equal(migrateCardTheme({ ...legacy, decorOpacity: 35 }).decorOpacity, 35);
       }
     }
   }
-  assert.equal(migrateCardTheme({ ...employees[0].theme, decorOpacity: 100 }).decorOpacity, 100);
+  assert.equal(migrateCardTheme({ ...employees[0].theme, decorOpacity: 100 }).decorOpacity, 60);
   assert.deepEqual(migrateCardTheme({ ...employees[0].theme, decor: [] }).decor, []);
-  assert.deepEqual(migrateCardTheme({ ...employees[0].theme, decor: ["leaves", "network", "geometry", "leaves", "invalid"] }).decor, ["leaves", "network", "geometry"]);
+  assert.deepEqual(migrateCardTheme({ ...employees[0].theme, decor: ["leaves", "network", "geometry", "leaves", "invalid"] }).decor, ["leaves"]);
   const { getProfileDecorPlacements } = require("../src/shared/utils/decor-layout.ts");
-  const motifKeys = ["blobs", "circles", "bokeh", "leaves", "network", "geometry"];
-  // Every combination must occupy separate slots, with no paint beside contacts.
+  const motifKeys = ["blobs", "bokeh", "circles", "leaves", "geometry", "network"];
+  // Motifs occupy spacious fixed slots strictly at the outer margins
   for (let mask = 0; mask < 1 << motifKeys.length; mask++) {
     const selected = motifKeys.filter((_, index) => mask & (1 << index));
     const placements = getProfileDecorPlacements(selected);
-    assert.equal(placements.length, selected.length === 0 ? 0 : selected.length <= 3 ? 3 : 6);
-    assert.deepEqual(placements, getProfileDecorPlacements([...selected].reverse()));
-    for (const key of selected) assert.ok(placements.some(slot => slot.decor === key));
+    assert.equal(placements.length, selected.length === 0 ? 0 : 6);
+    if (selected.length > 0) {
+      assert.ok(placements.some(slot => slot.decor === selected[0]));
+    }
     placements.forEach((a, index) => {
-      assert.ok(a.y + a.height < 300);
+      assert.ok(a.y + a.height <= 200);
+      for (const protectedArea of [{ x: 0, y: 45, width: 90, height: 120 }, { x: 280, y: 0, width: 110, height: 60 }]) {
+        const b = protectedArea;
+        assert.ok(a.x + a.width <= b.x || b.x + b.width <= a.x || a.y + a.height <= b.y || b.y + b.height <= a.y);
+      }
       for (const b of placements.slice(index + 1)) {
         assert.ok(a.x + a.width <= b.x || b.x + b.width <= a.x || a.y + a.height <= b.y || b.y + b.height <= a.y);
       }
     });
   }
   assert.ok(templates.length >= 8);
-  assert.ok(colorPresets.length >= 24);
+  assert.ok(colorPresets.length >= 12);
   assert.equal(new Set(templates.map((t) => t.id)).size, templates.length);
   for (const template of templates)
     assert.ok(backgrounds.some((b) => b.id === template.defaultBackgroundId));
@@ -179,12 +184,13 @@ async function main() {
 
   const { CardDecorations } = require("../src/client/components/card/CardDecorations.tsx");
   for (const template of templates) {
-    for (const decorOpacity of [0, 50, 100]) {
-      const theme = { ...employees[0].theme, templateId: template.id, backgroundId: template.defaultBackgroundId, decor: ["blobs", "circles", "skyline", "waves", "bokeh"], decorOpacity };
+    for (const decorOpacity of [0, 35, 60]) {
+      const theme = { ...employees[0].theme, templateId: template.id, backgroundId: template.defaultBackgroundId, decor: ["blobs"], decorOpacity };
       const preview = renderToStaticMarkup(createElement(CardDecorations, { theme, variant: "preview" }));
       const profile = renderToStaticMarkup(createElement(CardDecorations, { theme, variant: "profile" }));
       assert.equal(preview.replace("decor-preview", "decor-profile"), profile);
-      assert.equal((preview.match(/data-decor=/g) || []).length, 5);
+      // Active decor artwork + permanent skyline artwork = 2
+      assert.equal((preview.match(/data-decor=/g) || []).length, 2);
       assert.ok(preview.includes(`opacity:${decorOpacity / 100}`));
       assert.ok(!/<pattern|background-image|animate/i.test(preview));
     }

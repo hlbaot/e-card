@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { QueryProvider } from "@/client/providers/QueryProvider";
 import { ToastProvider } from "@/client/components/ui/Toast";
 import { PageBackground } from "@/client/components/ui/PageBackground";
 import { absoluteUrl, siteConfig } from "@/config/site";
@@ -70,7 +71,7 @@ export default function RootLayout({
     <html lang="vi" className={`${handwriting.variable} dark`}>
       <body>
         <PageBackground />
-        <ToastProvider>{children}</ToastProvider>
+        <QueryProvider><ToastProvider>{children}</ToastProvider></QueryProvider>
       </body>
     </html>
   );

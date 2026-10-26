@@ -1,11 +1,11 @@
 import type { MetadataRoute } from "next";
 import { absoluteUrl, siteConfig } from "@/config/site";
-import { getIndexableEmployees } from "@/server/employees";
+import { publicCards } from "@/server/cards/runtime";
 
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const indexableEmployees = await getIndexableEmployees();
+  const indexableEmployees = await publicCards.list();
 
   const entries: MetadataRoute.Sitemap = [];
 

@@ -1,6 +1,6 @@
 "use client";
 
-import type { Employee } from "@/shared/types/employee";
+import type { Employee } from "@/shared/types";
 import { ProfileView } from "./ProfileView";
 
 // Dữ liệu public đã được server kiểm tra; không ghi đè bằng localStorage.

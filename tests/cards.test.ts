@@ -51,19 +51,41 @@ test("public routes need no token, return 404 for unavailable cards and sanitize
   const { GET: detail } = await import("../src/app/api/cards/[slug]/route");
   const get = (slug: string) => detail(new Request(`http://localhost/api/cards/${slug}`), { params: Promise.resolve({ slug }) });
   try {
-    const response = await list();
+    const response = await list(new Request("http://localhost/api/cards"));
     assert.equal(response.status, 200);
-    assert.equal(response.headers.get("cache-control"), "no-store");
+    assert.equal(response.headers.get("cache-control"), "public, max-age=0, must-revalidate");
+    const conditional = new Request("http://localhost/api/cards", { headers: { "if-none-match": response.headers.get("etag")! } });
+    assert.equal((await list(conditional)).status, 304);
     assert.equal((await response.json()).cards.length, 1);
     const found = await get(card.slug);
     assert.equal(found.status, 200);
+    const conditionalDetail = new Request(`http://localhost/api/cards/${card.slug}`, { headers: { "if-none-match": found.headers.get("etag")! } });
+    const notModified = await detail(conditionalDetail, { params: Promise.resolve({ slug: card.slug }) });
+    assert.equal(notModified.status, 304); assert.equal(await notModified.text(), "");
     assert.equal((await found.json()).card.slug, card.slug);
     for (const slug of ["hidden", "deleted", "missing"]) assert.equal((await get(slug)).status, 404);
     publicCards.list = async () => { throw new Error("sensitive database credentials"); };
     publicCards.bySlug = async () => { throw new Error("sensitive database credentials"); };
-    for (const failure of [await list(), await get(card.slug)]) {
+    for (const failure of [await list(new Request("http://localhost/api/cards")), await get(card.slug)]) {
       assert.equal(failure.status, 503);
       assert.ok(!(await failure.text()).includes("sensitive"));
     }
   } finally { Object.assign(publicCards, originals); }
+});
+
+
+test("cached public profile checks visibility before reading persistent content", async () => {
+  process.env.DATABASE_URL = "postgresql://localhost:5432/cards_tests_never_connected";
+  process.env.JWT_SECRET = "test-only-secret-with-at-least-32-bytes";
+  const { cardsRepository } = await import("../src/server/cards/repository");
+  const { cachedPublicCards } = await import("../src/server/cards/cache");
+  const original = cardsRepository.isVisible;
+  let checks = 0;
+  cardsRepository.isVisible = async () => { checks++; return false; };
+  try {
+    assert.equal(await cachedPublicCards.bySlug("hidden"), null);
+    assert.equal(checks, 1);
+    assert.equal(await cachedPublicCards.bySlug(""), null);
+    assert.equal(checks, 1);
+  } finally { cardsRepository.isVisible = original; }
 });

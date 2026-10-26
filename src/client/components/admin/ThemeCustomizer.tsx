@@ -2,19 +2,19 @@
 import "@/client/components/card/card-styles.css";
 import { useState } from "react";
 import { migrateCardTheme } from "@/shared/utils/migrate-theme";
-import { Palette, Check, WandSparkles, Sparkles } from "lucide-react";
+import { Palette, Check, Sparkles } from "lucide-react";
 import {
   templates,
-  backgrounds,
+  palettes,
   decorOptions,
   colorPresets,
   getTemplate,
 } from "@/shared/constants/card-themes";
-import type { CardTheme } from "@/shared/types/employee";
-import { CardDecorations, DecorArtwork } from "@/client/components/card/CardDecorations";
+import type { CardTheme } from "@/shared/types";
+import { CardDecorations } from "@/client/components/card/CardDecorations";
 import { DecorSwatch } from "@/client/components/card/DecorIllustration";
 import { cn } from "@/shared/utils/cn";
-import { contrastText, readableAccent } from "@/shared/utils/color";
+import { contrastText } from "@/shared/utils/color";
 
 export function ThemeCustomizer({
   theme: rawTheme,
@@ -53,13 +53,17 @@ export function ThemeCustomizer({
         <h3>Phong cách thiết kế</h3>
         <span>{templates.length} mẫu</span>
       </div>
+      <p className="theme-help mb-3">
+        Phong cách quyết định cấu trúc, hình dạng nút, kiểu chữ, khung ảnh và đường kẻ (nền trắng &amp; màu trung tính).
+      </p>
       <div className="template-gallery">
         {templates.map((t) => {
           const thumbTheme: CardTheme = {
             templateId: t.id,
-            backgroundId: t.defaultBackgroundId,
+            styleId: t.id,
+            backgroundId: "white-clean",
             decor: [...t.defaultDecor],
-            primaryColor: t.defaultColor,
+            primaryColor: "#475569",
             shapes: Object.fromEntries(t.shapes.map((s) => [s.id, s.id === "editorial-frame"])),
             avatarSize: "md",
             avatarShape: "circle",
@@ -79,8 +83,8 @@ export function ThemeCustomizer({
               onClick={() =>
                 set({
                   templateId: t.id,
-                  backgroundId: t.defaultBackgroundId,
-                  primaryColor: t.defaultColor,
+                  styleId: t.id,
+                  backgroundId: t.defaultBackgroundId || theme.backgroundId,
                   decor: [...t.defaultDecor],
                   showDecor: true,
                   decorOpacity: t.defaultDecorOpacity,
@@ -93,7 +97,10 @@ export function ThemeCustomizer({
                 aria-hidden="true"
                 style={
                   {
-                    "--thumb-color": readableAccent(t.defaultColor, false, "#E0E0E0"),
+                    background: "#FFFFFF",
+                    "--card-background": "#FFFFFF",
+                    "--card-accent": "#475569",
+                    "--thumb-color": "#475569",
                   } as React.CSSProperties
                 }
               >
@@ -123,94 +130,126 @@ export function ThemeCustomizer({
         })}
       </div>
 
-      <button
-        type="button"
-        className="suggested-palette"
-        onClick={() =>
-          set({
-            backgroundId: template.defaultBackgroundId,
-            primaryColor: template.defaultColor,
-            decor: [...template.defaultDecor],
-            showDecor: true,
-            decorOpacity: template.defaultDecorOpacity,
-            shapes: Object.fromEntries(template.shapes.map((s) => [s.id, s.id === "editorial-frame"])),
-          })
-        }
-      >
-        <WandSparkles size={15} />
-        <span>Áp dụng phối màu & họa tiết chuẩn cho mẫu {template.name}</span>
-      </button>
-
-      {/* BƯỚC: NỀN HỒ SƠ */}
+      {/* BƯỚC: BỘ PHỐI MÀU (PALETTE) */}
       <div className="customizer-section">
         <div className="theme-group-heading">
-          <h3>Nền hồ sơ</h3>
-          <span>{backgrounds.length} lựa chọn</span>
+          <h3 className="inline-flex items-center gap-1.5">
+            <Palette size={14} />
+            Bộ phối màu (Palette)
+          </h3>
+          <span>{palettes.length} phối màu</span>
         </div>
-        <div className="background-gallery">
-          {backgrounds.map((b) => (
-            <button
-              type="button"
-              key={b.id}
-              aria-label={b.name}
-              aria-pressed={theme.backgroundId === b.id}
-              className={cn(
-                "background-tile",
-                theme.backgroundId === b.id && "selected",
-              )}
-              onClick={() => set({ backgroundId: b.id })}
-            >
-              <span style={{ background: b.css }}>
-                {theme.backgroundId === b.id && (
-                  <Check
-                    size={15}
-                    style={{ color: b.dark ? "#fff" : "#155e75" }}
-                  />
+        <p className="theme-help mb-3">
+          Chọn bộ màu để đồng bộ toàn bộ: nền, nút, viền, chữ nhấn và họa tiết. Đổi màu không làm đổi hình dạng phong cách.
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+          {palettes.map((p) => {
+            const isSelected =
+              theme.backgroundId === p.backgroundId &&
+              theme.primaryColor.toLowerCase() === p.primaryColor.toLowerCase();
+            return (
+              <button
+                type="button"
+                key={p.id}
+                aria-pressed={isSelected}
+                className={cn(
+                  "flex flex-col p-2.5 rounded-xl border text-left transition-all cursor-pointer relative",
+                  isSelected
+                    ? "border-cyan-400 bg-white/10 ring-1 ring-cyan-400/40"
+                    : "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.06]",
                 )}
-              </span>
-              <small>{b.name}</small>
-            </button>
-          ))}
+                onClick={() =>
+                  set({
+                    backgroundId: p.backgroundId,
+                    primaryColor: p.primaryColor,
+                    paletteId: p.id,
+                  })
+                }
+              >
+                <div
+                  className="h-10 w-full rounded-lg border border-black/10 flex items-center justify-center relative overflow-hidden mb-2 shadow-xs"
+                  style={{ background: p.backgroundCss }}
+                >
+                  <span
+                    className="w-5 h-5 rounded-full border border-white/60 shadow-xs flex items-center justify-center"
+                    style={{ background: p.primaryColor }}
+                  >
+                    {isSelected && <Check size={11} className="text-white" />}
+                  </span>
+                </div>
+                <strong className="text-xs font-semibold text-white truncate">
+                  {p.name}
+                </strong>
+                <span className="text-[10px] text-slate-400 truncate">
+                  {p.primaryColor}
+                </span>
+                {isSelected && (
+                  <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-cyan-400 text-slate-900 flex items-center justify-center text-[10px] font-bold">
+                    ✓
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
-        {template.dark && (
-          <p className="theme-help">
-            Mẫu {template.name} tự động tối ưu nền tối & ánh sáng điểm nhấn để
-            chữ luôn nổi bật.
-          </p>
-        )}
       </div>
 
-      {/* BƯỚC: HỌA TIẾT NỀN & CHI TIẾT TRANG TRÍ */}
+
+
+      {/* BƯỚC: HỌA TIẾT NỀN */}
       <div className="customizer-section">
         <div className="theme-group-heading">
           <h3 className="inline-flex items-center gap-1.5">
             <Sparkles size={13} />
             Họa tiết nền
           </h3>
+          <span>{decorOptions.length} lựa chọn</span>
         </div>
-        <div className="decor-suggestion">
-          <span>Gợi ý cho mẫu này: {template.defaultDecor.map((key) => decorOptions.find((option) => option.id === key)?.name).join(" + ") || "Không họa tiết"}</span>
-          <button type="button" onClick={() => set({ decor: [...template.defaultDecor], decorOpacity: template.defaultDecorOpacity })}>Áp dụng gợi ý</button>
-        </div>
-        <div className="decor-options" role="group" aria-label="Họa tiết nền (có thể chọn nhiều)">
+        <p className="theme-help mb-3">
+          Chọn đúng 1 họa tiết nhẹ nhàng viền quanh rìa thẻ. Thành phố luôn là chân trang cố định.
+        </p>
+        <div className="decor-options" role="radiogroup" aria-label="Họa tiết nền (chọn 1)">
           {decorOptions.map((option) => {
-            const selected = option.id === "none" ? theme.decor.length === 0 : theme.decor.includes(option.id);
+            const isSelected =
+              option.id === "none"
+                ? theme.decor.length === 0
+                : theme.decor[0] === option.id;
             return (
-              <label key={option.id} className={cn("decor-option", selected && "selected")}>
-                <input type="checkbox" checked={selected} onChange={() => {
-                  const id = option.id;
-                  set({ decor: id === "none" ? [] : selected ? theme.decor.filter((key) => key !== id) : [...theme.decor, id] });
-                }} />
-                <span className="decor-thumbnail" style={{ color: theme.primaryColor }}>
-                  {option.id === "none" ? <svg viewBox="0 0 80 50" aria-hidden="true"><path d="M29 36L51 14" stroke="currentColor" strokeWidth="1" /></svg> : option.id === "skyline" ? <DecorArtwork decor={option.id} seed={theme.templateId} /> : <DecorSwatch decor={option.id} />}
+              <label
+                key={option.id}
+                className={cn("decor-option cursor-pointer", isSelected && "selected")}
+                onClick={() => {
+                  set({
+                    decor: option.id === "none" ? [] : [option.id],
+                  });
+                }}
+              >
+                <input
+                  type="radio"
+                  name="card-decor-selection"
+                  value={option.id}
+                  checked={isSelected}
+                  onChange={() => {
+                    set({
+                      decor: option.id === "none" ? [] : [option.id],
+                    });
+                  }}
+                />
+                <span className="decor-thumbnail pointer-events-none" style={{ color: theme.primaryColor }}>
+                  {option.id === "none" ? (
+                    <svg viewBox="0 0 80 50" aria-hidden="true">
+                      <path d="M29 36L51 14" stroke="currentColor" strokeWidth="1.5" />
+                    </svg>
+                  ) : (
+                    <DecorSwatch decor={option.id} />
+                  )}
                 </span>
-                <span>{option.name}</span>
-                {selected && <Check className="decor-tick" size={14} />}
+                <span className="pointer-events-none">{option.name}</span>
+                {isSelected && <Check className="decor-tick" size={14} />}
               </label>
             );
           })}
         </div>
-        <p className="theme-help">Có thể kết hợp nhiều họa tiết. Độ đậm chỉ thay đổi độ trong suốt.</p>
 
         <div className="mt-4">
           <div className="flex items-center justify-between mb-1.5">
@@ -218,23 +257,23 @@ export function ThemeCustomizer({
               Độ đậm họa tiết
             </label>
             <span className="text-[11px] font-bold text-[#22D3EE]">
-              {decorOpacity}%
+              {Math.min(60, decorOpacity)}%
             </span>
           </div>
           <input
             id="decor-opacity-range"
             type="range"
             min={0}
-            max={100}
+            max={60}
             step={5}
-            value={decorOpacity}
+            value={Math.min(60, decorOpacity)}
             onChange={(e) => set({ decorOpacity: Number(e.target.value) })}
             className="w-full accent-[#22D3EE] cursor-pointer h-2 rounded-lg bg-white/10"
           />
           <div className="flex justify-between text-[9px] text-[#7A8AA8] mt-1">
             <span>0% (Ẩn)</span>
-            <span>50% (Dịu nhẹ)</span>
-            <span>100% (Rõ nét)</span>
+            <span>35% (Mặc định)</span>
+            <span>60% (Tối đa)</span>
           </div>
         </div>
       </div>

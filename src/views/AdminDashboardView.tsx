@@ -15,12 +15,12 @@ export function AdminDashboardView() {
   useAos(ready);
 
   if (!ready || !stats.ready) return <Skeleton />;
-  if (error || stats.error) return <p role="alert" className="panel text-red-400">{error || stats.error}</p>;
 
   const { total, active, inactive } = stats;
 
   return (
     <div className="mx-auto w-full max-w-[1280px] space-y-6">
+      {(error || stats.error) && <p role="alert" className="panel text-red-400">{error || stats.error}</p>}
       <div data-aos="fade-up" data-aos-delay="40">
         <PageHeader
           title="Tổng quan"

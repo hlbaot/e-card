@@ -1,8 +1,9 @@
 import { HomeView } from "@/views/HomeView";
-import { getActiveEmployees } from "@/server/employees";
+import { cachedPublicCards } from "@/server/cards/cache";
 
-export const dynamic = "force-dynamic";
+// Tối ưu ISR: Cache dữ liệu trang chủ 60 giây để chuyển trang tức thì (< 30ms).
+export const revalidate = 60;
 
 export default async function Page() {
-  return <HomeView employees={await getActiveEmployees()} />;
+  return <HomeView employees={await cachedPublicCards.list()} />;
 }

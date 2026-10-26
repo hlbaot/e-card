@@ -1,22 +1,20 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore, useDeferredValue } from "react";
 import Link from "next/link";
 import {
   Search,
   Users,
   ArrowRight,
-  Sparkles,
 } from "lucide-react";
 import { PublicHeader } from "@/client/components/layout/PublicHeader";
 import { PublicFooter } from "@/client/components/layout/PublicFooter";
-import type { Employee } from "@/shared/types/employee";
+import type { Employee } from "@/shared/types";
 import { useAos } from "@/client/hooks/useAos";
 import { useAuth } from "@/client/hooks/useAuth";
 import { CardListItem } from "@/client/components/card/CardListItem";
 import { Skeleton } from "@/client/components/ui/Skeleton";
 import { Badge } from "@/client/components/ui/Badge";
-import { StatBar } from "@/client/components/ui/StatBar";
 import { HeroArt } from "@/client/components/layout/HeroArt";
 import { slugify } from "@/shared/utils/slugify";
 import { routes } from "@/shared/constants/routes";
@@ -31,9 +29,21 @@ export function HomeView({ employees }: { employees: Employee[] }) {
   const { ready: authReady, authenticated } = useAuth();
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [search, setSearch] = useState("");
+  const deferredSearch = useDeferredValue(search);
   const [activeFilter, setActiveFilter] = useState("all");
 
-  const isLoggedIn = mounted && authReady && authenticated;
+  const hasLocalSession = useSyncExternalStore(
+    emptySubscribe,
+    () => {
+      try {
+        return localStorage.getItem("ecard_logged_in") === "1";
+      } catch {
+        return false;
+      }
+    },
+    () => false,
+  );
+  const isLoggedIn = mounted && (authReady ? authenticated : hasLocalSession);
 
   const active = employees.filter((e) => e.isActive);
   const departments = Array.from(
@@ -42,17 +52,12 @@ export function HomeView({ employees }: { employees: Employee[] }) {
 
   const filtered = active.filter((e) => {
     const matchesSearch = slugify(`${e.fullName} ${e.position}`).includes(
-      slugify(search),
+      slugify(deferredSearch),
     );
     const matchesTab = activeFilter === "all" || e.position === activeFilter;
     return matchesSearch && matchesTab;
   });
 
-  const stats = [{
-    value: String(active.length),
-    label: "Danh thiếp số hoạt động",
-    icon: Sparkles,
-  }];
 
   return (
     <>
@@ -90,6 +95,7 @@ export function HomeView({ employees }: { employees: Employee[] }) {
               <div className="button-row mt-6">
                 <Link
                   href={isLoggedIn ? routes.admin : routes.login}
+                  prefetch={true}
                   className="btn btn-primary group"
                 >
                   {isLoggedIn ? "VÀO TRANG QUẢN TRỊ" : "ĐĂNG NHẬP"}
@@ -105,13 +111,6 @@ export function HomeView({ employees }: { employees: Employee[] }) {
             </div>
           </div>
 
-          <div
-            className="container pb-12"
-            data-aos="fade-up"
-            data-aos-delay="200"
-          >
-            <StatBar items={stats} />
-          </div>
         </section>
 
         {siteConfig.listCardsOnHome && (

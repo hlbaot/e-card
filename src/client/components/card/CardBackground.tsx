@@ -1,4 +1,4 @@
-import type { CardTheme } from "@/shared/types/employee";
+import type { CardTheme } from "@/shared/types";
 import { CardDecorations } from "./CardDecorations";
 
 export function CardBackground({ theme }: { theme: CardTheme }) {

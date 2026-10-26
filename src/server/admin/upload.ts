@@ -1,5 +1,6 @@
 import "server-only";
 import type { NextRequest } from "next/server";
+import type { AvatarUploadResponse } from "@/shared/types";
 import { AuthError } from "@/server/auth/service";
 import { authJson } from "@/server/auth/http";
 import { adminHandler, readBody } from "./http";
@@ -67,5 +68,5 @@ export const uploadAvatar = (request: NextRequest) => adminHandler(request, asyn
   if (files.length !== 1 || !(files[0] instanceof File) || [...form.keys()].some((key) => key !== "file")) throw new AuthError("Vui lòng gửi một ảnh trong trường file.", 400);
   const file = files[0];
   validateAvatar(file.type, new Uint8Array(await file.arrayBuffer()));
-  return authJson({ url: await avatarStorage.upload(file) }, 201);
+  return authJson({ url: await avatarStorage.upload(file) } satisfies AvatarUploadResponse, 201);
 });

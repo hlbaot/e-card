@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { Pencil, Trash2, Phone, Mail } from "lucide-react";
-import type { Employee } from "@/shared/types/employee";
+import type { Employee } from "@/shared/types";
 import { Avatar } from "@/client/components/ui/Avatar";
 import { Switch } from "@/client/components/ui/Switch";
 import { routes } from "@/shared/constants/routes";
 
 export interface TeamRowCardProps {
   employee: Employee;
+  toggling?: boolean;
   onToggleActive: (employee: Employee) => void;
   onDeleteRequest: (employee: Employee) => void;
 }
@@ -16,6 +17,7 @@ export interface TeamRowCardProps {
 export function TeamRowCard({
   employee: e,
   onToggleActive,
+  toggling,
   onDeleteRequest,
 }: TeamRowCardProps) {
   return (
@@ -85,6 +87,7 @@ export function TeamRowCard({
         <div className="flex items-center gap-2.5">
           <Switch
             checked={e.isActive}
+            disabled={toggling}
             label={`Bật danh thiếp của ${e.fullName}`}
             onChange={() => onToggleActive(e)}
           />

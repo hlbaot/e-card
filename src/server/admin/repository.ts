@@ -1,6 +1,8 @@
 import "server-only";
 import { prisma } from "@/server/db/prisma";
+import { employeeCardSelect } from "@/server/cards/select";
 import type { EmployeeCreate, EmployeePatch } from "./dto";
+import type { EmployeeStats } from "@/shared/types";
 import type { CardRecord } from "@/server/cards/service";
 
 export interface AdminEmployeesRepository {
@@ -10,17 +12,17 @@ export interface AdminEmployeesRepository {
   update(id: string, input: EmployeePatch): Promise<CardRecord>;
   toggle(id: string): Promise<CardRecord | null>;
   remove(id: string): Promise<boolean>;
-  stats(): Promise<{ total: number; active: number; inactive: number }>;
+  stats(): Promise<EmployeeStats>;
 }
 export const adminEmployeesRepository: AdminEmployeesRepository = {
-  list: () => prisma.employee.findMany({ where: { deletedAt: null }, include: { theme: true }, orderBy: [{ createdAt: "desc" }, { id: "asc" }] }),
-  byId: (id) => prisma.employee.findFirst({ where: { id, deletedAt: null }, include: { theme: true } }),
+  list: () => prisma.employee.findMany({ where: { deletedAt: null }, select: employeeCardSelect, orderBy: [{ createdAt: "desc" }, { id: "asc" }] }),
+  byId: (id) => prisma.employee.findFirst({ where: { id, deletedAt: null }, select: employeeCardSelect }),
   create(input, slug) {
     const { theme, publicFields, ...data } = input;
     void publicFields; // DTO tương thích FE, schema hiện công khai mọi trường liên hệ.
     // Nested write và offices JSON nằm trong một transaction: không tạo card dở dang.
     return prisma.$transaction((tx) => tx.employee.create({
-      data: { ...data, slug, theme: { create: theme } }, include: { theme: true },
+      data: { ...data, slug, theme: { create: theme } }, select: employeeCardSelect,
     }));
   },
   update(id, input) {
@@ -30,7 +32,7 @@ export const adminEmployeesRepository: AdminEmployeesRepository = {
     return prisma.$transaction((tx) => tx.employee.update({
       where: { id, deletedAt: null },
       data: { ...data, ...(theme ? { theme: { upsert: { create: theme, update: theme } } } : {}) },
-      include: { theme: true },
+      select: employeeCardSelect,
     }));
   },
   toggle(id) {
@@ -40,7 +42,7 @@ export const adminEmployeesRepository: AdminEmployeesRepository = {
         UPDATE employees SET is_active = NOT is_active, updated_at = NOW()
         WHERE id = ${id}::uuid AND deleted_at IS NULL RETURNING id
       `;
-      return rows.length ? tx.employee.findUnique({ where: { id }, include: { theme: true } }) : null;
+      return rows.length ? tx.employee.findUnique({ where: { id }, select: employeeCardSelect }) : null;
     });
   },
   async remove(id) {

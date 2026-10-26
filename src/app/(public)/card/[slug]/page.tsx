@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { absoluteUrl, siteConfig } from "@/config/site";
-import { getPublicEmployeeBySlug } from "@/server/employees";
+import { cachedPublicCards } from "@/server/cards/cache";
 import { CardView } from "@/views/CardView";
 
 // Luôn kiểm tra DB để card vừa ẩn hoặc xóa trả 404 ngay.
@@ -13,7 +13,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const employee = await getPublicEmployeeBySlug(slug);
+  const employee = await cachedPublicCards.bySlug(slug);
 
   if (!employee || !employee.isActive) {
     notFound();
@@ -68,7 +68,7 @@ export default async function CardPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const employee = await getPublicEmployeeBySlug(slug);
+  const employee = await cachedPublicCards.bySlug(slug);
 
   if (!employee || !employee.isActive) {
     notFound();

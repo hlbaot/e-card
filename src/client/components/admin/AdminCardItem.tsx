@@ -3,7 +3,7 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import { QRCodeCanvas } from "qrcode.react";
 import { Eye, QrCode, Download, Pencil } from "lucide-react";
-import type { Employee } from "@/shared/types/employee";
+import type { Employee } from "@/shared/types";
 import { CardListContent } from "@/client/components/card/CardListItem";
 import { QRPanel } from "@/client/components/card/QRPanel";
 import { CopyButton } from "@/client/components/ui/CopyButton";

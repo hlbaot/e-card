@@ -53,7 +53,7 @@ Server tự sinh slug khi tạo mới, retry với hậu tố ngẫu nhiên nế
 
 Hệ thống hiện công khai toàn bộ trường liên hệ. publicFields có thể bỏ qua hoặc gửi tất cả true để tương thích form; không hỗ trợ ẩn từng trường. Email có thể là chuỗi rỗng, các trường liên hệ khác cũng cho phép chuỗi rỗng. avatarUrl chỉ nhận HTTPS hoặc đường dẫn /images/, không lưu base64/data URL.
 
-Response dùng camelCase và `Cache-Control: no-store`. ID sai định dạng trả 400; không tồn tại/đã xóa trả 404. JWT thiếu/sai/hết hạn/revoke trả 401; sai Origin trả 403. JSON hoặc DTO sai trả 400, body lớn hơn 64 KiB trả 413, sai content-type trả 415. Lỗi DB trả 503 với thông báo chung, không lộ lỗi nội bộ.
+Response dùng camelCase. GET thành công dùng ETag và `Cache-Control: private, max-age=0, must-revalidate`; `If-None-Match` khớp trả 304 không body, sau khi xác thực. Response ghi/lỗi vẫn `no-store`. Xem [kiểm tra cache](CLIENT-SERVER-CACHE.md). ID sai định dạng trả 400; không tồn tại/đã xóa trả 404. JWT thiếu/sai/hết hạn/revoke trả 401; sai Origin trả 403. JSON hoặc DTO sai trả 400, body lớn hơn 64 KiB trả 413, sai content-type trả 415. Lỗi DB trả 503 với thông báo chung, không lộ lỗi nội bộ.
 
 ## Upload avatar
 

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { ArrowUpRight, Building2 } from "lucide-react";
-import type { Employee } from "@/shared/types/employee";
+import type { Employee } from "@/shared/types";
 import { Avatar } from "@/client/components/ui/Avatar";
 import { routes } from "@/shared/constants/routes";
 export function CardListContent({

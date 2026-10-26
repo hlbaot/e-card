@@ -1,14 +1,14 @@
 import { apiClient } from "./client";
-import type { Employee } from "@/shared/types/employee";
+import type { Employee, CardResponse, CardsResponse } from "@/shared/types";
 
 export const cardApi = {
   async getAll(): Promise<Employee[]> {
-    const res = await apiClient.get<{ cards: Employee[] }>("/api/cards");
+    const res = await apiClient.get<CardsResponse>("/api/cards");
     return res.data.cards;
   },
 
   async getBySlug(slug: string): Promise<Employee> {
-    const res = await apiClient.get<{ card: Employee }>(`/api/cards/${encodeURIComponent(slug)}`);
+    const res = await apiClient.get<CardResponse>(`/api/cards/${encodeURIComponent(slug)}`);
     return res.data.card;
   },
 };

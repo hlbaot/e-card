@@ -3,22 +3,20 @@ import { useEmployeeStore } from "@/client/store/employee.store";
 import Link from "next/link";
 import { Search, Plus, ContactRound, ArrowRight } from "lucide-react";
 import { useEmployees } from "@/client/hooks/useEmployees";
-import { useAos } from "@/client/hooks/useAos";
 import { AdminCardItem } from "@/client/components/admin/AdminCardItem";
 import { Skeleton } from "@/client/components/ui/Skeleton";
 import { slugify } from "@/shared/utils/slugify";
 
 export function AdminCardsView() {
   const { employees, ready, error } = useEmployees();
-  useAos(ready);
   const search = useEmployeeStore(state => state.cardSearch);
   const setSearch = useEmployeeStore(state => state.setCardSearch);
   const filtered = employees.filter((e) =>
     slugify(`${e.fullName} ${e.position}`).includes(slugify(search)),
   );
   return (
-    <>
-      <div className="page-heading" data-aos="fade-up" data-aos-delay="50">
+    <div className="admin-fade-in">
+      <div className="page-heading">
         <div>
           <div className="eyebrow mb-2">QTM MEDIATECH PLATFORM</div>
           <h1>
@@ -39,7 +37,7 @@ export function AdminCardsView() {
         </Link>
       </div>
       {error && <p role="alert" className="panel text-red-400">{error}</p>}
-      <div className="section-heading" data-aos="fade-up" data-aos-delay="100">
+      <div className="section-heading">
         <div className="section-title">
           <ContactRound size={18} className="text-[#22D3EE]" />
           <span className="muted">Tất cả danh thiếp</span>
@@ -59,12 +57,8 @@ export function AdminCardsView() {
         <Skeleton />
       ) : (
         <div className="employee-grid">
-          {filtered.map((e, idx) => (
-            <div
-              key={e.id}
-              data-aos="fade-up"
-              data-aos-delay={String(Math.min(100 + idx * 50, 400))}
-            >
+          {filtered.map((e) => (
+            <div key={e.id}>
               <AdminCardItem employee={e} />
             </div>
           ))}
@@ -76,6 +70,6 @@ export function AdminCardsView() {
           )}
         </div>
       )}
-    </>
+    </div>
   );
 }

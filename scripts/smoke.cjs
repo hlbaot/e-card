@@ -86,7 +86,7 @@ async function main() {
   assert.equal(localizeEmployee(custom).slogan, custom.slogan);
   const { migrateCardTheme } = require("../src/shared/utils/migrate-theme.ts");
   const { decorOptions } = require("../src/shared/constants/card-themes.ts");
-  assert.deepEqual(decorOptions.map((option) => option.id), ["none", "blobs", "bokeh", "circles", "leaves", "geometry", "network"]);
+  assert.deepEqual(decorOptions.map((option) => option.id), ["none", "blobs", "bokeh", "circles", "leaves", "geometry", "network", "crystals"]);
   for (const templateId of ["bubble-blue", "dark-tech"]) {
     for (const pattern of ["dot", "dots", "grid", "diagonal", "art-deco", "plus", "crosses", "lines", "checks", "diamonds", "leaf", "leaf-dots", "none"]) {
       for (const field of ["pattern", "patternId"]) {
@@ -105,7 +105,7 @@ async function main() {
   assert.deepEqual(migrateCardTheme({ ...employees[0].theme, decor: [] }).decor, []);
   assert.deepEqual(migrateCardTheme({ ...employees[0].theme, decor: ["leaves", "network", "geometry", "leaves", "invalid"] }).decor, ["leaves"]);
   const { getProfileDecorPlacements } = require("../src/shared/utils/decor-layout.ts");
-  const motifKeys = ["blobs", "bokeh", "circles", "leaves", "geometry", "network"];
+  const motifKeys = ["blobs", "bokeh", "circles", "leaves", "geometry", "network", "crystals"];
   // Motifs occupy spacious fixed slots strictly at the outer margins
   for (let mask = 0; mask < 1 << motifKeys.length; mask++) {
     const selected = motifKeys.filter((_, index) => mask & (1 << index));

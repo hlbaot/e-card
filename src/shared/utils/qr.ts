@@ -19,10 +19,12 @@ export function downloadQR(canvas: HTMLCanvasElement | null, slug: string) {
 export async function downloadBusinessCard(svg: SVGSVGElement | null, slug: string) {
   if (!svg) throw new Error("Danh thiếp chưa sẵn sàng");
   const source = svg.cloneNode(true) as SVGSVGElement;
-  source.setAttribute("width", "2100");
-  source.setAttribute("height", "1200");
-  source.style.width = "2100px";
-  source.style.height = "1200px";
+  const width = Math.round(svg.viewBox.baseVal.width * 2);
+  const height = Math.round(svg.viewBox.baseVal.height * 2);
+  source.setAttribute("width", String(width));
+  source.setAttribute("height", String(height));
+  source.style.width = `${width}px`;
+  source.style.height = `${height}px`;
   const objectUrl = URL.createObjectURL(new Blob(
     [new XMLSerializer().serializeToString(source)],
     { type: "image/svg+xml;charset=utf-8" },
@@ -32,8 +34,8 @@ export async function downloadBusinessCard(svg: SVGSVGElement | null, slug: stri
     image.src = objectUrl;
     await image.decode();
     const canvas = document.createElement("canvas");
-    canvas.width = 2100;
-    canvas.height = 1200;
+    canvas.width = width;
+    canvas.height = height;
     const context = canvas.getContext("2d");
     if (!context) throw new Error("Không thể tạo ảnh danh thiếp");
     // Flatten the rounded artwork onto navy so photo viewers cannot show white corners.

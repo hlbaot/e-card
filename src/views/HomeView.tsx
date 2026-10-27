@@ -82,8 +82,9 @@ export function HomeView({ employees }: { employees: Employee[] }) {
               <h1>
                 MediaTech Partner
                 <br />
-                <span className="qtm-gradient-text">
-                  Kết nối con người. Lan tỏa giá trị.
+                <span className="qtm-gradient-text hero-tagline">
+                  <span>Kết nối con người.</span>{" "}
+                  <span>Lan tỏa giá trị.</span>
                 </span>
               </h1>
               <div className="qtm-hero-box">

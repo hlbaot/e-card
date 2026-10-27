@@ -21,7 +21,8 @@ export type DecorKey =
   | "bokeh"
   | "leaves"
   | "network"
-  | "geometry";
+  | "geometry"
+  | "crystals";
 
 export type ButtonShape =
   | "pill"

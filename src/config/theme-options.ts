@@ -16,5 +16,6 @@ export const decorOptions: { id: DecorKey | "none"; name: string }[] = [
   { id: "leaves", name: "Cành lá" },
   { id: "geometry", name: "Hình học nhẹ" },
   { id: "network", name: "Kết nối số nhẹ" },
+  { id: "crystals", name: "Khung tinh thể" },
 ];
 export const colorPresets = ["#0F4C75","#0284C7","#38BDF8","#0891B2","#10B981","#6EE7B7","#D4AF6A","#64748B"];

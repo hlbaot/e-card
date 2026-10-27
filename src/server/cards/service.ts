@@ -12,7 +12,7 @@ export interface CardsRepository {
 }
 const offices = z.array(z.object({ label: z.string(), address: z.string() }));
 const template = z.enum(["bubble-blue", "minimal-line", "dark-tech", "editorial", "aurora", "luxury", "botanical", "creative"]);
-const decor = z.array(z.enum(["blobs", "circles", "skyline", "waves", "bokeh", "leaves", "network", "geometry"]));
+const decor = z.array(z.enum(["blobs", "circles", "skyline", "waves", "bokeh", "leaves", "network", "geometry", "crystals"]));
 
 // DTO chỉ chứa dữ liệu public, không đưa deletedAt hoặc khóa quan hệ theme ra JSON.
 export function toPublicCard(record: CardRecord): Employee {

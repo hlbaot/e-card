@@ -40,7 +40,7 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
       "data-aos-delay": String(Math.min(Math.round(delay / 50) * 50, 350)),
       "data-aos-duration": "500",
     } : {};
-  const slogan = e.slogan?.trim() || "Let's Create a Brighter Tomorrow Together";
+  const slogan = e.slogan?.trim() || "Your Journey Partner";
   const authenticated = useAuthStore((state) => state.authenticated);
   const rows = [
     ...(pf.offices ? e.offices.map((office, index) => ({

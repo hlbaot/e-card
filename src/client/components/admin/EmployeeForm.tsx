@@ -51,7 +51,7 @@ const blank: EmployeeInput = {
   company: "",
   companyShort: "",
   website: "",
-  slogan: "",
+  slogan: "Your Journey Partner",
   isActive: true,
   fullName: "",
   position: "",
@@ -216,6 +216,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
         email: form.email.trim(),
         phone: form.phone.trim(),
         website: form.website.trim(),
+        slogan: form.slogan.trim(),
       };
       const saved = employee
         ? await update(employee.id, clean)
@@ -364,7 +365,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
           {input("email", "Thư điện tử", "name@qtmmedia.vn", false, "email")}
           {input("zalo", "Zalo", "0900000000")}
           {input("website", "Trang web", "qtmmedia.vn")}
-          {input("slogan", "Khẩu hiệu", "", true)}
+          {input("slogan", "Khẩu hiệu", "Your Journey Partner", true)}
           {employee && (
             <div className="field full">
               <label htmlFor="slug">Đường dẫn hồ sơ · cố định</label>

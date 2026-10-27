@@ -9,6 +9,8 @@ import { Brand } from "@/client/components/layout/PublicHeader";
 import { Badge } from "@/client/components/ui/Badge";
 import { Alert } from "@/client/components/ui/Alert";
 import { useToast } from "@/client/components/ui/Toast";
+import { Spinner } from "@/client/components/ui/Spinner";
+import { LoadingOverlay } from "@/client/components/ui/LoadingOverlay";
 import { HeroArt } from "@/client/components/layout/HeroArt";
 
 
@@ -44,6 +46,7 @@ export function LoginView() {
 
   return (
     <main className="login-page">
+      <LoadingOverlay show={busy} label="Đang đăng nhập…" />
       <section className="login-story">
         <Brand />
         <div data-aos="fade-right" data-aos-delay="100">
@@ -153,10 +156,14 @@ export function LoginView() {
           )}
           <button disabled={busy || checkingSession} className="btn btn-primary group">
             {busy ? "Đang đăng nhập…" : checkingSession ? "Đang kiểm tra phiên…" : "Đăng nhập"}
-            <ArrowRight
-              size={16}
-              className="transition-transform duration-200 group-hover:translate-x-1"
-            />
+            {busy || checkingSession ? (
+              <Spinner />
+            ) : (
+              <ArrowRight
+                size={16}
+                className="transition-transform duration-200 group-hover:translate-x-1"
+              />
+            )}
           </button>
         </form>
       </div>

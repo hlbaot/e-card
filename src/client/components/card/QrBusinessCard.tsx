@@ -1,8 +1,9 @@
 "use client";
 
-import { useId, type Ref, type SVGProps } from "react";
 import { QRCodeSVG } from "qrcode.react";
+import { useId, type Ref, type SVGProps } from "react";
 import { getPublicFields, type Employee } from "@/shared/types";
+import { CardName } from "./CardName";
 
 type IconProps = SVGProps<SVGSVGElement>;
 function Phone(props: IconProps) {
@@ -34,41 +35,38 @@ function wrapText(value: string, limit: number, maxLines = 2) {
     : lines;
 }
 
-// Separate vertical and horizontal traces reproduce the reference chip motif.
-const verticalTracks = [
-  { d: "M-100-128-160-188V-240", end: [-160, -240] },
-  { d: "M-24-128V-230", end: [-24, -230] },
-  { d: "M24-128V-230", end: [24, -230] },
-  { d: "M100-128 160-188V-240", end: [160, -240] },
-  { d: "M-112-128-172-198V-266H-192V-248", end: [-192, -248] },
-  { d: "M-88-128-148-198V-280" },
-  { d: "M-64-128V-170L-120-226V-270H-98V-234", end: [-98, -234] },
-  { d: "M-40-128V-194L-80-234V-280" },
-  { d: "M-12-128V-252", end: [-12, -252] },
-  { d: "M12-128V-252", end: [12, -252] },
-  { d: "M40-128V-194L80-234V-280" },
-  { d: "M64-128V-170L120-226V-270H98V-234", end: [98, -234] },
-  { d: "M88-128 148-198V-280" },
-  { d: "M112-128 172-198V-266H192V-248", end: [192, -248] },
+const INK = "#17566d";
+
+// Logo QTM vẽ bằng vector để bản xem trước và PNG tải về giống nhau.
+const dumbbells = [
+  { a: [203, 50], b: [57, 203] },
+  { a: [253, 230], b: [107, 375] },
+  { a: [423, 277], b: [277, 425] },
 ];
-const horizontalTracks = [
-  { d: "M128-70H208", end: [208, -70] },
-  { d: "M128-44H238" },
-  { d: "M128 0H238" },
-  { d: "M128 54H204", end: [204, 54] },
-  { d: "M128 80H238" },
-  { d: "M128-112 224-198H234" },
-  { d: "M128-96 220-178", end: [220, -178] },
-  { d: "M128-84H238" },
-  { d: "M128-56H224", end: [224, -56] },
-  { d: "M128-32H238" },
-  { d: "M128-8H194V-16H238" },
-  { d: "M128 16H204V8H224", end: [224, 8] },
-  { d: "M128 40H238" },
-  { d: "M128 68H224", end: [224, 68] },
-  { d: "M128 92H238" },
-  { d: "M128 108 220 190", end: [220, 190] },
-  { d: "M128 128 224 214H234" },
+
+// Connected silhouettes keep the soft, narrow necks visible in both SVG and PNG.
+const connectedBlobs = [
+  // Small upper bulb connected to the larger bulb below it.
+  "M1018 115C1031 115 1040 124 1040 137C1040 149 1030 155 1028 166C1024 180 1030 188 1040 197C1060 215 1051 243 1028 253C1004 263 979 247 979 224C979 206 991 196 1002 182C1010 171 1009 160 1001 151C986 135 995 115 1018 115Z",
+  // Branching cluster at the right edge, with a small hanging bulb.
+  "M964 267C981 267 992 277 1000 288C1013 306 1030 301 1044 287L1065 271V336C1050 324 1039 319 1025 320C1003 321 994 337 982 350C974 360 975 369 982 377C994 391 986 410 969 411C951 412 941 397 949 382C956 369 958 359 950 349C943 341 930 337 930 319C930 293 941 267 964 267Z",
+  // A narrow waist joins the two bulbs beside the contact block.
+  "M871 333C884 333 893 343 893 355C893 366 884 373 881 383C877 395 884 403 895 414C915 435 901 468 876 470C851 472 834 451 846 428C853 414 865 403 864 389C864 378 850 371 850 356C850 343 859 333 871 333Z",
+  // Linked round forms rising from the bottom edge.
+  "M691 640C690 617 706 601 726 601C745 601 751 615 769 614C784 613 787 600 798 592C812 582 831 589 835 604C839 620 826 628 829 640Z",
+  // Fill the lower-left QR gap with a small linked pair, leaving its white margin clear.
+  "M851 500C860 500 867 507 867 516C867 525 859 530 860 540C861 551 875 556 878 569C883 587 867 600 851 595C835 591 830 575 838 562C844 552 852 547 851 538C850 529 837 526 837 516C837 507 843 500 851 500Z",
+  "M803 640C804 624 817 614 831 617C845 620 849 633 861 632C875 631 877 616 891 615C906 613 918 624 918 640Z",
+  // Large curved cluster continuing beyond the bottom/right edges.
+  "M1050 405C1026 403 1011 419 1012 440C1013 459 1028 465 1029 482C1030 499 1011 506 1001 520C985 541 998 559 989 574C981 588 965 582 956 569C946 554 929 554 921 567C912 581 920 595 934 602C949 610 952 623 950 640H1050Z",
+];
+const blobDots: Array<[number, number, number]> = [
+  [958, 170, 8],
+  [964, 464, 22],
+  [916, 513, 8],
+  [819, 487, 7],
+  [792, 564, 10],
+  [884, 605, 5],
 ];
 
 /** A self-contained vector: the preview and downloaded PNG share this artwork. */
@@ -79,61 +77,76 @@ export function QrBusinessCard({ employee: e, url, svgRef }: {
 }) {
   const id = useId().replace(/:/g, "");
   const pf = getPublicFields(e);
-  const rows = [
-    ...(pf.phone && e.phone ? [{ Icon: Phone, value: e.phone }] : []),
-    ...(pf.email && e.email ? [{ Icon: Mail, value: e.email }] : []),
-    ...(pf.website && e.website ? [{ Icon: Globe, value: e.website.replace(/^https?:\/\//, "").replace(/\/$/, "") }] : []),
-    ...(pf.offices && e.offices[0]?.address ? [{ Icon: MapPin, value: e.offices[0].address }] : []),
+  const website = e.website.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  type Row = { Icon: typeof Phone | null; label: string; value: string };
+  const rows: Row[] = [
+    ...(pf.offices
+      ? e.offices.filter((o) => o.address).slice(0, 3).map((o, i): Row => ({
+          Icon: i === 0 ? MapPin : null, label: o.label || "Văn phòng", value: o.address,
+        }))
+      : []),
+    ...(pf.phone && e.phone ? [{ Icon: Phone, label: "Mobile", value: e.phone }] : []),
+    ...(pf.email && e.email ? [{ Icon: Mail, label: "Email", value: e.email }] : []),
+    ...(pf.website && website ? [{ Icon: Globe, label: "Web", value: website }] : []),
   ];
-  const position = wrapText(e.position || "", 38);
+  const company = wrapText((e.company || "").toUpperCase(), 40);
+  let cursor = 452;
 
   return (
-    <svg ref={svgRef} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1050 560" width="1050" height="560"
-      data-export-background="#042345"
-      role="img" aria-label={`Danh thiếp QR của ${e.fullName}`}
+    <svg ref={svgRef} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1050 640" width="1050" height="640"
+      data-export-background="#ffffff"
+      role="img" aria-label={`Danh thiếp của ${e.fullName}`}
       style={{ display: "block", width: "100%", height: "auto", fontFamily: "Arial, Helvetica, sans-serif" }}>
       <defs>
-        <clipPath id={`${id}-clip`}><rect width="1050" height="560" rx="40" /></clipPath>
+        <clipPath id={`${id}-clip`}><rect width="1050" height="640" rx="8" /></clipPath>
+        {dumbbells.map(({ a, b }, i) => (
+          <linearGradient key={i} id={`${id}-g${i}`} gradientUnits="userSpaceOnUse"
+            x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]}>
+            <stop offset="0" stopColor="#3ccbc8" /><stop offset="1" stopColor="#1f74a4" />
+          </linearGradient>
+        ))}
       </defs>
       <g clipPath={`url(#${id}-clip)`}>
-        <rect width="1050" height="560" fill="#042345" />
-        {/* The top/bottom fan stays vertical; the side rails stay horizontal. */}
-        <g transform="translate(810 280)" fill="none" stroke="#69b5d8"
-          strokeWidth="3" strokeOpacity=".7" strokeLinejoin="miter">
-          {[1, -1].map((direction) => <g key={`vertical-${direction}`} transform={`scale(1 ${direction})`}>
-            {verticalTracks.map(({ d, end }, index) => <g key={index}>
-              <path d={d} />
-              {end && <rect x={end[0] - 4} y={end[1] - 4} width="8" height="8" fill="#042345" />}
-            </g>)}
-            <rect x="-16" y="-190" width="8" height="8" fill="#042345" />
-            <rect x="8" y="-190" width="8" height="8" fill="#042345" />
-            <rect x="-4" y="-272" width="8" height="8" fill="#042345" />
-          </g>)}
-          {[1, -1].map((direction) => <g key={`horizontal-${direction}`} transform={`scale(${direction} 1)`}>
-            {horizontalTracks.map(({ d, end }, index) => <g key={index}>
-              <path d={d} />
-              {end && <rect x={end[0] - 4} y={end[1] - 4} width="8" height="8" fill="#042345" />}
-            </g>)}
-          </g>)}
+        <rect width="1050" height="640" fill="#ffffff" />
+
+        <g fill="#c7e7f2">
+          {connectedBlobs.map((d, i) => <path key={i} d={d} />)}
         </g>
-        <rect x="682" y="152" width="256" height="256" fill="#042345" stroke="#69b5d8" strokeWidth="3" strokeOpacity=".8" />
-        <rect x="700" y="170" width="220" height="220" fill="white" />
-        <QRCodeSVG x="700" y="170" value={url} size={220} level="H" marginSize={4} bgColor="#ffffff" fgColor="#04172d" />
-        <text x="60" y="116" fill="#ffffff" fontSize="48" fontWeight="700"
-          textLength={e.fullName.length > 18 ? 450 : undefined} lengthAdjust="spacingAndGlyphs">{e.fullName}</text>
-        {position.map((line, i) => <text key={i} x="60" y={156 + i * 28} fill="#b7ccdf" fontSize="24">{line}</text>)}
-        <path d={`M60 ${position.length > 1 ? 210 : 182}H136`} stroke="#59d7e8" strokeWidth="4" />
-        {rows.map(({ Icon, value }, index) => {
-          const lines = wrapText(value, 36);
-          const y = 296 + index * 60;
+        <g fill="#c7e7f2">
+          {blobDots.map(([x, y, r], i) => <circle key={i} cx={x} cy={y} r={r} />)}
+        </g>
+
+        <g transform="translate(66 62) scale(.1667)">
+          {dumbbells.map(({ a, b }, i) => (
+            <g key={i}>
+              <line x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke={`url(#${id}-g${i})`} strokeWidth="46" />
+              <circle cx={a[0]} cy={a[1]} r="55" fill="#3ccbc8" />
+              <circle cx={b[0]} cy={b[1]} r="55" fill="#1f74a4" />
+            </g>
+          ))}
+          <polygon fill="#3ccbc8" transform="translate(397 85)"
+            points="0,-70 14,-30 52,-48 36,-10 70,8 30,22 30,60 0,34 -30,60 -30,22 -70,8 -36,-10 -52,-48 -14,-30" />
+        </g>
+        <text x="158" y="141" fill={INK} fontSize="68" fontWeight="600" letterSpacing="3">QTM</text>
+
+        <CardName name={e.fullName} color={INK} />
+        <text x="73" y="334" fill={INK} fontSize="22" fontWeight="700" fontStyle="italic">{e.position}</text>
+
+        {company.map((line, i) => <text key={i} x="73" y={404 + i * 30} fill={INK} fontSize="23" fontWeight="700">{line}</text>)}
+        {rows.map(({ Icon, label, value }, index) => {
+          const lines = wrapText(value, 48);
+          const y = cursor + (company.length - 1) * 30;
+          cursor += lines.length * 30 + 8;
           return <g key={index}>
-            <circle cx="78" cy={y + 1} r="20" fill="#ffffff" />
-            <Icon x="66" y={y - 11} width="24" height="24" color="#042345" />
-            {lines.map((line, i) => <text key={i} x="114" y={y + 7 + i * 22} fill="#e2ecf5" fontSize="21"
-              textLength={line.length > 34 ? 410 : undefined} lengthAdjust="spacingAndGlyphs">{line}</text>)}
+            {Icon && <Icon x="38" y={y - 20} width="25" height="25" color={INK} />}
+            <text x="76" y={y} fill={INK} fontSize="24" fontWeight="600">{label}</text>
+            <text x="228" y={y} fill={INK} fontSize="24">:</text>
+            {lines.map((line, i) => <text key={i} x="244" y={y + i * 30} fill={INK} fontSize="24" fontWeight="600">{line}</text>)}
           </g>;
         })}
-        <rect x="1" y="1" width="1048" height="558" rx="39" fill="none" stroke="#78dcf3" strokeOpacity=".28" strokeWidth="2" />
+        <rect x="898" y="478" width="124" height="124" rx="8" fill="#ffffff" />
+        <QRCodeSVG x="906" y="486" value={url} size={108} level="M" marginSize={0} bgColor="#ffffff" fgColor="#17566d" />
+        <rect x="1" y="1" width="1048" height="638" rx="8" fill="none" stroke="#c4c8cc" strokeWidth="2" />
       </g>
     </svg>
   );

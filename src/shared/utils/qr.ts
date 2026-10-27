@@ -39,7 +39,7 @@ export async function downloadBusinessCard(svg: SVGSVGElement | null, slug: stri
     const context = canvas.getContext("2d");
     if (!context) throw new Error("Không thể tạo ảnh danh thiếp");
     // Flatten the rounded artwork onto navy so photo viewers cannot show white corners.
-    context.fillStyle = svg.getAttribute("data-export-background") || "#042345";
+    context.fillStyle = svg.getAttribute("data-export-background") || "#ffffff";
     context.fillRect(0, 0, canvas.width, canvas.height);
     context.drawImage(image, 0, 0, canvas.width, canvas.height);
     const blob = await new Promise<Blob>((resolve, reject) => {

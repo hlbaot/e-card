@@ -5,12 +5,15 @@ import { Pencil, Trash2 } from "lucide-react";
 import type { Employee } from "@/shared/types";
 import { Avatar } from "@/client/components/ui/Avatar";
 import { Switch } from "@/client/components/ui/Switch";
+import { Spinner } from "@/client/components/ui/Spinner";
 import { Modal } from "@/client/components/ui/Modal";
 import { useToast } from "@/client/components/ui/Toast";
 import { useEmployeeMutations } from "@/client/hooks/useEmployeeMutations";
 import { routes } from "@/shared/constants/routes";
 export function EmployeeTable({ employees }: { employees: Employee[] }) {
   const [deleting, setDeleting] = useState<Employee | null>(null);
+  const [removing, setRemoving] = useState(false);
+  const closeDelete = () => { if (!removing) setDeleting(null); };
   const { remove, toggleActive, isToggling } = useEmployeeMutations();
   const toast = useToast();
   return (
@@ -102,21 +105,24 @@ export function EmployeeTable({ employees }: { employees: Employee[] }) {
         )}
       </div>
       {deleting && (
-        <Modal title="Xóa nhân viên?" onClose={() => setDeleting(null)}>
+        <Modal title="Xác nhận xóa nhân viên" onClose={closeDelete}>
           <p className="confirmation">
-            Bạn muốn xóa <strong>{deleting.fullName}</strong>? Danh thiếp và
-            liên kết của nhân viên này sẽ không còn khả dụng.
+            Bạn có chắc muốn xóa nhân viên <strong>{deleting.fullName}</strong> không?
+            Danh thiếp và liên kết của nhân viên này sẽ không còn khả dụng.
           </p>
           <div className="button-row justify-end">
             <button
               className="btn btn-secondary"
-              onClick={() => setDeleting(null)}
+              disabled={removing}
+              onClick={closeDelete}
             >
               Hủy
             </button>
             <button
               className="btn btn-danger"
+              disabled={removing}
               onClick={async () => {
+                setRemoving(true);
                 try {
                   await remove(deleting.id);
                   setDeleting(null);
@@ -126,10 +132,13 @@ export function EmployeeTable({ employees }: { employees: Employee[] }) {
                     err instanceof Error ? err.message : "Không thể xóa nhân viên",
                     "error",
                   );
+                } finally {
+                  setRemoving(false);
                 }
               }}
             >
-              Xóa nhân viên
+              {removing ? <Spinner size={14} /> : null}
+              {removing ? "Đang xóa…" : "Xóa nhân viên"}
             </button>
           </div>
         </Modal>

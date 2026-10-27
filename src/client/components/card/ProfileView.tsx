@@ -1,15 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { QRCodeCanvas } from "qrcode.react";
 import { Copy, Download, ExternalLink, MapPin, X } from "lucide-react";
 import { getPublicFields } from "@/shared/types";
 import type { Employee } from "@/shared/types";
-import { cardUrl, downloadQR } from "@/shared/utils/qr";
+import { cardUrl, downloadBusinessCard } from "@/shared/utils/qr";
 import { useToast } from "@/client/components/ui/Toast";
 import { useAos } from "@/client/hooks/useAos";
 import { migrateCardTheme } from "@/shared/utils/migrate-theme";
 import { ECard } from "./ECard";
+import { QrBusinessCard } from "./QrBusinessCard";
 
 export function ProfileView({ employee }: { employee: Employee }) {
   useAos(true, employee.slug);
@@ -17,7 +17,8 @@ export function ProfileView({ employee }: { employee: Employee }) {
 
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [addressModalOpen, setAddressModalOpen] = useState(false);
-  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
+  const cardSvgRef = useRef<SVGSVGElement>(null);
+  const [downloading, setDownloading] = useState(false);
   const toast = useToast();
 
   const url = cardUrl(e.slug);
@@ -72,12 +73,16 @@ export function ProfileView({ employee }: { employee: Employee }) {
     }
   };
 
-  const handleDownloadQR = () => {
+  const handleDownloadQR = async () => {
+    if (downloading) return;
+    setDownloading(true);
     try {
-      downloadQR(qrCanvasRef.current, e.slug);
-      toast("Đã tải mã QR PNG");
+      await downloadBusinessCard(cardSvgRef.current, e.slug);
+      toast("Đã tải danh thiếp PNG");
     } catch {
-      toast("Mã QR chưa sẵn sàng");
+      toast("Không thể tải danh thiếp. Vui lòng thử lại.");
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -87,9 +92,6 @@ export function ProfileView({ employee }: { employee: Employee }) {
         <style>{`.qtm-public-profile [data-aos] { opacity: 1 !important; transform: none !important; }`}</style>
       </noscript>
       <ECard employee={e} variant="profile" onOpenQr={() => setQrModalOpen(true)} onShare={handleShare} onOpenAddresses={() => setAddressModalOpen(true)} />
-      <div className="sr-only" aria-hidden="true">
-        <QRCodeCanvas ref={qrCanvasRef} value={url} size={512} level="H" marginSize={4} />
-      </div>
       {/* MODAL 1: QR CODE (Dark QTM Glass Modal) */}
       {qrModalOpen && (
         <div
@@ -97,16 +99,16 @@ export function ProfileView({ employee }: { employee: Employee }) {
           onClick={() => setQrModalOpen(false)}
           role="dialog"
           aria-modal="true"
-          aria-label="Mã QR hồ sơ cá nhân"
+          aria-label="Danh thiếp QR cá nhân"
         >
           <div
-            className="w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl bg-[#0B1430]/95 backdrop-blur-xl text-white border border-[rgba(120,200,255,0.22)] p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-[0_0_40px_rgba(34,211,238,0.18)]"
+            className="w-full sm:max-w-3xl max-h-[92dvh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-[#0B1430]/95 backdrop-blur-xl text-white border border-[rgba(120,200,255,0.22)] p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-[0_0_40px_rgba(34,211,238,0.18)]"
             onClick={(ev) => ev.stopPropagation()}
           >
             <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-3 sm:hidden" />
             <div className="flex items-center justify-between gap-2 mb-4">
               <h3 className="text-base font-bold text-white">
-                Mã QR · {e.fullName}
+                Danh thiếp QR · {e.fullName}
               </h3>
               <button
                 type="button"
@@ -118,14 +120,12 @@ export function ProfileView({ employee }: { employee: Employee }) {
               </button>
             </div>
             <div className="flex flex-col items-center">
-              <div className="p-3 rounded-2xl border border-cyan-400/30 bg-white shadow-[0_0_24px_rgba(34,211,238,0.2)] mb-3">
-                <QRCodeCanvas
-                  value={url}
-                  size={180}
-                  level="H"
-                  marginSize={2}
-                />
+              <div className="w-full overflow-hidden rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.3)] mb-4">
+                <QrBusinessCard employee={e} url={url} svgRef={cardSvgRef} />
               </div>
+              <p className="text-xs text-[#B6C2D9] text-center mb-3">
+                Quét QR để mở hồ sơ · Tải trọn danh thiếp dưới dạng PNG
+              </p>
               <p className="text-xs text-[#B6C2D9] text-center mb-3 font-mono break-all bg-white/[0.04] border border-white/10 px-3 py-2 rounded-lg w-full">
                 {url}
               </p>
@@ -141,10 +141,11 @@ export function ProfileView({ employee }: { employee: Employee }) {
                 <button
                   type="button"
                   onClick={handleDownloadQR}
-                  className="btn btn-primary min-h-[42px] text-xs cursor-pointer"
+                  disabled={downloading}
+                  className="btn btn-primary min-h-[42px] text-xs cursor-pointer disabled:opacity-60 disabled:cursor-wait"
                 >
                   <Download size={15} />
-                  Tải PNG
+                  {downloading ? "Đang xuất…" : "Tải danh thiếp PNG"}
                 </button>
               </div>
             </div>

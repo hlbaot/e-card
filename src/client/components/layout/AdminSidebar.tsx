@@ -64,7 +64,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
 
       <aside className={cn("sidebar", open && "open")}>
         <div className="sidebar-top flex items-center justify-between">
-          <Brand />
+          <Brand href={routes.admin} />
           <button
             type="button"
             className="sidebar-close-btn lg:hidden"

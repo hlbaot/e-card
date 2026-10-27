@@ -64,6 +64,11 @@ export function useAos(ready: boolean, contentKey?: string) {
           }
           try {
             elements.forEach((element) => element.classList.remove("aos-preparing"));
+            if (typeof document !== "undefined" && typeof document.dispatchEvent === "function") {
+              try {
+                document.dispatchEvent(new CustomEvent("ecard:animations-ready"));
+              } catch {}
+            }
             AOS.refreshHard();
             AOS.refresh(true);
           } catch (error) {

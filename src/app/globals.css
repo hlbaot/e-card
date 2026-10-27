@@ -4086,6 +4086,18 @@ body:has(dialog[open]) > .toast {
   .qtm-public-profile [data-aos][data-aos]:not(.aos-animate) {
     opacity: 0;
   }
+
+  .login-page [data-aos].aos-init:not(.aos-animate) {
+    animation: login-reveal-fallback 0.4s ease-out forwards;
+    animation-delay: 0.15s;
+  }
+}
+
+@keyframes login-reveal-fallback {
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

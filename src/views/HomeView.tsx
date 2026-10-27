@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore, useDeferredValue } from "react";
+import { useState, useEffect, useSyncExternalStore, useDeferredValue } from "react";
 import Link from "next/link";
 import {
   Search,
@@ -44,6 +44,16 @@ export function HomeView({ employees }: { employees: Employee[] }) {
     () => false,
   );
   const isLoggedIn = mounted && (authReady ? authenticated : hasLocalSession);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      window.location.replace("/admin");
+    }
+  }, [isLoggedIn]);
+
+  if (isLoggedIn) {
+    return null;
+  }
 
   const active = employees.filter((e) => e.isActive);
   const departments = Array.from(

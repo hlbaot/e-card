@@ -13,20 +13,21 @@ export function DecorIllustration({ decor, variant = "halo" }: { decor: DecorKey
             />
           ) : (
             <>
-              {/* Soft organic primary blob */}
+              {/* Organic fluid splash blooming outward (Image 2 & 3) */}
               <path
-                d="M60 18C82 15 104 30 108 52C112 74 95 90 74 93C52 96 30 84 22 66C14 46 36 21 60 18Z"
-                opacity=".35"
+                d="M58 24C66 22 75 16 82 10C86 6 92 11 90 18C88 26 80 32 82 39C84 45 98 45 102 52C104 59 96 65 87 66C80 67 81 75 75 78C68 81 48 81 41 76C35 71 32 62 28 59C22 54 20 45 26 40C31 36 36 37 40 31C44 25 50 24 58 24Z"
+                opacity=".45"
               />
-              {/* Soft inner curve contour */}
               <path
-                d="M58 28C74 26 92 38 95 54C98 70 85 82 70 84C54 86 38 78 32 64C26 48 42 30 58 28Z"
-                opacity=".20"
+                d="M56 28C63 26 70 21 76 16C80 12 84 16 83 22C81 28 75 33 76 39C78 44 90 44 93 50C95 56 88 61 81 62C75 63 75 69 70 72C64 75 50 75 44 70C39 66 37 59 33 56C28 52 27 45 32 41C36 38 40 39 44 34C47 29 52 28 56 28Z"
+                opacity=".25"
               />
-              {/* Accent dots */}
-              <circle cx="106" cy="32" r="3.5" opacity=".45" />
-              <circle cx="20" cy="74" r="3" opacity=".40" />
-              <circle cx="88" cy="84" r="2.5" opacity=".35" />
+              {/* Separated splash droplets */}
+              <circle cx="94" cy="28" r="3" opacity=".60" />
+              <circle cx="104" cy="56" r="3.5" opacity=".55" />
+              <circle cx="20" cy="62" r="3" opacity=".55" />
+              <circle cx="26" cy="26" r="2.5" opacity=".50" />
+              <circle cx="86" cy="10" r="2" opacity=".45" />
             </>
           )}
         </g>
@@ -49,11 +50,23 @@ export function DecorIllustration({ decor, variant = "halo" }: { decor: DecorKey
         {[[12,58,5],[35,80,3],[86,22,5],[110,40,3],[72,88,2],[39,17,2]].map(([cx,cy,r]) => <circle key={cx} cx={cx} cy={cy} r={r} opacity=".3" />)}
       </g>;
     case "leaves":
-      return <g transform="translate(60 50) scale(1.18) translate(-60 -50)" fill="currentColor">
-        <path d="M29 91Q60 63 77 13M55 66Q82 61 100 37" fill="none" stroke="currentColor" strokeWidth="1.5" opacity=".6" />
-        <path d="M43 78Q14 63 21 44Q47 48 43 78ZM54 64Q33 42 43 27Q67 39 54 64ZM66 43Q54 20 68 8Q86 26 66 43ZM49 73Q78 75 86 55Q59 49 49 73ZM72 57Q101 60 109 39Q85 34 72 57Z" opacity=".28" />
-        <circle cx="16" cy="23" r="3" opacity=".35" /><circle cx="99" cy="80" r="4" opacity=".2" />
-      </g>;
+      return (
+        <g fill="currentColor">
+          {/* Main sweeping branch */}
+          <path d="M25 90Q58 60 78 12M55 64Q82 58 102 34" fill="none" stroke="currentColor" strokeWidth="1.5" opacity=".65" />
+          {/* Secondary counter branch */}
+          <path d="M95 90Q70 65 52 38" fill="none" stroke="currentColor" strokeWidth="1.3" opacity=".55" />
+          {/* Leaves on primary branch */}
+          <path d="M38 78Q10 63 18 42Q44 48 38 78ZM50 62Q28 40 38 24Q62 36 50 62ZM64 42Q52 18 66 6Q84 24 64 42ZM46 72Q75 74 84 54Q57 48 46 72ZM70 56Q99 58 107 38Q83 32 70 56Z" opacity=".45" />
+          {/* Leaves on secondary branch */}
+          <path d="M88 78Q110 65 102 46Q80 50 88 78ZM78 58Q96 42 90 28Q72 38 78 58ZM62 38Q78 22 72 10Q56 22 62 38Z" opacity=".35" />
+          {/* Berries / dew buds */}
+          <circle cx="15" cy="22" r="3" opacity=".4" />
+          <circle cx="102" cy="78" r="3.5" opacity=".35" />
+          <circle cx="48" cy="14" r="2.5" opacity=".45" />
+          <circle cx="82" cy="18" r="2.5" opacity=".4" />
+        </g>
+      );
     case "network":
       return <g stroke="currentColor" strokeWidth="1.3" fill="currentColor">
         <path d="M17 53L44 21L80 28L103 63L70 86L40 69ZM17 53L40 69L44 21L70 86L80 28M40 69L103 63" fill="none" opacity=".28" />
@@ -68,6 +81,39 @@ export function DecorIllustration({ decor, variant = "halo" }: { decor: DecorKey
         <circle cx="32" cy="79" r="11" fill="none" opacity=".35" />
         <circle cx="109" cy="83" r="4" fill="currentColor" opacity=".25" />
       </g>;
+    case "crystals":
+      return (
+        <g stroke="currentColor" strokeWidth="0.8" strokeLinejoin="round">
+          {/* Top-Right Crystal Cluster */}
+          <polygon points="120,0 85,0 100,28" fill="currentColor" fillOpacity=".7" strokeOpacity=".4" />
+          <polygon points="85,0 55,0 80,32" fill="currentColor" fillOpacity=".35" strokeOpacity=".3" />
+          <polygon points="120,0 100,28 120,38" fill="currentColor" fillOpacity=".8" strokeOpacity=".4" />
+          <polygon points="100,28 120,38 108,62" fill="currentColor" fillOpacity=".6" strokeOpacity=".4" />
+          <polygon points="85,0 100,28 75,45" fill="currentColor" fillOpacity=".5" strokeOpacity=".35" />
+          <polygon points="100,28 108,62 82,72" fill="currentColor" fillOpacity=".65" strokeOpacity=".4" />
+          <polygon points="75,45 100,28 82,72" fill="currentColor" fillOpacity=".4" strokeOpacity=".35" />
+          <polygon points="55,0 80,32 50,48" fill="currentColor" fillOpacity=".25" strokeOpacity=".3" />
+          <polygon points="75,45 82,72 52,80" fill="currentColor" fillOpacity=".45" strokeOpacity=".35" />
+          <polygon points="50,48 75,45 35,68" fill="currentColor" fillOpacity=".3" strokeOpacity=".25" />
+          <line x1="120" y1="8" x2="35" y2="8" strokeOpacity=".3" />
+          <line x1="112" y1="0" x2="112" y2="80" strokeOpacity=".3" />
+
+          {/* Bottom-Left Crystal Cluster */}
+          <g transform="rotate(180 60 50)">
+            <polygon points="120,0 85,0 100,28" fill="currentColor" fillOpacity=".7" strokeOpacity=".4" />
+            <polygon points="85,0 55,0 80,32" fill="currentColor" fillOpacity=".35" strokeOpacity=".3" />
+            <polygon points="120,0 100,28 120,38" fill="currentColor" fillOpacity=".8" strokeOpacity=".4" />
+            <polygon points="100,28 120,38 108,62" fill="currentColor" fillOpacity=".6" strokeOpacity=".4" />
+            <polygon points="85,0 100,28 75,45" fill="currentColor" fillOpacity=".5" strokeOpacity=".35" />
+            <polygon points="100,28 108,62 82,72" fill="currentColor" fillOpacity=".65" strokeOpacity=".4" />
+            <polygon points="75,45 100,28 82,72" fill="currentColor" fillOpacity=".4" strokeOpacity=".35" />
+            <polygon points="55,0 80,32 50,48" fill="currentColor" fillOpacity=".25" strokeOpacity=".3" />
+            <polygon points="75,45 82,72 52,80" fill="currentColor" fillOpacity=".45" strokeOpacity=".35" />
+            <line x1="120" y1="8" x2="35" y2="8" strokeOpacity=".3" />
+            <line x1="112" y1="0" x2="112" y2="80" strokeOpacity=".3" />
+          </g>
+        </g>
+      );
     default:
       return null;
   }

@@ -12,6 +12,7 @@ const validMotifs: DecorKey[] = [
   "leaves",
   "geometry",
   "network",
+  "crystals",
 ];
 
 type StoredTheme = Omit<CardTheme, "decor"> & {

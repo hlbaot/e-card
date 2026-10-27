@@ -7,6 +7,7 @@ export const motifOrder: DecorKey[] = [
   "leaves",
   "geometry",
   "network",
+  "crystals",
 ];
 
 // Percent coordinates relative to full card surface (edges only, never over center text)

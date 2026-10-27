@@ -4,6 +4,7 @@ import type { AuthUser } from "@/shared/types";
 import { useAuthStore } from "@/client/store/auth.store";
 import { authApi } from "@/api/auth.api";
 import { withAuthLock } from "@/client/auth/session-lock";
+import { ApiClientError } from "@/api/client";
 
 export const SESSION_CHECK_THROTTLE_MS = 60_000;
 
@@ -45,7 +46,8 @@ export function restoreSession() {
       if (typeof window !== "undefined") {
         try { localStorage.setItem("ecard_logged_in", "1"); } catch {}
       }
-    } catch {
+    } catch (error) {
+      if (!(error instanceof ApiClientError) || error.response?.status !== 401) throw error;
       useAuthStore.getState().setUser(null);
       lastCheckedAt = Date.now();
       if (typeof window !== "undefined") {

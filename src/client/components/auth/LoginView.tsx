@@ -11,7 +11,6 @@ import { Alert } from "@/client/components/ui/Alert";
 import { useToast } from "@/client/components/ui/Toast";
 import { HeroArt } from "@/client/components/layout/HeroArt";
 
-import { useAuthStore } from "@/client/store/auth.store";
 
 export function LoginView() {
   const { login, authenticated } = useAuth();
@@ -23,23 +22,25 @@ export function LoginView() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
+  const [checkingSession, setCheckingSession] = useState(true);
+  const [sessionVerified, setSessionVerified] = useState(false);
+
   useEffect(() => {
     let active = true;
     void restoreSession().then(() => {
-      if (active && useAuthStore.getState().authenticated) {
-        window.location.replace("/admin");
-      }
+      if (active) setSessionVerified(true);
+    }).catch(() => {
+      if (active) setError("Không thể kiểm tra phiên. Bạn có thể thử đăng nhập lại.");
+    }).finally(() => {
+      if (active) setCheckingSession(false);
     });
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, []);
 
   useEffect(() => {
-    if (authenticated) {
-      window.location.replace("/admin");
-    }
-  }, [authenticated]);
+    // Verify current cookies before trusting a previously authenticated store.
+    if (sessionVerified && authenticated) window.location.replace("/admin");
+  }, [sessionVerified, authenticated]);
 
   return (
     <main className="login-page">
@@ -77,7 +78,7 @@ export function LoginView() {
             try {
               await login(email, password);
               toast("Đăng nhập thành công!");
-              window.location.replace("/admin");
+              setSessionVerified(true);
             } catch (err) {
               setError(
                 err instanceof Error ? err.message : "Đăng nhập không thành công. Vui lòng thử lại.",
@@ -150,8 +151,8 @@ export function LoginView() {
               {error}
             </Alert>
           )}
-          <button disabled={busy} className="btn btn-primary group">
-            {busy ? "Đang đăng nhập…" : "Đăng nhập"}
+          <button disabled={busy || checkingSession} className="btn btn-primary group">
+            {busy ? "Đang đăng nhập…" : checkingSession ? "Đang kiểm tra phiên…" : "Đăng nhập"}
             <ArrowRight
               size={16}
               className="transition-transform duration-200 group-hover:translate-x-1"

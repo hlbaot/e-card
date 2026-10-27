@@ -1,16 +1,16 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, LogOut } from "lucide-react";
 import { routes } from "@/shared/constants/routes";
-import { useAuth } from "@/client/hooks/useAuth";
+import { restoreSession, shouldCheckSessionOnVisibility, useAuth } from "@/client/hooks/useAuth";
+import { useAuthStore } from "@/client/store/auth.store";
 import { useToast } from "@/client/components/ui/Toast";
 
-const emptySubscribe = () => () => {};
 
 export function Brand({ href = routes.home }: { href?: string } = {}) {
   return (
@@ -40,19 +40,12 @@ export function PublicHeader() {
   const router = useRouter();
   const toast = useToast();
   const [loggingOut, setLoggingOut] = useState(false);
-  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
-  const hasLocalSession = useSyncExternalStore(
-    emptySubscribe,
-    () => {
-      try {
-        return localStorage.getItem("ecard_logged_in") === "1";
-      } catch {
-        return false;
-      }
-    },
-    () => false,
-  );
-  const isLoggedIn = mounted && (ready ? authenticated : hasLocalSession);
+  useEffect(() => {
+    if (!useAuthStore.getState().ready || shouldCheckSessionOnVisibility()) {
+      void restoreSession().catch(() => {});
+    }
+  }, []);
+  const isLoggedIn = ready && authenticated;
 
   return (
     <header className="public-header">
@@ -65,7 +58,7 @@ export function PublicHeader() {
               <Link
                 className="qtm-header-cta group"
                 href={routes.admin}
-                prefetch={true}
+                prefetch={false}
               >
                 <span>QUẢN TRỊ</span>
                 <ArrowRight
@@ -99,7 +92,7 @@ export function PublicHeader() {
             <Link
               className="qtm-header-cta group"
               href={routes.login}
-              prefetch={true}
+              prefetch={false}
             >
               <span>ĐĂNG NHẬP</span>
               <ArrowRight

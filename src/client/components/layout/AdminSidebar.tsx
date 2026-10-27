@@ -11,6 +11,7 @@ import {
   ContactRound,
   UserCog,
   LogOut,
+  House,
   Menu,
   X,
 } from "lucide-react";
@@ -100,6 +101,10 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="sidebar-footer">
+          <Link href={routes.home} className="sidebar-home-btn" onClick={() => setOpen(false)}>
+            <House size={18} />
+            <span>Về trang chủ</span>
+          </Link>
           <button
             type="button"
             className="sidebar-logout-btn"
@@ -107,8 +112,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
               try {
                 await logout();
                 client.clear();
-                router.replace(routes.login);
-                router.refresh();
+                window.location.replace(routes.login);
               } catch {
                 toast("Chưa thể đăng xuất. Vui lòng thử lại.", "error");
               }

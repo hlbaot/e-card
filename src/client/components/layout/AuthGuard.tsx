@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import type { AuthUser } from "@/shared/types";
 import {
   hydrateAuthUser,
@@ -43,35 +42,48 @@ export function AuthGuard({
   }
 
   const { ready, authenticated } = useAuth();
-  const router = useRouter();
+  const [sessionRestored, setSessionRestored] = useState(false);
+  const [sessionError, setSessionError] = useState(false);
 
   useEffect(() => {
+    let active = true;
     if (initialUser) {
       try {
         localStorage.setItem("ecard_logged_in", "1");
       } catch {}
-    } else if (!useAuthStore.getState().ready) {
-      // Access token hết hạn nhưng còn phiên refresh: chạy ngầm không chặn khung trang.
-      void restoreSession();
+    } else {
+      // Server could not verify access; ignore stale client state until restore finishes.
+      void restoreSession().then(() => {
+        if (active) setSessionRestored(true);
+      }).catch(() => {
+        if (active) setSessionError(true);
+      });
     }
 
     // Đăng ký duy nhất 1 listener visibilitychange tại AuthGuard kèm throttle 60s.
     const checkSession = () => {
       if (document.visibilityState === "visible" && shouldCheckSessionOnVisibility()) {
-        void restoreSession();
+        void restoreSession().catch(() => {});
       }
     };
     document.addEventListener("visibilitychange", checkSession);
-    return () => document.removeEventListener("visibilitychange", checkSession);
+    return () => {
+      active = false;
+      document.removeEventListener("visibilitychange", checkSession);
+    };
   }, [initialUser]);
 
   useEffect(() => {
     // Chờ kiểm tra phiên hoàn tất để tránh chuyển về login khi request refresh còn đang chạy.
-    if (ready && !authenticated) router.replace("/login");
-  }, [ready, authenticated, router]);
+    if ((initialUser || sessionRestored) && ready && !authenticated) window.location.replace("/login");
+  }, [initialUser, sessionRestored, ready, authenticated]);
 
-  // Nếu đã xác định không còn phiên hợp lệ thì chờ điều hướng về /login.
-  // Khi đang refresh ngầm (!ready), vẫn hiển thị Sidebar và khung trang, chỉ nội dung con hiện Skeleton.
-  if (ready && !authenticated) return <Skeleton />;
+  if (sessionError && !initialUser) return (
+    <div role="alert" className="p-8 text-center">
+      <p>Không thể kiểm tra phiên đăng nhập. Vui lòng thử lại.</p>
+      <button type="button" className="btn btn-primary mt-4" onClick={() => window.location.reload()}>Thử lại</button>
+    </div>
+  );
+  if ((!initialUser && !sessionRestored) || !ready || !authenticated) return <Skeleton />;
   return <>{children}</>;
 }

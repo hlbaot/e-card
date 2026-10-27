@@ -10,6 +10,8 @@ import { routes } from "@/shared/constants/routes";
 import { restoreSession, shouldCheckSessionOnVisibility, useAuth } from "@/client/hooks/useAuth";
 import { useAuthStore } from "@/client/store/auth.store";
 import { useToast } from "@/client/components/ui/Toast";
+import { Spinner } from "@/client/components/ui/Spinner";
+import { LoadingOverlay } from "@/client/components/ui/LoadingOverlay";
 
 
 export function Brand({ href = routes.home }: { href?: string } = {}) {
@@ -49,6 +51,7 @@ export function PublicHeader() {
 
   return (
     <header className="public-header">
+      <LoadingOverlay show={loggingOut} label="Đang đăng xuất…" />
       <div className="container header-inner">
         <Brand />
 
@@ -84,7 +87,7 @@ export function PublicHeader() {
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white rounded-lg border border-white/10 hover:border-red-500/40 hover:bg-red-500/10 transition-all cursor-pointer disabled:opacity-50"
                 title="Đăng xuất khỏi hệ thống"
               >
-                <LogOut size={13} />
+                {loggingOut ? <Spinner size={13} /> : <LogOut size={13} />}
                 <span>{loggingOut ? "Đang thoát…" : "ĐĂNG XUẤT"}</span>
               </button>
             </>

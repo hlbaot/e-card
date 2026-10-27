@@ -11,7 +11,6 @@ import {
   ContactRound,
   UserCog,
   LogOut,
-  House,
   Menu,
   X,
 } from "lucide-react";
@@ -20,11 +19,14 @@ import { useAuth } from "@/client/hooks/useAuth";
 import { cn } from "@/shared/utils/cn";
 import { routes } from "@/shared/constants/routes";
 import { useToast } from "@/client/components/ui/Toast";
+import { Spinner } from "@/client/components/ui/Spinner";
+import { LoadingOverlay } from "@/client/components/ui/LoadingOverlay";
 
 export function AdminSidebar({ children }: { children: React.ReactNode }) {
   const client = useQueryClient();
   const userId = useAuthStore(state => state.user?.id);
   const [open, setOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const pathname = usePathname();
   const { logout, authenticated } = useAuth();
   const toast = useToast();
@@ -44,6 +46,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="admin-shell">
+      <LoadingOverlay show={loggingOut} label="Đang đăng xuất…" />
       {open && (
         <button
           className="mobile-overlay"
@@ -101,25 +104,24 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="sidebar-footer">
-          <Link href={routes.home} className="sidebar-home-btn" onClick={() => setOpen(false)}>
-            <House size={18} />
-            <span>Về trang chủ</span>
-          </Link>
           <button
             type="button"
             className="sidebar-logout-btn"
+            disabled={loggingOut}
             onClick={async () => {
+              setLoggingOut(true);
               try {
                 await logout();
                 client.clear();
                 window.location.replace(routes.login);
               } catch {
                 toast("Chưa thể đăng xuất. Vui lòng thử lại.", "error");
+                setLoggingOut(false);
               }
             }}
           >
-            <LogOut size={18} />
-            <span>Đăng xuất</span>
+            {loggingOut ? <Spinner size={18} /> : <LogOut size={18} />}
+            <span>{loggingOut ? "Đang đăng xuất…" : "Đăng xuất"}</span>
           </button>
         </div>
       </aside>

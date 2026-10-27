@@ -28,6 +28,8 @@ import { Avatar } from "@/client/components/ui/Avatar";
 import { Switch } from "@/client/components/ui/Switch";
 import { useToast } from "@/client/components/ui/Toast";
 import { Alert } from "@/client/components/ui/Alert";
+import { Spinner } from "@/client/components/ui/Spinner";
+import { LoadingOverlay } from "@/client/components/ui/LoadingOverlay";
 import { EmployeeFormLayout } from "./EmployeeFormLayout";
 import { PreviewToggleButton } from "./PreviewToggleButton";
 import { websiteUrl } from "@/shared/utils/vcard";
@@ -493,7 +495,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
         Hủy
       </Link>
       <button type="submit" className="btn btn-primary" disabled={busy || uploading}>
-        <Save size={16} />
+        {busy ? <Spinner /> : <Save size={16} />}
         {busy ? "Đang lưu…" : employee ? "Lưu thay đổi" : "Tạo nhân viên"}
       </button>
     </div>
@@ -501,6 +503,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
 
   return (
     <>
+      <LoadingOverlay show={busy} label="Đang lưu…" />
       <EmployeeFormLayout
         header={headerSection}
         formContent={formSections}

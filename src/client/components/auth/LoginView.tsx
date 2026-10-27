@@ -1,11 +1,9 @@
 "use client";
 
-import { useState, useEffect, useSyncExternalStore } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { restoreSession, useAuth } from "@/client/hooks/useAuth";
-import { useAuthStore } from "@/client/store/auth.store";
 import { useAos } from "@/client/hooks/useAos";
 import { Brand } from "@/client/components/layout/PublicHeader";
 import { Badge } from "@/client/components/ui/Badge";
@@ -13,12 +11,11 @@ import { Alert } from "@/client/components/ui/Alert";
 import { useToast } from "@/client/components/ui/Toast";
 import { HeroArt } from "@/client/components/layout/HeroArt";
 
-const emptySubscribe = () => () => {};
+import { useAuthStore } from "@/client/store/auth.store";
 
 export function LoginView() {
-  const { login, ready, authenticated } = useAuth();
+  const { login, authenticated } = useAuth();
   useAos(true);
-  const router = useRouter();
   const toast = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,42 +23,23 @@ export function LoginView() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const hasHint = useSyncExternalStore(
-    emptySubscribe,
-    () => {
-      try {
-        return localStorage.getItem("ecard_logged_in") === "1";
-      } catch {
-        return false;
+  useEffect(() => {
+    let active = true;
+    void restoreSession().then(() => {
+      if (active && useAuthStore.getState().authenticated) {
+        window.location.replace("/admin");
       }
-    },
-    () => false,
-  );
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
-    if (!useAuthStore.getState().ready) {
-      if (hasHint) {
-        void restoreSession();
-      } else {
-        useAuthStore.getState().setUser(null);
-      }
+    if (authenticated) {
+      window.location.replace("/admin");
     }
-  }, [hasHint]);
-
-  useEffect(() => {
-    if (ready && authenticated) router.replace("/admin");
-  }, [ready, authenticated, router]);
-
-  if (hasHint && !ready) {
-    return (
-      <main className="login-page flex items-center justify-center min-h-screen">
-        <div className="text-center p-8">
-          <div className="w-10 h-10 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-slate-400 text-sm">Đang kiểm tra phiên đăng nhập…</p>
-        </div>
-      </main>
-    );
-  }
+  }, [authenticated]);
 
   return (
     <main className="login-page">
@@ -99,6 +77,7 @@ export function LoginView() {
             try {
               await login(email, password);
               toast("Đăng nhập thành công!");
+              window.location.replace("/admin");
             } catch (err) {
               setError(
                 err instanceof Error ? err.message : "Đăng nhập không thành công. Vui lòng thử lại.",
@@ -171,7 +150,7 @@ export function LoginView() {
               {error}
             </Alert>
           )}
-          <button disabled={busy || !ready} className="btn btn-primary group">
+          <button disabled={busy} className="btn btn-primary group">
             {busy ? "Đang đăng nhập…" : "Đăng nhập"}
             <ArrowRight
               size={16}

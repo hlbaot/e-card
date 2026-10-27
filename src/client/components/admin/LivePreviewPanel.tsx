@@ -9,7 +9,7 @@ import { cn } from "@/shared/utils/cn";
 export interface ScaledECardViewportProps {
   employee: Employee;
   /**
-   * - "panel": fixed 390 × 694 mobile canvas fitted to the panel
+   * - "panel": fixed 390 × 680 mobile canvas fitted to the panel
    * - "mobile": same fixed portrait canvas in PreviewModal
    * - "desktop": desktop viewport containing the shared portrait profile
    */
@@ -26,7 +26,7 @@ export function ScaledECardViewport({
 }: ScaledECardViewportProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const baseWidth = mode === "desktop" ? 1120 : 390;
-  const baseHeight = mode === "desktop" ? 760 : 694;
+  const baseHeight = mode === "desktop" ? 760 : 680;
   const [scale, setScale] = useState(0.8);
 
   useEffect(() => {

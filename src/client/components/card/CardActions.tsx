@@ -93,7 +93,6 @@ export function CardActions({
           <a
             key={label}
             href={href}
-            className={index === 0 ? "action-primary" : undefined}
             target={external ? "_blank" : undefined}
             rel={external ? "noopener noreferrer" : undefined}
             {...aosProps}
@@ -107,7 +106,6 @@ export function CardActions({
           <button
             key={label}
             type="button"
-            className={index === 0 ? "action-primary" : undefined}
             disabled={label !== "Lưu danh bạ"}
             title={label !== "Lưu danh bạ" ? "Chưa có thông tin" : undefined}
             onClick={() => {

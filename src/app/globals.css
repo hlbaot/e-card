@@ -1492,6 +1492,22 @@
   border-top: 1px solid var(--line);
   padding-top: 16px;
 }
+.sidebar-home-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+.sidebar-home-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
 .sidebar-logout-btn {
   display: flex;
   align-items: center;

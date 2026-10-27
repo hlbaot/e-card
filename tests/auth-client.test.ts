@@ -152,3 +152,31 @@ test("hydrateAuthUser sets initialUser synchronously and throttles visibility se
   assert.equal(shouldCheckSessionOnVisibility(now + SESSION_CHECK_THROTTLE_MS - 1), false);
   assert.equal(shouldCheckSessionOnVisibility(now + SESSION_CHECK_THROTTLE_MS), true);
 });
+
+test("temporary session-check failures preserve the user and allow a later verification", async () => {
+  const originalFetch = globalThis.fetch;
+  useAuthStore.getState().setUser(user);
+  let fail = true;
+  globalThis.fetch = async () => {
+    if (fail) throw new TypeError("Network unavailable");
+    return json({ user });
+  };
+  try {
+    await assert.rejects(restoreSession(), /Network unavailable/);
+    assert.equal(useAuthStore.getState().authenticated, true);
+    assert.deepEqual(useAuthStore.getState().user, user);
+    fail = false;
+    await restoreSession();
+    assert.equal(useAuthStore.getState().authenticated, true);
+  } finally { globalThis.fetch = originalFetch; }
+});
+
+test("server errors during session restore do not sign out an authenticated user", async () => {
+  const originalFetch = globalThis.fetch;
+  useAuthStore.getState().setUser(user);
+  globalThis.fetch = async () => json({ error: "Temporarily unavailable" }, 503);
+  try {
+    await assert.rejects(restoreSession(), /Temporarily unavailable/);
+    assert.equal(useAuthStore.getState().authenticated, true);
+  } finally { globalThis.fetch = originalFetch; }
+});

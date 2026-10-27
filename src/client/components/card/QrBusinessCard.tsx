@@ -52,6 +52,7 @@ export function QrBusinessCard({ employee: e, url, svgRef }: {
 
   return (
     <svg ref={svgRef} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1050 600" width="1050" height="600"
+      data-export-background="#042345"
       role="img" aria-label={`Danh thiếp QR của ${e.fullName}`}
       style={{ display: "block", width: "100%", height: "auto", fontFamily: "Arial, Helvetica, sans-serif" }}>
       <defs>

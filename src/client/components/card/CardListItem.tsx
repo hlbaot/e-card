@@ -31,7 +31,7 @@ export function CardListContent({
         size={80}
         rounded={e.theme.avatarShape === "rounded"}
       />
-      <h3>{e.fullName}</h3>
+      <h3>{e.fullName.toUpperCase()}</h3>
       <p className="position">{e.position}</p>
       <p className={`company ${showFooter ? "" : "pb-4"}`}>{e.companyShort}</p>
       {showFooter && (

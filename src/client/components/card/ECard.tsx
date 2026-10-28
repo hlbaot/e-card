@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useLayoutEffect, useRef, type CSSProperties } from "react";
 import { MapPin, Phone, Mail, Globe, QrCode, Share2, Pencil } from "lucide-react";
 import { getPublicFields } from "@/shared/types";
 import type { Employee } from "@/shared/types";
@@ -52,7 +52,45 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
     ...(pf.email ? [{ key: "email", Icon: Mail, label: "Thư điện tử", value: e.email || "Chưa cập nhật", href: e.email ? `mailto:${e.email}` : "" }] : []),
     ...(pf.website ? [{ key: "website", Icon: Globe, label: "Trang web", value: e.website || "Chưa cập nhật", href: websiteUrl(e.website) }] : []),
   ];
-  useEffect(() => { scrollRef.current?.scrollTo({ top: 0 }); }, [theme.templateId]);
+  useLayoutEffect(() => {
+    if (variant !== "preview") return;
+    const viewport = scrollRef.current;
+    const layout = viewport?.firstElementChild as HTMLDivElement | null;
+    if (!viewport || !layout) return;
+    let active = true;
+    const fit = () => {
+      if (!active || !viewport.clientHeight) return;
+      layout.style.setProperty("--preview-scale", "1");
+      const setSpacing = (value: number) => layout.style.setProperty("--preview-spacing", String(value));
+      setSpacing(1);
+      if (layout.scrollHeight <= viewport.clientHeight) return;
+
+      // Keep the largest gaps that fit, preserving the text size and full values.
+      let low = 0;
+      let high = 1;
+      for (let i = 0; i < 10; i++) {
+        const middle = (low + high) / 2;
+        setSpacing(middle);
+        if (layout.scrollHeight > viewport.clientHeight) high = middle;
+        else low = middle;
+      }
+      setSpacing(low);
+      // Exceptionally large profiles still show the complete card in the preview.
+      if (layout.scrollHeight > viewport.clientHeight) {
+        layout.style.setProperty("--preview-scale", String(viewport.clientHeight / layout.scrollHeight));
+      }
+    };
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(viewport);
+    document.fonts.ready.then(fit);
+    document.fonts.addEventListener("loadingdone", fit);
+    return () => {
+      active = false;
+      observer.disconnect();
+      document.fonts.removeEventListener("loadingdone", fit);
+    };
+  }, [e, variant]);
 
   return (
     <div className="qtm-profile-surface" style={{
@@ -62,7 +100,7 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
       "--card-font": template.fontFamily || (template.fontStyle === "serif" ? "Georgia, serif" : template.fontStyle === "mono" ? "\"Courier New\", monospace" : "var(--font-body), Arial, sans-serif"),
       "--motif-opacity": (theme.showDecor === false ? 0 : (theme.decorOpacity ?? 35)) / 100,
     } as CSSProperties}>
-      <article className={`qtm-professional-card qtm-template-${theme.templateId}`} aria-label={`Hồ sơ của ${e.fullName || "nhân viên"}`}>
+      <article className={`qtm-professional-card qtm-template-${theme.templateId}${variant === "preview" ? " qtm-fit-preview" : ""}`} aria-label={`Hồ sơ của ${e.fullName || "nhân viên"}`}>
         <ProfileDecorations theme={theme} />
         <div className="qtm-card-scroll" ref={scrollRef}>
           <div className="qtm-card-layout">
@@ -84,7 +122,7 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
               </div>
             </div>
             <section className="qtm-profile-identity" aria-label="Thông tin cá nhân" {...aos("fade-up", 180)}>
-              <Name>{e.fullName || "HỌ TÊN NHÂN VIÊN"}</Name>
+              <Name>{(e.fullName || "HỌ TÊN NHÂN VIÊN").toUpperCase()}</Name>
               <p className="qtm-position">{e.position || "Chức vụ"}</p>
               <span className="qtm-identity-rule" aria-hidden="true" />
               <h3>{e.company || "CÔNG TY CỔ PHẦN CÔNG NGHỆ TRUYỀN THÔNG QTM"}</h3>

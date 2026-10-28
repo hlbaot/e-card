@@ -490,6 +490,36 @@
 }
 @media (prefers-reduced-motion: reduce) { .qtm-safe-decor { transition: none; } }
 
+/* Preview spacing contracts as content grows; all text remains visible. */
+.qtm-fit-preview .qtm-card-scroll { overflow: hidden; }
+.qtm-fit-preview .qtm-card-layout {
+  min-height: 100%;
+  gap: calc(var(--qtm-unit, 1cqw) * (0.3 + 1.2 * var(--preview-spacing, 1)));
+  padding-block: calc(var(--qtm-unit, 1cqw) * (1 + 2 * var(--preview-spacing, 1)));
+  transform: scale(var(--preview-scale, 1));
+  transform-origin: top center;
+}
+.qtm-fit-preview .qtm-card-layout > * { flex-shrink: 0; }
+.qtm-fit-preview .qtm-portrait {
+  margin-top: calc(var(--qtm-unit, 1cqw) * 3 * var(--preview-spacing, 1));
+  margin-bottom: calc(var(--qtm-unit, 1cqw) * var(--preview-spacing, 1));
+}
+.qtm-fit-preview .qtm-profile-contacts { padding-block: calc(var(--qtm-unit, 1cqw) * 1.2 * var(--preview-spacing, 1)); }
+.qtm-fit-preview .qtm-contact { padding-block: calc(var(--qtm-unit, 1cqw) * (0.25 + 1.15 * var(--preview-spacing, 1))); }
+.qtm-fit-preview .qtm-profile-footer {
+  margin-top: auto;
+  padding-top: calc(var(--qtm-unit, 1cqw) * 1.2 * var(--preview-spacing, 1));
+  padding-bottom: calc(var(--qtm-unit, 1cqw) * .8 * var(--preview-spacing, 1));
+}
+.qtm-fit-preview .qtm-footer-row { margin-bottom: calc(var(--qtm-unit, 1cqw) * (0.5 + 1.9 * var(--preview-spacing, 1))); }
+.qtm-desktop-stage .qtm-fit-preview .qtm-card-layout {
+  row-gap: calc(4px + 14px * var(--preview-spacing, 1));
+  padding-block: calc(8px + 20px * var(--preview-spacing, 1)) calc(8px + 12px * var(--preview-spacing, 1));
+}
+.qtm-desktop-stage .qtm-fit-preview .qtm-portrait { margin: 0; }
+.qtm-desktop-stage .qtm-fit-preview .qtm-contact { padding-block: calc(2px + 8px * var(--preview-spacing, 1)); }
+.qtm-desktop-stage .qtm-fit-preview .qtm-profile-footer { margin-top: calc(8px * var(--preview-spacing, 1)); }
+
 .qtm-professional-card :is(h1,h2,svg,a,button):not([data-aos]) { transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease; }
 @media (prefers-reduced-motion: reduce) {
   .qtm-public-profile { animation: none !important; }

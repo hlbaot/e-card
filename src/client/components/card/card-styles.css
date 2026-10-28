@@ -271,7 +271,7 @@
    Signature details: divider rules & avatar portrait effects
    ========================================================================== */
 .qtm-template-dark-tech .qtm-portrait::after {
-  content: ""; position: absolute; pointer-events: none; width: calc(var(--qtm-unit, 1cqw) * 35); height: calc(var(--qtm-unit, 1cqw) * 35);
+  content: ""; position: absolute; pointer-events: none; width: calc(var(--qtm-unit, 1cqw) * 32); height: calc(var(--qtm-unit, 1cqw) * 32);
   left: 50%; top: 50%; transform: translate(-50%,-50%);
   border: 1px dashed var(--card-accent); border-radius: 50%; opacity: .5;
 }

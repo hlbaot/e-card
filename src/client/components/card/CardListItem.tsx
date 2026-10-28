@@ -4,6 +4,7 @@ import { ArrowUpRight, Building2 } from "lucide-react";
 import type { Employee } from "@/shared/types";
 import { Avatar } from "@/client/components/ui/Avatar";
 import { routes } from "@/shared/constants/routes";
+import { capitalizeFirstLetter } from "@/shared/utils/format-text";
 export function CardListContent({
   employee: e,
   showFooter = true,
@@ -32,7 +33,7 @@ export function CardListContent({
         rounded={e.theme.avatarShape === "rounded"}
       />
       <h3>{e.fullName.toUpperCase()}</h3>
-      <p className="position">{e.position}</p>
+      <p className="position">{capitalizeFirstLetter(e.position)}</p>
       <p className={`company ${showFooter ? "" : "pb-4"}`}>{e.companyShort}</p>
       {showFooter && (
         <div className="employee-card-footer">

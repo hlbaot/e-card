@@ -121,7 +121,7 @@
 .qtm-profile-brand .qtm-card-brand strong { font-size: calc(var(--qtm-unit, 1cqw) * 8.5); line-height: 1.1; letter-spacing: -.045em; color: var(--card-accent); }
 .qtm-culture { border-left: calc(var(--qtm-unit, 1cqw) * .5) solid color-mix(in srgb,var(--card-accent) 28%,white); padding-left: calc(var(--qtm-unit, 1cqw) * 1.8); font-size: calc(var(--qtm-unit, 1cqw) * 2.05); line-height: 1.25; letter-spacing: .1em; color: #17394b; }
 .qtm-portrait { position: relative; display: flex; justify-content: center; align-items: center; margin-block: calc(var(--qtm-unit, 1cqw) * 3.0) calc(var(--qtm-unit, 1cqw) * 1.0); }
-.qtm-portrait .avatar { width: calc(var(--qtm-unit, 1cqw) * 35) !important; height: calc(var(--qtm-unit, 1cqw) * 35) !important; font-size: calc(var(--qtm-unit, 1cqw) * 10.5) !important; border: calc(var(--qtm-unit, 1cqw) * .65) solid white; border-radius: 50%; box-shadow: var(--style-avatar-shadow,0 calc(var(--qtm-unit, 1cqw) * 1.2) calc(var(--qtm-unit, 1cqw) * 4) color-mix(in srgb,var(--card-accent) 24%,transparent)); box-sizing: border-box; }
+.qtm-portrait .avatar { width: calc(var(--qtm-unit, 1cqw) * 32) !important; height: calc(var(--qtm-unit, 1cqw) * 32) !important; font-size: calc(var(--qtm-unit, 1cqw) * 10.5) !important; border: calc(var(--qtm-unit, 1cqw) * .65) solid white; border-radius: 50%; box-shadow: var(--style-avatar-shadow,0 calc(var(--qtm-unit, 1cqw) * 1.2) calc(var(--qtm-unit, 1cqw) * 4) color-mix(in srgb,var(--card-accent) 24%,transparent)); box-sizing: border-box; }
 .qtm-creative { position: absolute; left: calc(var(--qtm-unit, 1cqw) * 1); top: calc(var(--qtm-unit, 1cqw) * 10); font-size: calc(var(--qtm-unit, 1cqw) * 2.31); line-height: 1.35; color: #17394b; margin: 0; }
 .qtm-creative strong { font-weight: 750; }
 .qtm-creative span { display: block; margin-top: calc(var(--qtm-unit, 1cqw) * 1.2); width: calc(var(--qtm-unit, 1cqw) * 6); height: calc(var(--qtm-unit, 1cqw) * .5); background: color-mix(in srgb,var(--card-accent) 35%,white); }
@@ -264,8 +264,8 @@
 }
 
 .qtm-desktop-stage .qtm-portrait .avatar {
-  width: 210px !important;
-  height: 210px !important;
+  width: 190px !important;
+  height: 190px !important;
   font-size: 64px !important;
   border: 4px solid white;
   border-radius: 50%;
@@ -273,8 +273,8 @@
 }
 
 .qtm-desktop-stage .qtm-portrait::after {
-  width: 222px;
-  height: 222px;
+  width: 202px;
+  height: 202px;
 }
 
 .qtm-desktop-stage .qtm-creative {
@@ -552,10 +552,10 @@
     minmax(calc(var(--qtm-unit) * 24), 1fr);
 }
 .qtm-public-profile .qtm-portrait .avatar {
-  width: calc(var(--qtm-unit) * 40) !important;
-  height: calc(var(--qtm-unit) * 40) !important;
+  width: calc(var(--qtm-unit) * 36) !important;
+  height: calc(var(--qtm-unit) * 36) !important;
 }
-.qtm-public-profile .qtm-portrait::after { width: calc(var(--qtm-unit) * 42); height: calc(var(--qtm-unit) * 42); }
+.qtm-public-profile .qtm-portrait::after { width: calc(var(--qtm-unit) * 38); height: calc(var(--qtm-unit) * 38); }
 .qtm-public-profile .qtm-profile-identity { height: auto; overflow: visible; padding-block: calc(var(--qtm-unit) * 1.5); }
 .qtm-public-profile .qtm-profile-contacts { justify-content: flex-start; align-self: stretch; }
 .qtm-public-profile .qtm-profile-footer { min-height: calc(var(--qtm-unit) * 24); }
@@ -637,9 +637,9 @@
     grid-area: portrait; min-height: 290px; margin: 0; align-items: flex-end;
   }
   .qtm-public-profile .qtm-portrait .avatar {
-    width: 240px !important; height: 240px !important; font-size: 72px !important;
+    width: 216px !important; height: 216px !important; font-size: 72px !important;
   }
-  .qtm-public-profile .qtm-portrait::after { width: 252px; height: 252px; }
+  .qtm-public-profile .qtm-portrait::after { width: 228px; height: 228px; }
   .qtm-public-profile .qtm-creative { left: 0; top: 50%; transform: translateY(-50%); font-size: 12px; }
   .qtm-public-profile .qtm-profile-tools { top: 0; right: 0; }
   .qtm-public-profile .qtm-profile-identity {

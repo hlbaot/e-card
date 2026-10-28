@@ -3,6 +3,7 @@
 import { QRCodeSVG } from "qrcode.react";
 import { useId, type Ref, type SVGProps } from "react";
 import { getPublicFields, type Employee } from "@/shared/types";
+import { capitalizeFirstLetter } from "@/shared/utils/format-text";
 import { CardName } from "./CardName";
 
 type IconProps = SVGProps<SVGSVGElement>;
@@ -138,7 +139,7 @@ export function QrBusinessCard({ employee: e, url, svgRef }: {
 
         <g transform="translate(0 -32)">
           <CardName name={e.fullName} color={INK} />
-          <text x="73" y="334" fill={INK} fontSize="22" fontWeight="700" fontStyle="italic">{e.position}</text>
+          <text x="73" y="334" fill={INK} fontSize="22" fontWeight="700" fontStyle="italic">{capitalizeFirstLetter(e.position)}</text>
         </g>
 
         {company.map((line, i) => <text key={i} x="73" y={354 + i * 30} fill={INK} fontSize="23" fontWeight="700">{line}</text>)}

@@ -7,6 +7,7 @@ import { getPublicFields } from "@/shared/types";
 import type { Employee } from "@/shared/types";
 import { getTemplate, getThemeBackgroundCss } from "@/config/card-themes";
 import { readableAccent } from "@/shared/utils/color";
+import { capitalizeFirstLetter } from "@/shared/utils/format-text";
 import { Avatar } from "@/client/components/ui/Avatar";
 import { migrateCardTheme } from "@/shared/utils/migrate-theme";
 import { websiteUrl } from "@/shared/utils/vcard";
@@ -123,7 +124,7 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
             </div>
             <section className="qtm-profile-identity" aria-label="Thông tin cá nhân" {...aos("fade-up", 180)}>
               <Name>{(e.fullName || "HỌ TÊN NHÂN VIÊN").toUpperCase()}</Name>
-              <p className="qtm-position">{e.position || "Chức vụ"}</p>
+              <p className="qtm-position">{capitalizeFirstLetter(e.position || "Chức vụ")}</p>
               <span className="qtm-identity-rule" aria-hidden="true" />
               <h3>{e.company || "CÔNG TY CỔ PHẦN CÔNG NGHỆ TRUYỀN THÔNG QTM"}</h3>
               <p className="qtm-company-short">{e.companyShort || "QTM MEDIATECH.,JSC"}</p>

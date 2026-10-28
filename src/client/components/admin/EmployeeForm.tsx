@@ -173,6 +173,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
       <input
         id={key}
         type={type}
+        style={key === "fullName" ? { textTransform: "uppercase" } : undefined}
         required={requiredFields.includes(key)}
         value={form[key]}
         placeholder={placeholder}

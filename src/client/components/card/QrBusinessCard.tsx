@@ -90,7 +90,14 @@ export function QrBusinessCard({ employee: e, url, svgRef }: {
     ...(pf.website && website ? [{ Icon: Globe, label: "Web", value: website }] : []),
   ];
   const company = wrapText((e.company || "").toUpperCase(), 40);
-  let cursor = 452;
+  const contactRows = rows.map((row) => ({ ...row, lines: wrapText(row.value, 48) }));
+  const firstContactY = 398 + Math.max(0, company.length - 1) * 30;
+  const lineCount = contactRows.reduce((count, row) => count + row.lines.length, 0);
+  const rowGap = 6;
+  const lineHeight = Math.min(28, (608 - firstContactY - Math.max(0, rows.length - 1) * rowGap) / Math.max(1, lineCount - 1));
+  const contactFontSize = Math.min(24, lineHeight - 2);
+  const iconSize = Math.min(25, lineHeight);
+  let cursor = firstContactY;
 
   return (
     <svg ref={svgRef} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1050 640" width="1050" height="640"
@@ -129,23 +136,24 @@ export function QrBusinessCard({ employee: e, url, svgRef }: {
         </g>
         <text x="158" y="141" fill={INK} fontSize="68" fontWeight="600" letterSpacing="3">QTM</text>
 
-        <CardName name={e.fullName} color={INK} />
-        <text x="73" y="334" fill={INK} fontSize="22" fontWeight="700" fontStyle="italic">{e.position}</text>
+        <g transform="translate(0 -32)">
+          <CardName name={e.fullName} color={INK} />
+          <text x="73" y="334" fill={INK} fontSize="22" fontWeight="700" fontStyle="italic">{e.position}</text>
+        </g>
 
-        {company.map((line, i) => <text key={i} x="73" y={404 + i * 30} fill={INK} fontSize="23" fontWeight="700">{line}</text>)}
-        {rows.map(({ Icon, label, value }, index) => {
-          const lines = wrapText(value, 48);
-          const y = cursor + (company.length - 1) * 30;
-          cursor += lines.length * 30 + 8;
+        {company.map((line, i) => <text key={i} x="73" y={354 + i * 30} fill={INK} fontSize="23" fontWeight="700">{line}</text>)}
+        {contactRows.map(({ Icon, label, lines }, index) => {
+          const y = cursor;
+          cursor += lines.length * lineHeight + rowGap;
           return <g key={index}>
-            {Icon && <Icon x="38" y={y - 20} width="25" height="25" color={INK} />}
-            <text x="76" y={y} fill={INK} fontSize="24" fontWeight="600">{label}</text>
-            <text x="228" y={y} fill={INK} fontSize="24">:</text>
-            {lines.map((line, i) => <text key={i} x="244" y={y + i * 30} fill={INK} fontSize="24" fontWeight="600">{line}</text>)}
+            {Icon && <Icon x="38" y={y - iconSize * .8} width={iconSize} height={iconSize} color={INK} />}
+            <text x="76" y={y} fill={INK} fontSize={contactFontSize} fontWeight="600">{label}</text>
+            <text x="228" y={y} fill={INK} fontSize={contactFontSize}>:</text>
+            {lines.map((line, i) => <text key={i} x="244" y={y + i * lineHeight} fill={INK} fontSize={contactFontSize} fontWeight="600">{line}</text>)}
           </g>;
         })}
-        <rect x="898" y="478" width="124" height="124" rx="8" fill="#ffffff" />
-        <QRCodeSVG x="906" y="486" value={url} size={108} level="M" marginSize={0} bgColor="#ffffff" fgColor="#17566d" />
+        <rect x="860" y="54" width="124" height="124" rx="8" fill="#ffffff" />
+        <QRCodeSVG x="868" y="62" value={url} size={108} level="M" marginSize={0} bgColor="#ffffff" fgColor="#17566d" />
         <rect x="1" y="1" width="1048" height="638" rx="8" fill="none" stroke="#c4c8cc" strokeWidth="2" />
       </g>
     </svg>

@@ -96,7 +96,7 @@ function QtmBusinessCard({ employee: e, url, svgRef }: {
   const rows: Row[] = [
     ...(pf.offices
       ? e.offices.filter((o) => o.address).slice(0, 3).map((o, i): Row => ({
-          Icon: i === 0 ? MapPin : null, label: o.label || "Văn phòng", value: o.address,
+          Icon: i === 0 ? MapPin : null, label: o.label || "Office", value: o.address,
         }))
       : []),
     ...(pf.phone && e.phone ? [{ Icon: Phone, label: "Mobile", value: formatPhone(e.phone) }] : []),

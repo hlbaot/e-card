@@ -48,12 +48,12 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
   const rows = [
     ...(pf.offices ? e.offices.map((office, index) => ({
       key: `office-${index}`, Icon: MapPin,
-      label: office.label || "Văn phòng",
+      label: office.label || "Office",
       value: office.address.trim(), href: "",
     })).filter(office => office.value) : []),
-    ...(pf.phone && e.phone.trim() ? [{ key: "phone", Icon: Phone, label: "Điện thoại", value: formatPhone(e.phone), href: e.phone ? `tel:${e.phone.replace(/\s/g, "")}` : "" }] : []),
-    ...(pf.email && e.email.trim() ? [{ key: "email", Icon: Mail, label: "Thư điện tử", value: e.email, href: e.email ? `mailto:${e.email}` : "" }] : []),
-    ...(pf.website && e.website.trim() ? [{ key: "website", Icon: Globe, label: "Trang web", value: e.website, href: websiteUrl(e.website) }] : []),
+    ...(pf.phone && e.phone.trim() ? [{ key: "phone", Icon: Phone, label: "Phone", value: formatPhone(e.phone), href: e.phone ? `tel:${e.phone.replace(/\s/g, "")}` : "" }] : []),
+    ...(pf.email && e.email.trim() ? [{ key: "email", Icon: Mail, label: "Email", value: e.email, href: e.email ? `mailto:${e.email}` : "" }] : []),
+    ...(pf.website && e.website.trim() ? [{ key: "website", Icon: Globe, label: "Website", value: e.website, href: websiteUrl(e.website) }] : []),
   ];
   useLayoutEffect(() => {
     if (variant !== "preview") return;

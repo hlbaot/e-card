@@ -31,8 +31,8 @@ export function ContactList({
   ) => {
     if (!rawLabel) return fallback;
     const normalized = rawLabel.trim().toLowerCase();
-    if (normalized === "head office") return "Trụ sở chính";
-    if (normalized === "hanoi office") return "Văn phòng Hà Nội";
+    if (normalized === "head office") return "Head Office";
+    if (normalized === "hanoi office") return "Hanoi Office";
     return rawLabel;
   };
 
@@ -41,7 +41,7 @@ export function ContactList({
       ? [
           {
             id: "head-office",
-            label: translateOfficeLabel(e.offices[0]?.label, "Trụ sở chính"),
+            label: translateOfficeLabel(e.offices[0]?.label, "Head Office"),
             value: headOffice,
             icon: MapPin,
             href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(headOffice)}`,
@@ -52,7 +52,7 @@ export function ContactList({
             id: "hanoi-office",
             label: translateOfficeLabel(
               e.offices[1]?.label,
-              "Văn phòng Hà Nội",
+              "Hanoi Office",
             ),
             value: hanoiOffice,
             icon: MapPin,
@@ -66,7 +66,7 @@ export function ContactList({
       ? [
           {
             id: "mobile",
-            label: "Điện thoại",
+            label: "Phone",
             value: formatPhone(e.phone) || "Chưa cập nhật",
             icon: Phone,
             href: e.phone ? `tel:${e.phone.replace(/\s/g, "")}` : "",
@@ -79,7 +79,7 @@ export function ContactList({
       ? [
           {
             id: "email",
-            label: "Thư điện tử",
+            label: "Email",
             value: e.email || "Chưa cập nhật",
             icon: Mail,
             href: e.email ? `mailto:${e.email}` : "",
@@ -92,7 +92,7 @@ export function ContactList({
       ? [
           {
             id: "website",
-            label: "Trang web",
+            label: "Website",
             value: e.website || "qtmmedia.vn",
             icon: Globe,
             href: webHref || "https://qtmmedia.vn",

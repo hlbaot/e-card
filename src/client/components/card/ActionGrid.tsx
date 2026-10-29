@@ -29,7 +29,7 @@ export function ActionGrid({ employee: e }: { employee: Employee }) {
       ? [
           {
             id: "call",
-            label: "Gọi điện",
+            label: "Call",
             icon: Phone,
             href: e.phone ? `tel:${e.phone.replace(/\s/g, "")}` : "",
             external: false,
@@ -41,7 +41,7 @@ export function ActionGrid({ employee: e }: { employee: Employee }) {
       ? [
           {
             id: "email",
-            label: "Gửi thư",
+            label: "Email",
             icon: Mail,
             href: e.email ? `mailto:${e.email}` : "",
             external: false,
@@ -53,7 +53,7 @@ export function ActionGrid({ employee: e }: { employee: Employee }) {
       ? [
           {
             id: "zalo",
-            label: "Nhắn Zalo",
+            label: "Zalo",
             icon: MessageCircle,
             href: e.zalo
               ? `https://zalo.me/${e.zalo.replace(/[^0-9]/g, "")}`
@@ -65,20 +65,20 @@ export function ActionGrid({ employee: e }: { employee: Employee }) {
       : []),
     {
       id: "save",
-      label: "Lưu danh bạ",
+      label: "Save contact",
       icon: UserPlus,
       href: "",
       external: false,
       onClick: () => {
         saveContact(e);
-        toast("Đã tải danh bạ vCard (.vcf)");
+        toast("Contact downloaded (.vcf)");
       },
     },
     ...(pf.website
       ? [
           {
             id: "website",
-            label: "Trang web",
+            label: "Website",
             icon: Globe,
             href: webHref,
             external: true,
@@ -90,7 +90,7 @@ export function ActionGrid({ employee: e }: { employee: Employee }) {
       ? [
           {
             id: "direction",
-            label: "Chỉ đường",
+            label: "Directions",
             icon: MapPin,
             href: mapHref,
             external: true,

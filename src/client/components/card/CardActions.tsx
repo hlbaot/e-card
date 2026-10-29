@@ -26,7 +26,7 @@ export function CardActions({
     ...(pf.phone && e.phone.trim()
       ? [
           {
-            label: "Gọi điện",
+            label: "Call",
             icon: Phone,
             href: e.phone ? `tel:${e.phone.replace(/\s/g, "")}` : "",
             external: false,
@@ -36,7 +36,7 @@ export function CardActions({
     ...(pf.email && e.email.trim()
       ? [
           {
-            label: "Gửi thư",
+            label: "Email",
             icon: Mail,
             href: e.email ? `mailto:${e.email}` : "",
             external: false,
@@ -46,7 +46,7 @@ export function CardActions({
     ...(pf.zalo && e.zalo.replace(/[^0-9]/g, "")
       ? [
           {
-            label: "Nhắn Zalo",
+            label: "Zalo",
             icon: MessageCircle,
             href: e.zalo
               ? `https://zalo.me/${e.zalo.replace(/[^0-9]/g, "")}`
@@ -55,11 +55,11 @@ export function CardActions({
           },
         ]
       : []),
-    { label: "Lưu danh bạ", icon: ContactRound, href: "", external: false },
+    { label: "Save contact", icon: ContactRound, href: "", external: false },
     ...(pf.website && websiteUrl(e.website)
       ? [
           {
-            label: "Trang web",
+            label: "Website",
             icon: Globe,
             href: websiteUrl(e.website),
             external: true,
@@ -69,7 +69,7 @@ export function CardActions({
     ...(pf.offices && firstOffice
       ? [
           {
-            label: "Chỉ đường",
+            label: "Directions",
             icon: MapPin,
             href: firstOffice?.address
               ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(firstOffice.address.trim())}`
@@ -109,7 +109,7 @@ export function CardActions({
             type="button"
             onClick={() => {
               saveContact(e);
-              toast("Đã tải danh bạ vCard");
+              toast("Contact downloaded");
             }}
             {...aosProps}
           >

@@ -17,7 +17,7 @@ import { useAuthStore } from "@/client/store/auth.store";
 import { routes } from "@/shared/constants/routes";
 import { CyberSecurityBrand, QtmBrand } from "./QtmBrand";
 import { CardActions } from "./CardActions";
-import { ProfileConnectionArtwork, ProfileDecorations, ProfileFooterDecorations } from "./ProfileDecorations";
+import { ProfileConnectionArtwork, ProfileDecorations } from "./ProfileDecorations";
 import "./professional-card.css";
 import "./card-styles.css";
 
@@ -44,12 +44,11 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
       "data-aos-delay": String(Math.min(Math.round(delay / 50) * 50, 350)),
       "data-aos-duration": "500",
     } : {};
-  const slogan = e.slogan?.trim() || "Your Journey Partner";
   const authenticated = useAuthStore((state) => state.authenticated);
   const rows = [
     ...(pf.offices ? e.offices.map((office, index) => ({
       key: `office-${index}`, Icon: MapPin,
-      label: office.label || `Văn phòng ${index + 1}`,
+      label: office.label || "Văn phòng",
       value: office.address.trim(), href: "",
     })).filter(office => office.value) : []),
     ...(pf.phone && e.phone.trim() ? [{ key: "phone", Icon: Phone, label: "Điện thoại", value: formatPhone(e.phone), href: e.phone ? `tel:${e.phone.replace(/\s/g, "")}` : "" }] : []),
@@ -130,7 +129,10 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
               <p className="qtm-position">{capitalizeFirstLetter(e.position || "Chức vụ")}</p>
               <span className="qtm-identity-rule" aria-hidden="true" />
               <h3>{e.company || (isCyberSecurity ? "TẠP CHÍ ĐIỆN TỬ AN NINH MẠNG VIỆT NAM" : "CÔNG TY CỔ PHẦN CÔNG NGHỆ TRUYỀN THÔNG QTM")}</h3>
-              {(e.companyShort || !isCyberSecurity) && <p className="qtm-company-short">{e.companyShort || "QTM MEDIATECH.,JSC"}</p>}
+              <p className="qtm-company-short" aria-hidden={!e.companyShort.trim()}
+                style={e.companyShort.trim() ? undefined : { visibility: "hidden" }}>
+                {e.companyShort.trim() || "\u00a0"}
+              </p>
             </section>
             {rows.length > 0 && <section className="qtm-profile-contacts" aria-label="Thông tin liên hệ">
               {rows.map(({ key, Icon, label, value, href }, index) => (
@@ -143,15 +145,8 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
             </section>}
             <CardActions employee={e} animate={isProfile} />
             <ProfileConnectionArtwork theme={theme} />
-            <footer className="qtm-profile-footer" {...aos("fade-up", 420)}>
-              <div className="qtm-footer-row">
-                <div className="qtm-profile-slogan-wrap">
-                  <p className="qtm-profile-slogan">{slogan}</p>
-                  <span className="qtm-slogan-line" aria-hidden="true" />
-                </div>
-                <ProfileFooterDecorations theme={theme} />
-              </div>
-              {!isCyberSecurity && <p className="qtm-profile-motto">QUALITY - TECHNOLOGY - MINDSET</p>}
+            <footer className="qtm-profile-footer qtm-brand-footer" aria-hidden={!isCyberSecurity} {...aos("fade-up", 420)}>
+              {isCyberSecurity && <p className="qtm-profile-motto anm-profile-motto">TIN CẬY - TIÊN PHONG - KHÁT VỌNG</p>}
             </footer>
           </div>
         </div>

@@ -152,7 +152,7 @@ function QtmBusinessCard({ employee: e, url, svgRef }: {
 
         <g transform="translate(0 -32)">
           <CardName name={e.fullName} color={INK} />
-          <text x="73" y="334" fill={INK} fontSize="22" fontWeight="700" fontStyle="italic">{capitalizeFirstLetter(e.position)}</text>
+          <text x="73" y="334" fill={INK} fontSize="20" fontWeight="400" fontStyle="italic">{capitalizeFirstLetter(e.position)}</text>
         </g>
 
         {company.map((line, i) => <text key={i} x="73" y={354 + i * 30} fill={INK} fontSize="23" fontWeight="700">{line}</text>)}

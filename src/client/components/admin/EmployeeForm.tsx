@@ -408,7 +408,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
         </div>
         <div className="fields">
           {input("fullName", "Họ và tên", "Nguyễn Văn An", true)}
-          {input("position", "Chức vụ", "Quản lý dự án", true)}
+          {input("position", "Chức vụ", "Trưởng ban Hợp tác Phát triển", true)}
           {input("company", "Tên công ty", "", true)}
           {input("companyShort", "Tên công ty viết tắt", "", true)}
           {input("phone", "Số điện thoại", "0900 000 000", false, "tel")}
@@ -448,7 +448,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
           <div className="office-row" key={index}>
             <div className="field">
               <label htmlFor={`office-label-${index}`}>
-                Văn phòng {index + 1}
+                Văn phòng
               </label>
               <input
                 id={`office-label-${index}`}

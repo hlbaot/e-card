@@ -189,7 +189,7 @@ export function ProfileView({ employee }: { employee: Employee }) {
                   >
                     <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#22D3EE] mb-1">
                       <MapPin size={15} />
-                      <span>{o.label || `Văn phòng ${idx + 1}`}</span>
+                      <span>{o.label || "Văn phòng"}</span>
                     </div>
                     <p className="text-sm text-[#B6C2D9] leading-relaxed break-words">
                       {o.address}

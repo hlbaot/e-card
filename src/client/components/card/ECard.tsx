@@ -145,8 +145,9 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
             </section>}
             <CardActions employee={e} animate={isProfile} />
             <ProfileConnectionArtwork theme={theme} />
-            <footer className="qtm-profile-footer qtm-brand-footer" aria-hidden={!isCyberSecurity} {...aos("fade-up", 420)}>
+            <footer className="qtm-profile-footer qtm-brand-footer" {...aos("fade-up", 420)}>
               {isCyberSecurity && <p className="qtm-profile-motto anm-profile-motto">TIN CẬY - TIÊN PHONG - KHÁT VỌNG</p>}
+              <p className="qtm-profile-motto qtm-platform-motto">QUALITY - TECHNOLOGY - MINDSET</p>
             </footer>
           </div>
         </div>

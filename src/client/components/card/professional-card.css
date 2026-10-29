@@ -719,3 +719,5 @@
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
+
+.qtm-brand-footer .anm-profile-motto + .qtm-platform-motto { margin-top: 12px; }

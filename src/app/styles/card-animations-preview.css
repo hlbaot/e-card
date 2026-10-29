@@ -1,0 +1,554 @@
+/* ==========================================================================
+   AOS CUSTOM OVERRIDES & FULL-VIEWPORT QTM E-CARD PROFILE VIEW (/card/[slug])
+   ========================================================================== */
+/* Server-rendered content stays readable while the animation module loads. */
+[data-aos][data-aos]:not(.aos-init) {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+/* Set the entrance starting styles instantly; animating this preparation
+   would reverse the reveal before the element has visibly moved. */
+[data-aos].aos-preparing {
+  transition: none !important;
+}
+
+/* The public card starts at the entrance state in the server HTML too.
+   Otherwise its complete contents flash before hydration restarts AOS. */
+@media (prefers-reduced-motion: no-preference) {
+  .qtm-public-profile [data-aos][data-aos]:not(.aos-animate) {
+    opacity: 0;
+  }
+
+  .login-page [data-aos].aos-init:not(.aos-animate) {
+    animation: login-reveal-fallback 0.4s ease-out forwards;
+    animation-delay: 0.15s;
+  }
+}
+
+@keyframes login-reveal-fallback {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-aos][data-aos][data-aos] {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: none;
+  }
+}
+
+[data-aos="fade-up"]:not(.aos-animate) {
+  transform: translate3d(0, 24px, 0);
+}
+[data-aos="fade-down"]:not(.aos-animate) {
+  transform: translate3d(0, -24px, 0);
+}
+[data-aos="fade-left"]:not(.aos-animate) {
+  transform: translate3d(28px, 0, 0);
+}
+[data-aos="fade-right"]:not(.aos-animate) {
+  transform: translate3d(-28px, 0, 0);
+}
+[data-aos="zoom-in"]:not(.aos-animate) {
+  transform: scale(0.84);
+}
+[data-aos="zoom-in-up"]:not(.aos-animate) {
+  transform: translate3d(0, 20px, 0) scale(0.92);
+}
+
+.profile-view-root {
+  color: #0a2540;
+  font-family: var(--font-jakarta), Arial, Helvetica, sans-serif;
+}
+
+.ecard-footer-aos[data-aos="fade-up"]:not(.aos-animate) {
+  transform: translate3d(0, 12px, 0);
+}
+
+.ecard-shell {
+  overflow: hidden;
+  padding-top: calc(clamp(8px, 1.6dvh, 22px) + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(
+    clamp(6px, 1.4dvh, 18px) + env(safe-area-inset-bottom, 0px)
+  );
+  padding-left: calc(clamp(14px, 4vw, 28px) + env(safe-area-inset-left, 0px));
+  padding-right: calc(clamp(14px, 4vw, 28px) + env(safe-area-inset-right, 0px));
+  gap: clamp(4px, 1dvh, 14px);
+}
+
+@media (min-width: 768px) {
+  .ecard-shell {
+    padding-left: calc(clamp(24px, 4.5vw, 72px) + env(safe-area-inset-left, 0px));
+    padding-right: calc(
+      clamp(24px, 4.5vw, 72px) + env(safe-area-inset-right, 0px)
+    );
+    gap: clamp(8px, 1.8dvh, 22px);
+  }
+}
+
+.ecard-avatar-box {
+  --avatar-size: clamp(96px, 17dvh, 168px);
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  font-size: calc(var(--avatar-size) * 0.32);
+}
+
+@media (min-width: 768px) {
+  .ecard-avatar-box {
+    --avatar-size: clamp(132px, 21.5dvh, 200px);
+  }
+}
+
+.ecard-fullname {
+  font-size: clamp(1.1rem, 2.9dvh, 2rem);
+  line-height: 1.28;
+}
+
+@media (min-width: 768px) {
+  .ecard-fullname {
+    font-size: clamp(1.45rem, min(3.2vw, 4.2dvh), 2.35rem);
+    line-height: 1.28;
+  }
+}
+
+.ecard-position {
+  font-size: clamp(0.75rem, 1.75dvh, 1rem);
+  line-height: 1.25;
+  margin-top: clamp(2px, 0.4dvh, 6px);
+}
+
+.ecard-company-name {
+  font-size: clamp(0.68rem, 1.55dvh, 0.9rem);
+  line-height: 1.3;
+}
+
+.ecard-company-short {
+  font-size: clamp(0.6rem, 1.25dvh, 0.76rem);
+  line-height: 1.25;
+  margin-top: 2px;
+}
+
+.ecard-contact-list {
+  gap: clamp(5px, 1.1dvh, 12px);
+}
+
+.ecard-contact-row {
+  padding: clamp(2px, 0.4dvh, 4px) 0;
+}
+
+.ecard-contact-line {
+  font-size: clamp(0.74rem, 1.65dvh, 0.94rem);
+}
+
+.ecard-header-btn {
+  background: var(--pv-pill-bg, rgba(255, 255, 255, 0.85));
+  color: var(--pv-primary, #0f4c75);
+  border: 1px solid var(--pv-pill-border, rgba(15, 76, 117, 0.18));
+}
+
+.ecard-header-btn:hover {
+  background: var(--pv-btn-hover-bg, #0f4c75);
+  color: var(--pv-btn-hover-text, #ffffff);
+  border-color: var(--pv-btn-hover-bg, #0f4c75);
+}
+
+.ecard-action-grid {
+  gap: clamp(5px, 1dvh, 10px);
+}
+
+.ecard-action-btn {
+  height: clamp(36px, 5.6dvh, 52px);
+  min-height: 36px;
+  background-color: var(--pv-btn-bg, #e2f0fc);
+  color: var(--pv-btn-text, #0f4c75);
+  border: 1px solid var(--pv-btn-border, rgba(15, 76, 117, 0.14));
+}
+
+.ecard-action-btn:hover {
+  background-color: var(--pv-btn-hover-bg, #0f4c75);
+  color: var(--pv-btn-hover-text, #ffffff);
+  border-color: var(--pv-btn-hover-bg, #0f4c75);
+  box-shadow: 0 6px 16px rgba(15, 76, 117, 0.22);
+}
+
+@keyframes auroraFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-12px, 10px, 0) scale(1.05);
+  }
+}
+
+.aurora-mesh-anim {
+  animation: auroraFloat 14s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora-mesh-anim {
+    animation: none !important;
+  }
+}
+
+.ecard-action-label {
+  font-size: clamp(0.66rem, 1.45dvh, 0.84rem);
+}
+
+.ecard-qr-thumb {
+  width: clamp(64px, 10dvh, 92px);
+  height: clamp(64px, 10dvh, 92px);
+}
+
+.qtm-slogan {
+  font-size: clamp(1.05rem, 2.5dvh, 1.65rem);
+  line-height: 1.25;
+}
+
+.qtm-motto {
+  font-size: clamp(7px, 1.05dvh, 10px);
+  line-height: 1.2;
+}
+
+/* Short mobile screens (height <= 680px, e.g. 360x640, 375x667) */
+@media (max-height: 680px) and (max-width: 767px) {
+  .ecard-avatar-box {
+    --avatar-size: clamp(80px, 13.5dvh, 104px);
+  }
+  .ecard-fullname {
+    font-size: clamp(1rem, 2.6dvh, 1.25rem);
+  }
+  .ecard-contact-row {
+    padding: 2px 0;
+  }
+  .ecard-action-btn {
+    height: clamp(34px, 5.2dvh, 42px);
+    min-height: 34px;
+  }
+}
+
+/* ==========================================================================
+   EMPLOYEE ADD/EDIT SPLIT-SCROLL LAYOUT & AUTO-SCALED LIVE PREVIEW
+   ========================================================================== */
+@media (min-width: 1024px) {
+  .admin-shell:has(.employee-form-layout) {
+    height: 100dvh;
+    overflow: hidden;
+  }
+  .admin-content:has(.employee-form-layout) {
+    height: 100dvh;
+    overflow: hidden;
+    padding: 0 !important;
+    max-width: none;
+  }
+}
+
+.form-scroll-column {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(34, 211, 238, 0.28) transparent;
+}
+.form-scroll-column::-webkit-scrollbar {
+  width: 6px;
+}
+.form-scroll-column::-webkit-scrollbar-track {
+  background: transparent;
+}
+.form-scroll-column::-webkit-scrollbar-thumb {
+  background: rgba(34, 211, 238, 0.25);
+  border-radius: 999px;
+}
+.form-scroll-column::-webkit-scrollbar-thumb:hover {
+  background: rgba(34, 211, 238, 0.48);
+}
+
+.ecard-scaled-frame {
+  display: block;
+}
+.ecard-scaled-frame .ecard {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  min-height: inherit;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.ecard-scaled-mobile .ecard {
+  min-height: 780px;
+}
+.ecard-scaled-frame .ecard-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.ecard-scaled-frame .ecard-closing {
+  margin-top: auto;
+}
+
+/* Right-hand LivePreviewPanel: full-frame fit with slightly smaller text & spacing */
+.ecard-scaled-panel .ecard-content {
+  padding: 16px 22px 12px;
+}
+.ecard-scaled-panel .ecard-brand {
+  margin-bottom: 10px;
+}
+.ecard-scaled-panel .ecard-brand img {
+  width: 72px;
+  height: auto;
+}
+.ecard-scaled-panel .ecard-brand > span {
+  font-size: 7px;
+  line-height: 1.35;
+}
+.ecard-scaled-panel .ecard-wordmark {
+  font-size: 22px;
+  margin-bottom: 12px;
+}
+.ecard-scaled-panel .ecard-identity .avatar {
+  transform: scale(0.82);
+  margin-block: -8px;
+}
+.ecard-scaled-panel .ecard-identity h2 {
+  font-size: 17px;
+  margin-top: 10px;
+}
+.ecard-scaled-panel .ecard-identity p {
+  font-size: 11px;
+  margin-top: 2px;
+}
+.ecard-scaled-panel .ecard-identity .identity-copy > i {
+  margin: 8px auto 10px;
+}
+.ecard-scaled-panel .ecard-company {
+  margin-bottom: 11px;
+}
+.ecard-scaled-panel .ecard-company h3 {
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+.ecard-scaled-panel .ecard-company p {
+  font-size: 9.5px;
+}
+.ecard-scaled-panel .ecard-section-title {
+  margin-bottom: 9px;
+  font-size: 7.5px;
+}
+.ecard-scaled-panel .ecard-info {
+  gap: 7px;
+  font-size: 11px;
+}
+.ecard-scaled-panel .ecard-info strong {
+  font-size: 10px;
+}
+.ecard-scaled-panel .ecard-info svg {
+  width: 14px;
+  height: 14px;
+}
+.ecard-scaled-panel .card-actions {
+  margin: 12px 0;
+  gap: 6px;
+}
+.ecard-scaled-panel .card-actions a,
+.ecard-scaled-panel .card-actions button {
+  padding: 8px 2px;
+  gap: 4px;
+  font-size: 10px;
+}
+.ecard-scaled-panel .card-actions svg {
+  width: 15px;
+  height: 15px;
+}
+.ecard-scaled-panel .ecard-slogan {
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+.ecard-scaled-panel .ecard-motto {
+  font-size: 6.5px;
+  margin-top: 5px;
+}
+.ecard-scaled-panel .skyline {
+  width: calc(100% + 44px);
+  margin: 2px -22px 0;
+}
+
+/* PreviewModal Desktop Mode: Horizontal 2-column detail layout (ProfileView) */
+.ecard-scaled-desktop [data-aos] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+.ecard-scaled-desktop .profile-view-root {
+  width: 1120px !important;
+  height: 650px !important;
+  min-height: 650px !important;
+  max-height: 650px !important;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(2, 6, 23, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+.ecard-scaled-desktop .ecard-shell {
+  max-width: 1040px !important;
+  padding: 24px 42px 18px !important;
+  gap: 12px !important;
+}
+.ecard-scaled-desktop .ecard-main {
+  display: grid !important;
+  grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+  align-items: center !important;
+  gap: 36px !important;
+}
+.ecard-scaled-desktop .ecard-col-left {
+  grid-column: span 5 / span 5 !important;
+  align-items: flex-start !important;
+}
+.ecard-scaled-desktop .ecard-col-right {
+  grid-column: span 7 / span 7 !important;
+  gap: 12px !important;
+}
+.ecard-scaled-desktop .ecard-avatar-box {
+  --avatar-size: 132px !important;
+}
+.ecard-scaled-desktop .ecard-fullname {
+  font-size: 24px !important;
+  line-height: 1.25 !important;
+  text-align: left !important;
+}
+.ecard-scaled-desktop .ecard-position {
+  font-size: 13.5px !important;
+  text-align: left !important;
+}
+.ecard-scaled-desktop .ecard-company-name {
+  font-size: 11.5px !important;
+  text-align: left !important;
+}
+.ecard-scaled-desktop .ecard-company-short {
+  font-size: 10px !important;
+  text-align: left !important;
+}
+.ecard-scaled-desktop .ecard-contact-list {
+  gap: 8px !important;
+}
+.ecard-scaled-desktop .ecard-contact-line {
+  font-size: 12.5px !important;
+}
+.ecard-scaled-desktop .ecard-action-grid {
+  gap: 8px !important;
+}
+.ecard-scaled-desktop .ecard-action-btn {
+  height: 40px !important;
+  min-height: 40px !important;
+}
+.ecard-scaled-desktop .ecard-action-label {
+  font-size: 11.5px !important;
+}
+.ecard-scaled-desktop .qtm-slogan {
+  font-size: 21px !important;
+}
+.ecard-scaled-desktop .qtm-motto {
+  font-size: 8.5px !important;
+}
+
+
+
+/* Sparse artwork spans the profile; city silhouettes sit in a shallow bottom band. */
+.card-decorations {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+.decor-motifs { position: absolute; inset: 0; }
+.decor-artwork { position: absolute; width: 100%; left: 0; }
+.decor-field { top: 0; height: 100%; }
+.decor-bottom { bottom: 0; height: 12%; max-height: 110px; }
+.decor-single-frame { position: absolute; inset: 12px; border: 1px solid currentColor; opacity: .2; }
+.decor-detail { position: absolute; inset: 0 0 auto; width: 100%; height: 60px; }
+.ecard, .profile-view-root { overflow: hidden; isolation: isolate; }
+.ecard .ecard-closing { padding-bottom: clamp(48px, 10vw, 85px); }
+.ecard .ecard-info { background: transparent; color: #1e293b; border-radius: 0; padding: 0; }
+.ecard.ecard-dark .ecard-info { background: transparent; color: #e2e8f0; }
+.profile-view-root .ecard-col-right { background: transparent; border-radius: 0; padding: 0; }
+.profile-view-root.profile-view-dark .ecard-col-right { background: transparent; }
+.profile-view-root .ecard-footer { position: relative; background: transparent; padding: 3px 8px; }
+.profile-view-root.profile-view-dark .ecard-footer { background: transparent; }
+.decor-suggestion { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; font-size: 11px; color: #b6c2d9; }
+.decor-suggestion button { color: #22d3ee; border: 1px solid #22d3ee60; border-radius: 7px; padding: 6px 10px; cursor: pointer; }
+.decor-options { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.decor-option { position: relative; min-width: 0; display: flex; flex-direction: column; gap: 7px; text-align: center; padding: 7px; border: 1px solid #ffffff25; border-radius: 10px; color: #b6c2d9; font-size: 11px; cursor: pointer; }
+.decor-option.selected { border-color: #22d3ee; box-shadow: 0 0 0 1px #22d3ee; color: #ecfeff; }
+.decor-option:focus-within { outline: 2px solid #22d3ee; outline-offset: 3px; }
+.decor-option input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.decor-thumbnail { position: relative; display: block; overflow: hidden; height: 64px; border-radius: 7px; background: #f4f9fc; }
+.decor-thumbnail > svg { position: absolute; inset: 0; height: 100%; width: 100%; mask-image: none; max-height: none; }
+.decor-tick { position: absolute; top: 7px; right: 7px; color: #0891b2; background: #ecfeff; border-radius: 50%; }
+@media (max-width: 640px) { .decor-options { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+.decor-thumbnail [fill-opacity] { fill-opacity: .3; }
+.decor-thumbnail [stroke-opacity] { stroke-opacity: .5; }
+
+/* Contact details remain typography and icons on the chosen profile background. */
+.ecard .ecard-info > div, .ecard.ecard-dark .ecard-info > div { background: transparent; border: 0; border-radius: 0; box-shadow: none; }
+
+/* Keep the complete QTM lockup visible at the upper left of every card. */
+.qtm-card-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+  color: var(--pv-primary, var(--accent, #0f4c75));
+  line-height: 1;
+}
+.qtm-card-brand img, .ecard .qtm-card-brand img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  filter: none;
+}
+.qtm-card-brand strong {
+  font-family: var(--font-sans), Arial, sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  font-style: normal;
+  letter-spacing: -1.5px;
+}
+
+
+/* Hộp thoại dạng bottom-sheet: trượt từ dưới lên trên mobile, phóng nhẹ trên desktop. */
+@keyframes sheet-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes sheet-slide-up {
+  from { transform: translateY(100%); opacity: 0.6; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes sheet-pop-in {
+  from { transform: translateY(24px) scale(0.97); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+.sheet-overlay {
+  animation: sheet-fade-in 0.22s ease-out both;
+}
+.sheet-panel {
+  animation: sheet-slide-up 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@media (min-width: 640px) {
+  .sheet-panel {
+    animation-name: sheet-pop-in;
+    animation-duration: 0.3s;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet-overlay,
+  .sheet-panel {
+    animation: none;
+  }
+}

@@ -1,0 +1,300 @@
+.detail-main {
+  padding: 30px 0 55px;
+}
+.breadcrumb {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 30px;
+}
+.detail-heading {
+  text-align: center;
+  margin-bottom: 27px;
+}
+.detail-heading h1 {
+  font-size: 27px;
+  margin: 8px 0;
+}
+.detail-heading p {
+  color: var(--text-body);
+  font-size: 13px;
+}
+.detail-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 430px) minmax(0, 360px);
+  gap: 36px;
+  justify-content: center;
+  align-items: start;
+}
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono-tech);
+  font-size: 10px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  color: var(--brand);
+  margin: 0 0 13px;
+}
+.section-label:after {
+  content: "";
+  height: 1px;
+  background: var(--line);
+  flex: 1;
+}
+.ecard {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  max-width: 430px;
+  margin: auto;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px #164e6320;
+  border: 1px solid #ffffff70;
+}
+.ecard-content {
+  position: relative;
+  z-index: 1;
+  padding: 25px 29px 15px;
+}
+.ecard-brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 19px;
+}
+.ecard-brand > span {
+  font-size: 8px;
+  line-height: 1.5;
+  letter-spacing: 2px;
+  font-weight: 750;
+  color: var(--primary);
+}
+.ecard-wordmark {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--primary);
+  font-size: 28px;
+  letter-spacing: -1px;
+  font-weight: 800;
+  margin-bottom: 25px;
+}
+.ecard-wordmark span {
+  font-size: 6px;
+  letter-spacing: 1.4px;
+  max-width: 100px;
+  line-height: 1.8;
+}
+.ecard-identity {
+  text-align: center;
+}
+.ecard-identity > .avatar {
+  box-shadow:
+    0 0 0 5px #ffffff7a,
+    0 6px 20px #12344920;
+}
+.ecard-identity h2 {
+  color: var(--primary);
+  font-size: 21px;
+  line-height: 1.3;
+  text-transform: uppercase;
+  margin-top: 19px;
+  overflow-wrap: anywhere;
+  letter-spacing: 0.1px;
+}
+.ecard-identity p {
+  font-size: 12px;
+  font-style: italic;
+  margin-top: 4px;
+}
+.ecard-identity > i {
+  display: block;
+  width: 35px;
+  height: 2px;
+  background: var(--primary);
+  margin: 15px auto 17px;
+  opacity: 0.6;
+}
+.ecard-company {
+  text-align: center;
+  margin-bottom: 21px;
+}
+.ecard-company h3 {
+  color: inherit;
+  font-size: 11px;
+  line-height: 1.65;
+  letter-spacing: 0.35px;
+}
+.ecard-company p {
+  font-size: 9px;
+  letter-spacing: 0.6px;
+  margin-top: 2px;
+}
+.ecard-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 10px;
+}
+.ecard-info > div {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.ecard-info svg {
+  color: var(--primary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.ecard-info p {
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.ecard-info strong {
+  font-weight: 700;
+  display: block;
+  font-size: 9px;
+  margin-bottom: 1px;
+}
+.ecard-info span,
+.ecard-info a {
+  display: block;
+  opacity: 1;
+}
+.card-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 23px 0;
+}
+.card-actions a,
+.card-actions button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 12px 2px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 9%, transparent);
+  font-size: 9px;
+  font-weight: 600;
+  transition: filter 0.2s;
+}
+.card-actions a:hover,
+.card-actions button:hover {
+  filter: brightness(0.9);
+}
+.actions-outline a,
+.actions-outline button {
+  border-color: color-mix(in srgb, var(--primary) 40%, transparent);
+  background: transparent;
+}
+.actions-filled a,
+.actions-filled button {
+  background: color-mix(in srgb, var(--primary) 15%, transparent);
+}
+.actions-filled a:first-child {
+  background: var(--primary);
+  color: #082331;
+}
+.ecard:not(.ecard-dark) .actions-filled a:first-child {
+  color: var(--on-primary);
+  background: var(--primary);
+}
+.ecard-slogan {
+  font-family: var(--font-handwriting), cursive;
+  text-align: center;
+  color: var(--primary);
+  font-size: 23px;
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+.skyline {
+  width: calc(100% + 58px);
+  margin: 3px -29px 0;
+  color: var(--primary);
+  opacity: 0.42;
+  display: block;
+}
+.ecard-motto {
+  text-align: center;
+  font-size: 7px;
+  letter-spacing: 2.4px;
+  color: var(--primary);
+  margin-top: 9px;
+  font-weight: 600;
+}
+.card-decor {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--primary) 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 8%, transparent);
+}
+.bubble-one {
+  width: 230px;
+  height: 230px;
+  left: -140px;
+  top: 110px;
+}
+.bubble-two {
+  width: 170px;
+  height: 170px;
+  right: -100px;
+  top: 280px;
+}
+.bubble-three {
+  width: 100px;
+  height: 100px;
+  right: -50px;
+  top: -30px;
+}
+.accent-bar {
+  position: absolute;
+  left: 0;
+  top: 300px;
+  width: 5px;
+  height: 95px;
+  border-radius: 0 4px 4px 0;
+  background: var(--primary);
+  opacity: 0.8;
+}
+.top-line {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5px;
+  background: var(--primary);
+}
+.circuit {
+  position: absolute;
+  top: 0;
+  opacity: 0.17;
+  color: var(--primary);
+}
+.ecard-dark .ecard-identity h2,
+.ecard-dark .ecard-brand,
+.ecard-dark .ecard-wordmark,
+.ecard-dark .ecard-slogan,
+.ecard-dark .ecard-motto,
+.ecard-dark .ecard-info svg {
+  color: #7dd3fc;
+}
+.ecard-dark .card-actions a,
+.ecard-dark .card-actions button {
+  color: #c2edff;
+  border-color: #7dd3fc55;
+}

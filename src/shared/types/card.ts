@@ -95,7 +95,10 @@ export interface CardPalette {
   isDark?: boolean;
 }
 
+export type BusinessCardType = "qtm" | "an-ninh-mang";
+
 export interface CardTheme {
+  businessCardType?: BusinessCardType;
   templateId: TemplateId; // Style ID (database & backward compatible)
   styleId?: StyleId;      // Alias for templateId
   backgroundId: string;   // Palette background ID

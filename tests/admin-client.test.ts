@@ -9,7 +9,7 @@ const input: EmployeeInput = {
   fullName: "Test", position: "Developer", company: "Test", companyShort: "T", website: "example.com",
   email: "test@example.com", phone: "0123456789", zalo: "", offices: [], slogan: "", avatarUrl: "", isActive: true,
   allowIndexing: false, publicFields: DEFAULT_PUBLIC_FIELDS,
-  theme: { templateId: "bubble-blue", styleId: "bubble-blue", paletteId: "brand-white", backgroundId: "sky-soft", primaryColor: "#0F4C75", avatarSize: "lg", avatarShape: "circle", buttonStyle: "soft", decor: [], shapes: {} },
+  theme: { businessCardType: "an-ninh-mang", templateId: "bubble-blue", styleId: "bubble-blue", paletteId: "brand-white", backgroundId: "sky-soft", primaryColor: "#0F4C75", avatarSize: "lg", avatarShape: "circle", buttonStyle: "soft", decor: [], shapes: {} },
 };
 const employee = { ...input, id: "211cb740-bad0-4940-9c21-859b6c580434", slug: "test", createdAt: "2026-10-25T00:00:00Z", updatedAt: "2026-10-25T00:00:00Z" };
 test("admin client uses APIs for CRUD, statistics and multipart avatar; drops immutable form metadata", async () => {
@@ -32,6 +32,7 @@ test("admin client uses APIs for CRUD, statistics and multipart avatar; drops im
       for (const key of ["id", "slug", "createdAt", "updatedAt"]) assert.equal(key in body, false);
       for (const key of ["styleId", "paletteId", "palette"]) assert.equal(key in body.theme, false);
       assert.equal(body.fullName, input.fullName);
+      assert.equal(body.theme.businessCardType, "an-ninh-mang");
     }
     return Response.json(url.endsWith("employees") && !options?.method ? { employees: [employee] } : { employee });
   };

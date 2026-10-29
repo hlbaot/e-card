@@ -29,7 +29,7 @@ export function CyberSecurityBusinessCard({ employee: e, url, svgRef }: {
   const id = useId().replace(/:/g, "");
   const name = e.fullName.toLocaleUpperCase("vi-VN");
   const nameSize = Math.min(32, 760 / Math.max(name.length, 1));
-  const position = wrap(e.position.toLocaleUpperCase("vi-VN"), 34, 2);
+  const position = wrap(e.position.trim(), 40, 2);
   const rows = [
     ...(e.phone ? [{ Icon: Phone, lines: [formatPhone(e.phone)] }] : []),
     ...(e.email ? [{ Icon: Mail, lines: [e.email] }] : []),
@@ -79,7 +79,7 @@ export function CyberSecurityBusinessCard({ employee: e, url, svgRef }: {
       <g transform={`translate(0 ${detailsOffset})`}>
       <text x="489" y="226" fill={INK} fontSize={nameSize} fontWeight="800"
         {...(name.length > 35 ? { textLength: 510, lengthAdjust: "spacingAndGlyphs" as const } : {})}>{name}</text>
-      {position.map((line, i) => <text key={i} x="489" y={263 + i * 31} fill={INK} fontSize="26" fontWeight="700">{line}</text>)}
+      {position.map((line, i) => <text key={i} x="489" y={263 + i * 31} fill={INK} fontSize="22" fontWeight="400" fontStyle="italic">{line}</text>)}
       {rows.map(({ Icon, lines }, index) => {
         const rowY = y;
         y += lines.length * lineHeight + rowGap;

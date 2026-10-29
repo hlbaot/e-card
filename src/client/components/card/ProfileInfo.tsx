@@ -84,7 +84,7 @@ export function ProfileInfo({ employee: e }: { employee: Employee }) {
         />
       </div>
 
-      {/* Company Name in bold + subtitle QTM MEDIATECH.,JSC */}
+      {/* Keep the subtitle slot even when the optional short name is empty. */}
       <div
         data-aos="fade-up"
         data-aos-delay="300"
@@ -98,9 +98,10 @@ export function ProfileInfo({ employee: e }: { employee: Employee }) {
         </h2>
         <p
           className="ecard-company-short font-bold uppercase tracking-[0.14em] line-clamp-1"
-          style={{ color: "var(--pv-muted)" }}
+          aria-hidden={!e.companyShort.trim()}
+          style={{ color: "var(--pv-muted)", visibility: e.companyShort.trim() ? undefined : "hidden" }}
         >
-          ({e.companyShort || "QTM MEDIATECH.,JSC"})
+          {e.companyShort.trim() ? `(${e.companyShort.trim()})` : "\u00a0"}
         </p>
       </div>
     </div>

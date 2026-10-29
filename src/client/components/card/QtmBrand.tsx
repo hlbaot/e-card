@@ -20,12 +20,8 @@ export function QtmBrand() {
 export function CyberSecurityBrand() {
   return (
     <div className="qtm-card-brand anm-card-brand" aria-label="An ninh mạng Việt Nam">
-      <Image src="/logo_anninhmang.png" width={1191} height={1320}
+      <Image src="/logo_anninhmang.png" width={1672} height={941}
         alt="Logo An ninh mạng Việt Nam" unoptimized />
-      <div className="anm-brand-copy">
-        <strong>AN NINH MẠNG VIỆT NAM</strong>
-        <small>VIETNAM CYBER SECURITY MAGAZINE</small>
-      </div>
     </div>
   );
 }

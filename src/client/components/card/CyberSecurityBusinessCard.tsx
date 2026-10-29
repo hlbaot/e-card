@@ -69,14 +69,13 @@ export function CyberSecurityBusinessCard({ employee: e, url, svgRef }: {
       <path d="M1050 600H865C957 566 1020 511 1050 461Z" fill="#387aa7" opacity=".65" />
       <path d="M1050 600H947C995 575 1030 545 1050 516Z" fill="#5397bb" opacity=".7" />
       <g transform={`translate(0 ${brandOffset})`}>
-      <image href="/logo_anninhmang.png" x="152" y="128" width="150" height="167" />
-      <text x="227" y="330" textAnchor="middle" fill="#073347" fontSize="16" fontWeight="800">TẠP CHÍ ĐIỆN TỬ</text>
-      <text x="227" y="366" textAnchor="middle" fill="#073347" fontSize="25" fontWeight="900"
-        textLength="358" lengthAdjust="spacingAndGlyphs">AN NINH MẠNG VIỆT NAM</text>
-      <text x="227" y="390" textAnchor="middle" fill="#244a57" fontSize="10" textLength="358" lengthAdjust="spacing">VIETNAM CYBER SECURITY MAGAZINE</text>
+      {/* Trim transparent padding while keeping the complete logo centered in its column. */}
+      <svg x="40" y="206" width="390" height="109" viewBox="150 300 1400 390">
+        <image href="/logo_anninhmang.png" width="1672" height="941" />
+      </svg>
       </g>
-      <path d={`M449 ${centerY - dividerHalfHeight}V${centerY + dividerHalfHeight}`} stroke={INK} strokeWidth="1.5" />
-      <g transform={`translate(0 ${detailsOffset})`}>
+      <path d={`M467 ${centerY - dividerHalfHeight}V${centerY + dividerHalfHeight}`} stroke={INK} strokeWidth="1.5" />
+      <g transform={`translate(18 ${detailsOffset})`}>
       <text x="489" y="226" fill={INK} fontSize={nameSize} fontWeight="800"
         {...(name.length > 35 ? { textLength: 510, lengthAdjust: "spacingAndGlyphs" as const } : {})}>{name}</text>
       {position.map((line, i) => <text key={i} x="489" y={263 + i * 31} fill={INK} fontSize="22" fontWeight="400" fontStyle="italic">{line}</text>)}

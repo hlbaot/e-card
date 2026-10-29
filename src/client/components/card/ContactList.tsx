@@ -1,5 +1,7 @@
 "use client";
 
+import { formatPhone } from "@/shared/utils/phone";
+
 import { MapPin, Phone, Mail, Globe } from "lucide-react";
 import { getPublicFields } from "@/shared/types";
 import type { Employee } from "@/shared/types";
@@ -65,7 +67,7 @@ export function ContactList({
           {
             id: "mobile",
             label: "Điện thoại",
-            value: e.phone || "Chưa cập nhật",
+            value: formatPhone(e.phone) || "Chưa cập nhật",
             icon: Phone,
             href: e.phone ? `tel:${e.phone.replace(/\s/g, "")}` : "",
             external: false,

@@ -30,8 +30,10 @@ import { useToast } from "@/client/components/ui/Toast";
 import { Alert } from "@/client/components/ui/Alert";
 import { Spinner } from "@/client/components/ui/Spinner";
 import { LoadingOverlay } from "@/client/components/ui/LoadingOverlay";
+import { BusinessCardPicker } from "./BusinessCardPicker";
 import { EmployeeFormLayout } from "./EmployeeFormLayout";
 import { PreviewToggleButton } from "./PreviewToggleButton";
+import { formatPhone, normalizePhone } from "@/shared/utils/phone";
 import { websiteUrl } from "@/shared/utils/vcard";
 
 const ThemeCustomizer = dynamic(() =>
@@ -84,6 +86,21 @@ type TextField =
 
 const requiredFields: readonly TextField[] = ["fullName", "phone", "email"];
 
+
+function formFingerprint(input: EmployeeInput) {
+  // Compare editable fields only; ignore response metadata and phone display spacing.
+  const editable = Object.fromEntries(Object.keys(blank).map((key) => [key, input[key as keyof EmployeeInput]]));
+  editable.phone = normalizePhone(input.phone);
+  editable.publicFields = getPublicFields(input);
+  editable.theme = { ...migrateCardTheme(input.theme), businessCardType: input.theme.businessCardType ?? "qtm" };
+  return JSON.stringify(editable, (_key, value) => {
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      return Object.fromEntries(Object.entries(value).sort(([a], [b]) => a.localeCompare(b)));
+    }
+    return value;
+  });
+}
+
 export function EmployeeForm({ employee }: { employee?: Employee }) {
   const [form, setForm] = useState<EmployeeInput>(() => {
     const source = structuredClone(employee || blank);
@@ -94,6 +111,9 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
       theme: migrateCardTheme(source.theme),
     };
   });
+  const [savedFingerprint, setSavedFingerprint] = useState(() => formFingerprint(form));
+  const isDirty = formFingerprint(form) !== savedFingerprint;
+  const [cardPickerEmployee, setCardPickerEmployee] = useState<Employee | null>(null);
   const [errors, setErrors] = useState<Partial<Record<TextField, string>>>({});
   const [formError, setFormError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -175,9 +195,34 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
         type={type}
         style={key === "fullName" ? { textTransform: "uppercase" } : undefined}
         required={requiredFields.includes(key)}
-        value={form[key]}
+        value={key === "phone" ? formatPhone(form.phone) : form[key]}
         placeholder={placeholder}
-        onChange={(e) => set(key, e.target.value)}
+        onChange={(e) => {
+          if (key !== "phone") { set(key, e.target.value); return; }
+          const element = e.currentTarget;
+          const cursor = element.selectionStart ?? element.value.length;
+          let offset = normalizePhone(element.value.slice(0, cursor)).length;
+          let value = normalizePhone(element.value);
+          const inputType = (e.nativeEvent as InputEvent).inputType;
+          // Backspace/delete on a generated separator should remove a digit as usual.
+          if (value === normalizePhone(form.phone) && inputType?.startsWith("delete")) {
+            const index = inputType === "deleteContentBackward" ? offset - 1 : offset;
+            if (index >= 0) {
+              value = value.slice(0, index) + value.slice(index + 1);
+              offset = Math.max(0, index);
+            }
+          }
+          set("phone", value);
+          const formatted = formatPhone(value);
+          let nextCursor = 0;
+          while (nextCursor < formatted.length && offset > 0) {
+            if (formatted[nextCursor] !== " ") offset--;
+            nextCursor++;
+          }
+          requestAnimationFrame(() => {
+            if (document.activeElement === element) element.setSelectionRange(nextCursor, nextCursor);
+          });
+        }}
         aria-invalid={!!errors[key]}
         aria-describedby={errors[key] ? `${key}-error` : undefined}
       />
@@ -191,6 +236,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
 
   async function submit(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (busy || uploading || cardPickerEmployee || (employee && !isDirty)) return;
     setFormError("");
     const next: Partial<Record<TextField, string>> = {};
     if (!form.fullName.trim()) next.fullName = "Vui lòng nhập họ tên.";
@@ -211,24 +257,25 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
       toast(msg, "error");
       return;
     }
+    const clean = {
+      ...form,
+      fullName: form.fullName.trim(),
+      email: form.email.trim(),
+      phone: normalizePhone(form.phone),
+      website: form.website.trim(),
+      slogan: form.slogan.trim(),
+    };
+    if (!employee) {
+      // Keep the new employee in memory until a card is explicitly confirmed.
+      setCardPickerEmployee({ ...preview, ...clean });
+      return;
+    }
     setBusy(true);
     try {
-      const clean = {
-        ...form,
-        fullName: form.fullName.trim(),
-        email: form.email.trim(),
-        phone: form.phone.trim(),
-        website: form.website.trim(),
-        slogan: form.slogan.trim(),
-      };
-      const saved = employee
-        ? await update(employee.id, clean)
-        : await create(clean);
-      toast(
-        employee
-          ? "Đã lưu thay đổi nhân viên thành công"
-          : "Đã tạo nhân viên và danh thiếp thành công",
-      );
+      const saved = await update(employee.id, clean);
+      setForm({ ...saved, theme: migrateCardTheme(saved.theme) });
+      setSavedFingerprint(formFingerprint(saved));
+      toast("Đã lưu thay đổi nhân viên thành công");
       router.push(`/admin/employees/${saved.id}`);
       router.refresh();
     } catch (err) {
@@ -369,6 +416,17 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
           {input("zalo", "Zalo", "0900000000")}
           {input("website", "Trang web", "qtmmedia.vn")}
           {input("slogan", "Khẩu hiệu", "Your Journey Partner", true)}
+          {employee && <div className="field full">
+            <span id="business-card-type-label" className="text-sm font-semibold">Mẫu card xuất</span>
+            <div role="group" aria-labelledby="business-card-type-label" className="mt-2 grid grid-cols-2 gap-3">
+              {([["qtm", "QTM"], ["an-ninh-mang", "An ninh mạng"]] as const).map(([value, label]) =>
+                <button key={value} type="button" disabled={busy || uploading}
+                  aria-pressed={(form.theme.businessCardType ?? "qtm") === value}
+                  className={`btn ${(form.theme.businessCardType ?? "qtm") === value ? "btn-primary" : "btn-secondary"}`}
+                  onClick={() => set("theme", { ...form.theme, businessCardType: value })}>{label}</button>)}
+            </div>
+            <small>Chọn lại mẫu nếu đã tạo nhầm, rồi bấm Lưu thay đổi. Đường dẫn và QR được giữ nguyên.</small>
+          </div>}
           {employee && (
             <div className="field full">
               <label htmlFor="slug">Đường dẫn hồ sơ · cố định</label>
@@ -484,6 +542,9 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
             <QrCode size={18} />
             <span>05</span>QR / Liên kết cố định
           </h2>
+          <button type="button" className="btn btn-secondary mb-4" onClick={() => setCardPickerEmployee(preview)}>
+            Đổi mẫu / Xuất card · {form.theme.businessCardType === "an-ninh-mang" ? "An ninh mạng" : "QTM"}
+          </button>
           <QRPanel slug={employee.slug} />
         </section>
       )}
@@ -495,16 +556,18 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
       <Link href="/admin/employees" className="btn btn-secondary">
         Hủy
       </Link>
-      <button type="submit" className="btn btn-primary" disabled={busy || uploading}>
+      {employee && <button type="button" className="btn btn-secondary" disabled={busy || uploading}
+        onClick={() => setCardPickerEmployee(preview)}>Đổi mẫu / Xuất card</button>}
+      <button type="submit" className="btn btn-primary" disabled={busy || uploading || !!cardPickerEmployee || (!!employee && !isDirty)}>
         {busy ? <Spinner /> : <Save size={16} />}
-        {busy ? "Đang lưu…" : employee ? "Lưu thay đổi" : "Tạo nhân viên"}
+        {busy ? (employee ? "Đang cập nhật…" : "Đang tạo nhân viên…") : employee ? "Lưu thay đổi" : "Tạo nhân viên"}
       </button>
     </div>
   );
 
   return (
     <>
-      <LoadingOverlay show={busy} label="Đang lưu…" />
+      <LoadingOverlay show={busy} label={employee ? "Đang cập nhật nhân viên…" : "Đang tạo nhân viên…"} />
       <EmployeeFormLayout
         header={headerSection}
         formContent={formSections}
@@ -527,6 +590,31 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
         onSubmit={submit}
       />
 
+      {cardPickerEmployee && (
+        <BusinessCardPicker
+          employee={cardPickerEmployee}
+          isNew={!employee}
+          onClose={() => setCardPickerEmployee(null)}
+          onSave={async (businessCardType) => {
+            setBusy(true);
+            try {
+              const theme = { ...cardPickerEmployee.theme, businessCardType };
+              const input = { ...cardPickerEmployee, theme };
+              const saved = employee
+                ? await update(employee.id, input)
+                : await create(input);
+              setForm({ ...saved, theme: migrateCardTheme(saved.theme) });
+              setSavedFingerprint(formFingerprint(saved));
+              setCardPickerEmployee(null);
+              toast(employee ? "Đã cập nhật mẫu card" : "Đã tạo nhân viên và lưu mẫu card");
+              router.push(`/admin/employees/${saved.id}`);
+              router.refresh();
+            } finally {
+              setBusy(false);
+            }
+          }}
+        />
+      )}
       {previewModalOpen && (
         <PreviewModal
           open={previewModalOpen}

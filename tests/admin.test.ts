@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { test } from "node:test";
+import { toStoredCardTheme } from "../src/server/cards/business-card-theme";
 import { employeeInput, employeePatch } from "../src/server/admin/dto";
 import { createAdminEmployeesService } from "../src/server/admin/service";
 import { createCardsService, type CardRecord } from "../src/server/cards/service";
@@ -24,7 +25,7 @@ function setup() {
       const id = randomUUID();
       const { theme, publicFields: ignored, ...fields } = data;
       void ignored;
-      const record: CardRecord = { ...fields, id, slug, theme: { ...theme }, createdAt: new Date(), updatedAt: new Date(), deletedAt: null };
+      const record: CardRecord = { ...fields, id, slug, theme: toStoredCardTheme(theme), createdAt: new Date(), updatedAt: new Date(), deletedAt: null };
       rows.set(id, record);
       return record;
     },
@@ -33,7 +34,7 @@ function setup() {
       if (!record) throw { code: "P2025" };
       const { theme, publicFields: ignored, ...fields } = data;
       void ignored;
-      const next: CardRecord = { ...record, ...fields, ...(theme ? { theme: { ...theme } } : {}), updatedAt: new Date() };
+      const next: CardRecord = { ...record, ...fields, ...(theme ? { theme: toStoredCardTheme(theme) } : {}), updatedAt: new Date() };
       rows.set(id, next);
       return next;
     },
@@ -291,4 +292,28 @@ test("adminHandler runs GET in parallel, never leaks data or masks 401 when toke
   } finally {
     serverAuth.currentUser = originalCurrentUser;
   }
+});
+
+
+test("business card choice persists through admin updates and public reads", async () => {
+  const { service, repository } = setup();
+  assert.equal(input.theme.businessCardType, "qtm");
+  const employee = await service.create(input);
+  const changed = await service.update(employee.id, {
+    theme: { ...input.theme, businessCardType: "an-ninh-mang" },
+  });
+  assert.equal(changed.theme.businessCardType, "an-ninh-mang");
+  assert.equal(changed.slug, employee.slug);
+  const stored = await repository.byId(employee.id);
+  assert.equal("businessCardType" in stored!.theme!, false);
+  assert.equal((stored!.theme!.shapes as Record<string, boolean>).__businessCardAnNinhMang, true);
+  assert.equal("__businessCardAnNinhMang" in changed.theme.shapes, false);
+  const publicService = createCardsService({
+    list: () => repository.list(),
+    async bySlug() { return repository.byId(employee.id); },
+  });
+  assert.equal((await publicService.bySlug(employee.slug))?.theme.businessCardType, "an-ninh-mang");
+  assert.equal(employeeInput.safeParse({ ...input, theme: { ...input.theme, businessCardType: "unknown" } }).success, false);
+  const reverted = await service.update(employee.id, { theme: { ...input.theme, businessCardType: "qtm" } });
+  assert.equal(reverted.theme.businessCardType, "qtm");
 });

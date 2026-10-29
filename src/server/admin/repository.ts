@@ -1,5 +1,6 @@
 import "server-only";
 import { prisma } from "@/server/db/prisma";
+import { toStoredCardTheme } from "@/server/cards/business-card-theme";
 import { employeeCardSelect } from "@/server/cards/select";
 import type { EmployeeCreate, EmployeePatch } from "./dto";
 import type { EmployeeStats } from "@/shared/types";
@@ -36,7 +37,7 @@ export const adminEmployeesRepository: AdminEmployeesRepository = {
     const { theme, publicFields, ...data } = input;
     void publicFields; // DTO tương thích FE, schema hiện công khai mọi trường liên hệ.
     return prisma.employee.create({
-      data: { ...data, slug, theme: { create: theme } }, select: employeeCardSelect,
+      data: { ...data, slug, theme: { create: toStoredCardTheme(theme) } }, select: employeeCardSelect,
     });
   },
   update(id, input) {
@@ -45,7 +46,7 @@ export const adminEmployeesRepository: AdminEmployeesRepository = {
     // Chỉ cập nhật bản chưa xóa; slug không nằm trong DTO nên luôn được giữ nguyên.
     return prisma.employee.update({
       where: { id, deletedAt: null },
-      data: { ...data, ...(theme ? { theme: { upsert: { create: theme, update: theme } } } : {}) },
+      data: { ...data, ...(theme ? { theme: { upsert: { create: toStoredCardTheme(theme), update: toStoredCardTheme(theme) } } } : {}) },
       select: employeeCardSelect,
     });
   },

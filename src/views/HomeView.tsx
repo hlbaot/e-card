@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useSyncExternalStore, useDeferredValue } from "react";
+import { useState, useDeferredValue } from "react";
 import Link from "next/link";
 import {
   Search,
@@ -11,7 +11,7 @@ import { PublicHeader } from "@/client/components/layout/PublicHeader";
 import { PublicFooter } from "@/client/components/layout/PublicFooter";
 import type { Employee } from "@/shared/types";
 import { useAos } from "@/client/hooks/useAos";
-import { useAuth } from "@/client/hooks/useAuth";
+import { HomeSessionRedirect } from "@/client/components/auth/HomeSessionRedirect";
 import { CardListItem } from "@/client/components/card/CardListItem";
 import { Skeleton } from "@/client/components/ui/Skeleton";
 import { Badge } from "@/client/components/ui/Badge";
@@ -21,39 +21,12 @@ import { routes } from "@/shared/constants/routes";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/shared/utils/cn";
 
-const emptySubscribe = () => () => {};
-
 export function HomeView({ employees }: { employees: Employee[] }) {
   const ready = true;
-  const { ready: authReady, authenticated } = useAuth();
-  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [search, setSearch] = useState("");
   const deferredSearch = useDeferredValue(search);
   const [activeFilter, setActiveFilter] = useState("all");
   useAos(ready, `${deferredSearch}:${activeFilter}`);
-
-  const hasLocalSession = useSyncExternalStore(
-    emptySubscribe,
-    () => {
-      try {
-        return localStorage.getItem("ecard_logged_in") === "1";
-      } catch {
-        return false;
-      }
-    },
-    () => false,
-  );
-  const isLoggedIn = mounted && (authReady ? authenticated : hasLocalSession);
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      window.location.replace("/admin");
-    }
-  }, [isLoggedIn]);
-
-  if (isLoggedIn) {
-    return null;
-  }
 
   const active = employees.filter((e) => e.isActive);
   const departments = Array.from(
@@ -71,6 +44,7 @@ export function HomeView({ employees }: { employees: Employee[] }) {
 
   return (
     <>
+      <HomeSessionRedirect />
       <PublicHeader />
       <main>
         <section className="hero">
@@ -105,11 +79,11 @@ export function HomeView({ employees }: { employees: Employee[] }) {
               </div>
               <div className="button-row mt-6">
                 <Link
-                  href={isLoggedIn ? routes.admin : routes.login}
+                  href={routes.login}
                   prefetch={true}
                   className="btn btn-primary group"
                 >
-                  {isLoggedIn ? "VÀO TRANG QUẢN TRỊ" : "ĐĂNG NHẬP"}
+                  ĐĂNG NHẬP
                   <ArrowRight
                     size={15}
                     className="transition-transform duration-200 group-hover:translate-x-1"

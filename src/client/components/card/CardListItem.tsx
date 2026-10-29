@@ -12,6 +12,7 @@ export function CardListContent({
   employee: Employee;
   showFooter?: boolean;
 }) {
+  const isCyberSecurity = e.theme.businessCardType === "an-ninh-mang";
   return (
     <>
       <div
@@ -22,7 +23,7 @@ export function CardListContent({
           } as CSSProperties
         }
       >
-        <span>QTM MEDIATECH</span>
+        <span>{isCyberSecurity ? "AN NINH MẠNG VIỆT NAM" : "QTM MEDIATECH"}</span>
         {showFooter && e.isActive && <i className="live-dot" />}
       </div>
       <Avatar
@@ -39,7 +40,7 @@ export function CardListContent({
         <div className="employee-card-footer">
           <span className="button-row">
             <Building2 size={12} />
-            QTM MediaTech
+            {isCyberSecurity ? "An ninh mạng Việt Nam" : "QTM MediaTech"}
           </span>
           <span>
             Xem hồ sơ

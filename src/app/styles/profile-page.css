@@ -1,0 +1,282 @@
+/* Standalone personal sites: the shared directory header never wraps a profile. */
+.profile-page {
+  min-height: 100dvh;
+  padding: 28px 20px 24px;
+  background:
+    radial-gradient(
+      ellipse at 50% 0%,
+      color-mix(in srgb, var(--profile-color) 9%, #f4f7f8),
+      transparent 70%
+    ),
+    #f4f7f8;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.profile-page-dark {
+  background:
+    radial-gradient(
+      ellipse at 50% 0%,
+      color-mix(in srgb, var(--profile-color) 18%, #111b28),
+      transparent 75%
+    ),
+    #111b28;
+}
+.profile-container {
+  width: 100%;
+  max-width: 620px;
+  min-width: 0;
+}
+.profile-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 0 4px;
+  margin-bottom: 16px;
+  color: #6e8790;
+  font-size: 11px;
+}
+.profile-toolbar > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.profile-toolbar > span i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #329f87;
+  box-shadow: 0 0 0 3px #329f8712;
+}
+.profile-toolbar > span > svg {
+  display: none;
+}
+.profile-toolbar button {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  border: 1px solid #dbe5e8;
+  border-radius: 100px;
+  background: #ffffffa6;
+  padding: 8px 13px;
+  color: #42616d;
+  font-size: 11px;
+  font-weight: 600;
+}
+.profile-page-dark .profile-toolbar {
+  color: #94aaba;
+}
+.profile-page-dark .profile-toolbar button {
+  background: #ffffff08;
+  color: #c4d8e4;
+  border-color: #ffffff24;
+}
+.profile-signature {
+  font-size: 10px;
+  letter-spacing: 0.2px;
+  color: #8ca0a8;
+  text-align: center;
+  margin-top: 19px;
+}
+.profile-signature span {
+  margin: 0 7px;
+  opacity: 0.5;
+}
+.profile-page-dark .profile-signature {
+  color: #71889a;
+}
+.profile-loading {
+  min-height: 100dvh;
+  padding-top: 40px;
+  background: transparent;
+}
+.profile-loading .skeleton {
+  max-width: 660px;
+}
+.ecard {
+  --accent: var(--primary);
+  --on-primary: #fff;
+}
+.ecard-identity h1,
+.ecard-identity h2 {
+  color: var(--accent);
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+.ecard-identity .identity-copy > i {
+  display: block;
+  width: 35px;
+  height: 2px;
+  background: var(--accent);
+  margin: 16px auto 18px;
+  opacity: 0.65;
+}
+.ecard-info svg,
+.ecard-brand > span,
+.ecard-wordmark,
+.ecard-slogan,
+.ecard-motto,
+.skyline {
+  color: var(--accent);
+}
+.ecard-section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--accent);
+  margin-bottom: 16px;
+  opacity: 0.8;
+  font-weight: 700;
+}
+.ecard-section-title > i {
+  height: 1px;
+  flex: 1;
+  background: currentColor;
+  opacity: 0.18;
+}
+.ecard-closing {
+  padding-top: 1px;
+}
+.ecard .card-actions a,
+.ecard .card-actions button {
+  color: var(--accent);
+}
+.ecard .actions-filled a:first-child {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+.ecard .actions-outline a,
+.ecard .actions-outline button {
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.ecard .card-actions button:disabled {
+  cursor: default;
+}
+.ecard-profile {
+  max-width: 620px;
+  border-radius: 22px;
+  box-shadow: 0 18px 70px #16354d18;
+}
+.ecard-profile .ecard-content {
+  padding: 36px 42px 22px;
+}
+.ecard-profile .ecard-brand {
+  margin-bottom: 28px;
+}
+.ecard-profile .ecard-brand > span {
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+.ecard-profile .ecard-wordmark {
+  font-size: 35px;
+  margin-bottom: 32px;
+}
+.ecard-profile .ecard-wordmark > span {
+  font-size: 8px;
+  max-width: 170px;
+  letter-spacing: 1.8px;
+  text-align: right;
+}
+.ecard-profile .ecard-identity h1 {
+  font-size: 30px;
+  letter-spacing: -0.5px;
+  line-height: 1.25;
+  margin-top: 25px;
+  font-weight: 800;
+}
+.ecard-profile .ecard-identity p {
+  font-size: 15px;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+.ecard-profile .ecard-identity .identity-copy > i {
+  margin: 23px auto 24px;
+  width: 48px;
+}
+.ecard-profile .ecard-company {
+  margin-bottom: 28px;
+}
+.ecard-profile .ecard-company h3 {
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  line-height: 1.65;
+}
+.ecard-profile .ecard-company p {
+  font-size: 12px;
+  margin-top: 5px;
+  opacity: 0.9;
+}
+.ecard-profile .ecard-section-title {
+  font-size: 9px;
+  margin-bottom: 20px;
+  letter-spacing: 1.7px;
+}
+.ecard-profile .ecard-info {
+  font-size: 14.5px;
+  gap: 18px;
+}
+.ecard-profile .ecard-info > div {
+  gap: 13px;
+}
+.ecard-profile .ecard-info strong {
+  font-size: 12.5px;
+  margin-bottom: 3px;
+}
+.ecard-profile .ecard-info svg {
+  width: 20px;
+  height: 20px;
+  margin-top: 3px;
+}
+.ecard-profile .card-actions {
+  margin: 30px 0;
+  gap: 12px;
+}
+.ecard-profile .card-actions a,
+.ecard-profile .card-actions button {
+  font-size: 13px;
+  padding: 18px 5px;
+  gap: 10px;
+  border-radius: 12px;
+}
+.ecard-profile .card-actions svg {
+  width: 23px;
+  height: 23px;
+}
+.ecard-profile .ecard-slogan {
+  font-size: 30px;
+  margin-top: 14px;
+  margin-bottom: 20px;
+  line-height: 1.45;
+}
+.ecard-profile .ecard-motto {
+  font-size: 8px;
+  letter-spacing: 2.4px;
+  margin-top: 15px;
+}
+.ecard-profile .skyline {
+  width: calc(100% + 84px);
+  margin-inline: -42px;
+}
+.ecard-dark .ecard-identity h1,
+.ecard-dark .ecard-identity h2,
+.ecard-dark .ecard-wordmark,
+.ecard-dark .ecard-slogan,
+.ecard-dark .ecard-motto,
+.ecard-dark .ecard-info svg {
+  color: var(--accent);
+}
+.ecard-dark .card-actions a,
+.ecard-dark .card-actions button {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+.ecard-dark .ecard-section-title {
+  color: var(--accent);
+}
+.ecard-dark .ecard-info p {
+  color: #e4edf5;
+}

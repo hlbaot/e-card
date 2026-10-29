@@ -1,9 +1,12 @@
 "use client";
 
+import { formatPhone } from "@/shared/utils/phone";
+
 import { QRCodeSVG } from "qrcode.react";
 import { useId, type Ref, type SVGProps } from "react";
 import { getPublicFields, type Employee } from "@/shared/types";
 import { capitalizeFirstLetter } from "@/shared/utils/format-text";
+import { CyberSecurityBusinessCard } from "./CyberSecurityBusinessCard";
 import { CardName } from "./CardName";
 
 type IconProps = SVGProps<SVGSVGElement>;
@@ -71,7 +74,17 @@ const blobDots: Array<[number, number, number]> = [
 ];
 
 /** A self-contained vector: the preview and downloaded PNG share this artwork. */
-export function QrBusinessCard({ employee: e, url, svgRef }: {
+export function QrBusinessCard(props: {
+  employee: Employee;
+  url: string;
+  svgRef?: Ref<SVGSVGElement>;
+}) {
+  return props.employee.theme.businessCardType === "an-ninh-mang"
+    ? <CyberSecurityBusinessCard {...props} />
+    : <QtmBusinessCard {...props} />;
+}
+
+function QtmBusinessCard({ employee: e, url, svgRef }: {
   employee: Employee;
   url: string;
   svgRef?: Ref<SVGSVGElement>;
@@ -86,7 +99,7 @@ export function QrBusinessCard({ employee: e, url, svgRef }: {
           Icon: i === 0 ? MapPin : null, label: o.label || "Văn phòng", value: o.address,
         }))
       : []),
-    ...(pf.phone && e.phone ? [{ Icon: Phone, label: "Mobile", value: e.phone }] : []),
+    ...(pf.phone && e.phone ? [{ Icon: Phone, label: "Mobile", value: formatPhone(e.phone) }] : []),
     ...(pf.email && e.email ? [{ Icon: Mail, label: "Email", value: e.email }] : []),
     ...(pf.website && website ? [{ Icon: Globe, label: "Web", value: website }] : []),
   ];

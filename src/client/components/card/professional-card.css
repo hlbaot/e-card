@@ -202,7 +202,7 @@
   min-height: 100%;
   margin-inline: auto;
   padding: 28px 36px 20px;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-template-rows: auto minmax(230px, 1fr) auto auto;
   grid-template-areas:
     "brand brand"
@@ -259,7 +259,7 @@
   position: relative;
   display: flex;
   justify-content: center;
-  align-items: flex-end;
+  align-items: center;
   margin: 0;
 }
 
@@ -626,15 +626,19 @@
     margin-inline: auto;
     padding: 40px 0 24px;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-    grid-template-rows: auto minmax(260px, 1fr) auto auto;
+    grid-template-rows: auto minmax(260px, max-content) auto 1fr;
     grid-template-areas: "brand brand" "portrait contacts" "identity actions" "footer footer";
     column-gap: clamp(40px, 5vw, 88px);
     row-gap: 16px;
     position: relative;
   }
-  .qtm-public-profile .qtm-profile-brand { grid-area: brand; }
+  .qtm-public-profile .qtm-ambient-waves { bottom: 0; }
+  .qtm-public-profile .qtm-profile-brand {
+    grid-area: brand;
+    margin-bottom: clamp(24px, 8dvh, 80px);
+  }
   .qtm-public-profile .qtm-portrait {
-    grid-area: portrait; min-height: 290px; margin: 0; align-items: flex-end;
+    grid-area: portrait; min-height: 260px; margin: 0; align-items: center;
   }
   .qtm-public-profile .qtm-portrait .avatar {
     width: 216px !important; height: 216px !important; font-size: 72px !important;
@@ -644,7 +648,7 @@
   .qtm-public-profile .qtm-profile-tools { top: 0; right: 0; }
   .qtm-public-profile .qtm-profile-identity {
     grid-area: identity; height: auto; overflow: visible; align-self: start;
-    margin-top: 0; padding-top: 0; padding-bottom: 12px;
+    margin-top: -28px; padding-top: 0; padding-bottom: 12px;
   }
   .qtm-public-profile .qtm-profile-identity :is(h1,h2) { font-size: clamp(26px, 2.2vw, 34px); }
   .qtm-public-profile .qtm-position { font-size: 17px; margin-top: 10px; }
@@ -660,11 +664,11 @@
     gap: 12px; padding: 18px 0; font-size: 15px;
   }
   .qtm-public-profile .qtm-contact strong { font-size: 14px; }
-  .qtm-public-profile .card-actions { grid-area: actions; align-self: start; gap: 12px; }
+  .qtm-public-profile .card-actions { grid-area: actions; align-self: start; gap: 12px; margin-top: 16px; }
   .qtm-public-profile .card-actions :is(a,button) { min-height: 52px; font-size: 14px; padding: 10px 12px; }
   .qtm-public-profile .card-actions .action-btn-content svg { width: 17px; height: 17px; }
   .qtm-public-profile .qtm-profile-footer {
-    grid-area: footer; min-height: 90px; margin-top: 16px; padding-top: 16px; display: flex; flex-direction: column;
+    grid-area: footer; align-self: end; min-height: 90px; margin-top: 16px; padding-top: 16px; display: flex; flex-direction: column;
   }
   .qtm-public-profile .qtm-footer-row {
     display: flex; align-items: flex-end; justify-content: space-between; width: 100%; margin-bottom: 12px;
@@ -673,3 +677,32 @@
   .qtm-public-profile .qtm-profile-motto { font-size: 10px; text-align: center; }
   .qtm-public-profile .qtm-footer-decor { width: 42%; height: 85px; position: relative; }
 }
+
+/* Cyber Security profiles share the selected layout with their own brand lockup. */
+.qtm-profile-brand .anm-card-brand img {
+  flex-shrink: 0;
+  width: calc(var(--qtm-unit, 1cqw) * 11);
+  height: calc(var(--qtm-unit, 1cqw) * 12.2);
+}
+.qtm-profile-brand .anm-card-brand strong {
+  font-size: calc(var(--qtm-unit, 1cqw) * 3.4);
+  line-height: 1.3;
+  letter-spacing: .015em;
+  color: #073347;
+}
+.qtm-desktop-stage .qtm-profile-brand .anm-card-brand img { width: 48px; height: 54px; }
+.qtm-desktop-stage .qtm-profile-brand .anm-card-brand strong { font-size: 17px; letter-spacing: .015em; }
+
+.qtm-profile-brand .anm-brand-copy {
+  display: grid;
+  gap: calc(var(--qtm-unit, 1cqw) * .6);
+  white-space: nowrap;
+}
+.qtm-profile-brand .anm-brand-copy small {
+  display: block;
+  font-size: calc(var(--qtm-unit, 1cqw) * 1.5);
+  line-height: 1.4;
+  letter-spacing: .14em;
+  color: #244a57;
+}
+.qtm-desktop-stage .qtm-profile-brand .anm-brand-copy small { font-size: 7.5px; }

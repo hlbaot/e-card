@@ -1,3 +1,4 @@
+import { readBusinessCardChoice } from "./business-card-theme";
 import type { employeeCardSelect } from "./select";
 import type { Prisma } from "@prisma/client";
 import { z } from "zod";
@@ -30,7 +31,8 @@ export function toPublicCard(record: CardRecord): Employee {
       templateId: template.parse(theme.templateId), backgroundId: theme.backgroundId,
       primaryColor: theme.primaryColor, avatarSize: theme.avatarSize,
       avatarShape: theme.avatarShape, buttonStyle: theme.buttonStyle,
-      decor: decor.parse(theme.decor), shapes: z.record(z.string(), z.boolean()).parse(theme.shapes),
+      decor: decor.parse(theme.decor),
+      ...readBusinessCardChoice(z.record(z.string(), z.boolean()).parse(theme.shapes)),
       showDecor: theme.showDecor, decorOpacity: theme.decorOpacity,
     } : {
       templateId: "bubble-blue", backgroundId: "white-clean", primaryColor: "#0F4C75",

@@ -6,8 +6,10 @@ export function Modal({
   title,
   children,
   onClose,
+  width,
 }: {
   title: string;
+  width?: number;
   children: React.ReactNode;
   onClose: () => void;
 }) {
@@ -27,6 +29,7 @@ export function Modal({
       ref={ref}
       aria-labelledby={titleId}
       className="modal"
+      style={width ? { width: `min(${width}px, calc(100vw - 30px))` } : undefined}
       onCancel={(e) => { e.preventDefault(); onClose(); }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();

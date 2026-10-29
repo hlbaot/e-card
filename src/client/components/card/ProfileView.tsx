@@ -23,10 +23,7 @@ export function ProfileView({ employee }: { employee: Employee }) {
 
   const url = cardUrl(e.slug);
   const pf = getPublicFields(e);
-  const offices =
-    e.offices.length > 0
-      ? e.offices
-      : [{ label: "Trụ sở chính", address: "Chưa cập nhật địa chỉ" }];
+  const offices = e.offices.filter(office => office.address.trim());
   useEffect(() => {
     if (!qrModalOpen && !addressModalOpen) return;
     const onKeyDown = (ev: KeyboardEvent) => {
@@ -91,30 +88,30 @@ export function ProfileView({ employee }: { employee: Employee }) {
       <noscript>
         <style>{`.qtm-public-profile [data-aos] { opacity: 1 !important; transform: none !important; }`}</style>
       </noscript>
-      <ECard employee={e} variant="profile" onOpenQr={() => setQrModalOpen(true)} onShare={handleShare} onOpenAddresses={() => setAddressModalOpen(true)} />
+      <ECard employee={e} variant="profile" onOpenQr={() => setQrModalOpen(true)} onShare={handleShare} onOpenAddresses={offices.length ? () => setAddressModalOpen(true) : undefined} />
       {/* MODAL 1: QR CODE (Dark QTM Glass Modal) */}
       {qrModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-[#050B1A]/75 backdrop-blur-sm p-0 sm:p-4"
+          className="sheet-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-[#050B1A]/75 backdrop-blur-sm p-0 sm:p-4"
           onClick={() => setQrModalOpen(false)}
           role="dialog"
           aria-modal="true"
           aria-label="Danh thiếp QR cá nhân"
         >
           <div
-            className="w-full sm:max-w-3xl max-h-[92dvh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-[#0B1430]/95 backdrop-blur-xl text-white border border-[rgba(120,200,255,0.22)] p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-[0_0_40px_rgba(34,211,238,0.18)]"
+            className="sheet-panel w-full min-w-0 sm:max-w-3xl max-h-[92dvh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-[#0B1430]/95 backdrop-blur-xl text-white border border-[rgba(120,200,255,0.22)] p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-[0_0_40px_rgba(34,211,238,0.18)]"
             onClick={(ev) => ev.stopPropagation()}
           >
             <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-3 sm:hidden" />
             <div className="flex items-center justify-between gap-2 mb-4">
-              <h3 className="text-base font-bold text-white">
+              <h3 className="min-w-0 break-words text-base font-bold text-white">
                 Danh thiếp QR · {e.fullName}
               </h3>
               <button
                 type="button"
                 onClick={() => setQrModalOpen(false)}
                 aria-label="Đóng"
-                className="h-9 w-9 rounded-full inline-flex items-center justify-center bg-white/10 text-[#B6C2D9] hover:bg-cyan-400/20 hover:text-cyan-300 border border-white/15 cursor-pointer"
+                className="h-9 w-9 shrink-0 rounded-full inline-flex items-center justify-center bg-white/10 text-[#B6C2D9] hover:bg-cyan-400/20 hover:text-cyan-300 border border-white/15 cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -126,14 +123,14 @@ export function ProfileView({ employee }: { employee: Employee }) {
               <p className="text-xs text-[#B6C2D9] text-center mb-3">
                 Quét QR để mở hồ sơ · Tải trọn danh thiếp dưới dạng PNG
               </p>
-              <p className="text-xs text-[#B6C2D9] text-center mb-3 font-mono break-all bg-white/[0.04] border border-white/10 px-3 py-2 rounded-lg w-full">
+              <p className="text-xs text-[#B6C2D9] text-center mb-3 font-mono break-all [overflow-wrap:anywhere] bg-white/[0.04] border border-white/10 px-3 py-2 rounded-lg w-full">
                 {url}
               </p>
-              <div className="grid grid-cols-2 gap-2.5 w-full">
+              <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-2.5 w-full">
                 <button
                   type="button"
                   onClick={handleCopyUrl}
-                  className="btn btn-secondary min-h-[42px] text-xs cursor-pointer"
+                  className="btn btn-secondary min-h-[42px] min-w-0 whitespace-normal text-center leading-tight text-xs cursor-pointer"
                 >
                   <Copy size={15} />
                   Sao chép link
@@ -142,7 +139,7 @@ export function ProfileView({ employee }: { employee: Employee }) {
                   type="button"
                   onClick={handleDownloadQR}
                   disabled={downloading}
-                  className="btn btn-primary min-h-[42px] text-xs cursor-pointer disabled:opacity-60 disabled:cursor-wait"
+                  className="btn btn-primary min-h-[42px] min-w-0 whitespace-normal text-center leading-tight text-xs cursor-pointer disabled:opacity-60 disabled:cursor-wait"
                 >
                   <Download size={15} />
                   {downloading ? "Đang xuất…" : "Tải danh thiếp PNG"}
@@ -154,28 +151,28 @@ export function ProfileView({ employee }: { employee: Employee }) {
       )}
 
       {/* MODAL 2: FULL OFFICE ADDRESSES (Dark QTM Glass Modal) */}
-      {pf.offices && addressModalOpen && (
+      {pf.offices && offices.length > 0 && addressModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-[#050B1A]/75 backdrop-blur-sm p-0 sm:p-4"
+          className="sheet-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-[#050B1A]/75 backdrop-blur-sm p-0 sm:p-4"
           onClick={() => setAddressModalOpen(false)}
           role="dialog"
           aria-modal="true"
           aria-label="Địa chỉ văn phòng"
         >
           <div
-            className="w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl bg-[#0B1430]/95 backdrop-blur-xl text-white border border-[rgba(120,200,255,0.22)] p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-[0_0_40px_rgba(34,211,238,0.18)] max-h-[85dvh] overflow-y-auto"
+            className="sheet-panel w-full min-w-0 sm:max-w-lg rounded-t-3xl sm:rounded-3xl bg-[#0B1430]/95 backdrop-blur-xl text-white border border-[rgba(120,200,255,0.22)] p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-[0_0_40px_rgba(34,211,238,0.18)] max-h-[85dvh] overflow-y-auto"
             onClick={(ev) => ev.stopPropagation()}
           >
             <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-3 sm:hidden" />
             <div className="flex items-center justify-between gap-2 mb-4">
-              <h3 className="text-base font-bold text-white">
+              <h3 className="min-w-0 break-words text-base font-bold text-white">
                 Địa chỉ văn phòng
               </h3>
               <button
                 type="button"
                 onClick={() => setAddressModalOpen(false)}
                 aria-label="Đóng"
-                className="h-9 w-9 rounded-full inline-flex items-center justify-center bg-white/10 text-[#B6C2D9] hover:bg-cyan-400/20 hover:text-cyan-300 border border-white/15 cursor-pointer"
+                className="h-9 w-9 shrink-0 rounded-full inline-flex items-center justify-center bg-white/10 text-[#B6C2D9] hover:bg-cyan-400/20 hover:text-cyan-300 border border-white/15 cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -195,7 +192,7 @@ export function ProfileView({ employee }: { employee: Employee }) {
                       <span>{o.label || `Văn phòng ${idx + 1}`}</span>
                     </div>
                     <p className="text-sm text-[#B6C2D9] leading-relaxed break-words">
-                      {o.address || "Chưa cập nhật địa chỉ"}
+                      {o.address}
                     </p>
                     {mapLink && (
                       <a

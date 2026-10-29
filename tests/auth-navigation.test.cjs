@@ -116,3 +116,30 @@ test('admin releases protected children only after successful refresh', async ()
   h.flush();
   assert.deepEqual(h.navigations, []);
 });
+
+
+test('home checks actual cookies and stays public without an active session despite stale state', async () => {
+  const h = harness('auth/HomeSessionRedirect');
+  h.renders(); h.flush();
+  assert.equal(h.restores(), 1);
+  assert.deepEqual(h.navigations, []);
+  await h.resolve(false);
+  h.renders(); h.flush();
+  assert.deepEqual(h.navigations, []);
+});
+
+test('home redirects to admin after cookie session verification or refresh, without a local login hint', async () => {
+  const h = harness('auth/HomeSessionRedirect', { authenticated: false });
+  h.renders(); h.flush();
+  await h.resolve(true);
+  h.renders(); h.flush();
+  assert.deepEqual(h.navigations, ['/admin']);
+});
+
+test('home stays public when session verification temporarily fails', async () => {
+  const h = harness('auth/HomeSessionRedirect');
+  h.renders(); h.flush();
+  await h.reject();
+  h.renders(); h.flush();
+  assert.deepEqual(h.navigations, []);
+});

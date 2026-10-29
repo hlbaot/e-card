@@ -20,7 +20,8 @@ export async function generateMetadata({
   }
 
   // All cards are public and indexable.
-  const pageTitle = `${employee.fullName} - ${employee.position} | QTM MediaTech`;
+  const brandName = employee.theme.businessCardType === "an-ninh-mang" ? "An ninh mạng Việt Nam" : "QTM MediaTech";
+  const pageTitle = `${employee.fullName} - ${employee.position} | ${brandName}`;
   const pageDescription = `${employee.fullName} — ${employee.position} tại ${employee.company}. Danh thiếp điện tử chính thức trên E-card.`;
   const canonicalUrl = absoluteUrl(`/card/${employee.slug}`);
   const ogImageUrl = employee.avatarUrl

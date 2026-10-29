@@ -21,8 +21,9 @@ export function CardActions({
 }) {
   const toast = useToast();
   const pf = getPublicFields(e);
+  const firstOffice = e.offices.find(office => office.address.trim());
   const actions = [
-    ...(pf.phone
+    ...(pf.phone && e.phone.trim()
       ? [
           {
             label: "Gọi điện",
@@ -32,7 +33,7 @@ export function CardActions({
           },
         ]
       : []),
-    ...(pf.email
+    ...(pf.email && e.email.trim()
       ? [
           {
             label: "Gửi thư",
@@ -42,7 +43,7 @@ export function CardActions({
           },
         ]
       : []),
-    ...(pf.zalo
+    ...(pf.zalo && e.zalo.replace(/[^0-9]/g, "")
       ? [
           {
             label: "Nhắn Zalo",
@@ -55,7 +56,7 @@ export function CardActions({
         ]
       : []),
     { label: "Lưu danh bạ", icon: ContactRound, href: "", external: false },
-    ...(pf.website
+    ...(pf.website && websiteUrl(e.website)
       ? [
           {
             label: "Trang web",
@@ -65,13 +66,13 @@ export function CardActions({
           },
         ]
       : []),
-    ...(pf.offices
+    ...(pf.offices && firstOffice
       ? [
           {
             label: "Chỉ đường",
             icon: MapPin,
-            href: e.offices[0]?.address
-              ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.offices[0].address)}`
+            href: firstOffice?.address
+              ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(firstOffice.address.trim())}`
               : "",
             external: true,
           },
@@ -106,8 +107,6 @@ export function CardActions({
           <button
             key={label}
             type="button"
-            disabled={label !== "Lưu danh bạ"}
-            title={label !== "Lưu danh bạ" ? "Chưa có thông tin" : undefined}
             onClick={() => {
               saveContact(e);
               toast("Đã tải danh bạ vCard");

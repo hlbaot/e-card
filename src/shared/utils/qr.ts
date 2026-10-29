@@ -25,6 +25,21 @@ export async function downloadBusinessCard(svg: SVGSVGElement | null, slug: stri
   source.setAttribute("height", String(height));
   source.style.width = `${width}px`;
   source.style.height = `${height}px`;
+  // SVG images must be embedded before rasterizing, otherwise downloaded PNGs lose the logo.
+  await Promise.all(Array.from(source.querySelectorAll("image")).map(async (node) => {
+    const href = node.getAttribute("href");
+    if (!href || href.startsWith("data:")) return;
+    const response = await fetch(href);
+    if (!response.ok) throw new Error("Không thể tải logo danh thiếp");
+    const logoBlob = await response.blob();
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.onerror = () => reject(new Error("Không thể đọc logo danh thiếp"));
+      reader.readAsDataURL(logoBlob);
+    });
+    node.setAttribute("href", dataUrl);
+  }));
   const objectUrl = URL.createObjectURL(new Blob(
     [new XMLSerializer().serializeToString(source)],
     { type: "image/svg+xml;charset=utf-8" },

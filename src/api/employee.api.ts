@@ -22,6 +22,7 @@ function handleApiError(err: unknown, defaultMessage = "Không thể tải dữ 
 function sanitizeTheme(theme: EmployeeInput["theme"]) {
   const {
     templateId,
+    businessCardType,
     styleId,
     backgroundId,
     primaryColor,
@@ -35,6 +36,7 @@ function sanitizeTheme(theme: EmployeeInput["theme"]) {
   } = theme;
   return {
     templateId: templateId || styleId || "bubble-blue",
+    businessCardType: businessCardType ?? "qtm",
     backgroundId,
     primaryColor,
     avatarSize,

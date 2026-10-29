@@ -10,6 +10,7 @@ const safeImage = text(2048).refine((value) => {
 }, "Ảnh phải là URL HTTPS hoặc đường dẫn /images/.");
 const styleIds = ["bubble-blue", "minimal-line", "dark-tech", "editorial", "aurora", "luxury", "botanical", "creative"] as const;
 export const themeInput = z.object({
+  businessCardType: z.enum(["qtm", "an-ninh-mang"]).default("qtm"),
   templateId: z.enum(styleIds),
   styleId: z.enum(styleIds).optional(),
   paletteId: text(64).optional(),

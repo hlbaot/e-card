@@ -82,6 +82,18 @@ export function CyberMagazineArtwork({ className, primaryColor = "#0F4C75", thum
       {/* The reference's top composition scales with card width, never its height. */}
       <svg width="100%" height="48%" viewBox="0 0 1080 600" preserveAspectRatio="xMaxYMin meet">
       <CyberMagazineTopRight id={id} primaryColor={primaryColor} />
+        <g stroke={blue} strokeWidth="1.4" opacity=".4">
+          <path d="M1080 482H1027L997 452H970L945 423M1080 500H1017L984 468H905M1080 564L1033 517H1005L978 489" />
+          {[[945, 423], [905, 468], [978, 489]].map(([x, y]) => <circle key={x} cx={x} cy={y} r="3.6" />)}
+        </g>
+        <g stroke={paint("gold")} strokeWidth="1.5" opacity=".9">
+          <path d="M1080 546L1024 490H934" />
+          <circle cx="934" cy="490" r="4" strokeWidth="2" />
+        </g>
+      </svg>
+      {/* Separate anchors keep the left cluster at the left edge on wide cards. */}
+      <svg data-cyber-corner="top-left" x="0" y="0" width="100%" height="48%"
+        viewBox="0 0 1080 600" preserveAspectRatio="xMinYMin meet">
       {/* The reference's second wave enters from the left beside the portrait. */}
       <g transform="translate(0 0)">
       <path d="M0 295C137 322 203 377 283 437C332 473 364 488 401 501C225 429 112 394 0 462Z" fill={paint("teal")} />
@@ -94,12 +106,11 @@ export function CyberMagazineArtwork({ className, primaryColor = "#0F4C75", thum
 
         <g stroke={blue} strokeWidth="1.4" opacity=".4">
           <path d="M0 48H54L104 0M0 28H40L68 0M0 171H38L73 205H156M0 203H27L62 237H145M0 244H16L51 280H91" />
-          <path d="M1080 482H1027L997 452H970L945 423M1080 500H1017L984 468H905M1080 564L1033 517H1005L978 489" />
-          {[[20, 25], [156, 205], [145, 237], [91, 280], [945, 423], [905, 468], [978, 489]].map(([x, y]) => <circle key={x} cx={x} cy={y} r="3.6" />)}
+          {[[20, 25], [156, 205], [145, 237], [91, 280]].map(([x, y]) => <circle key={x} cx={x} cy={y} r="3.6" />)}
         </g>
         <g stroke={paint("gold")} strokeWidth="1.5" opacity=".9">
-          <path d="M0 82L94 182H170L217 234H263M0 131L78 216H157L207 268H297M1080 546L1024 490H934" />
-          {[[48, 133], [170, 182], [263, 234], [297, 268], [934, 490]].map(([x, y]) => <circle key={x} cx={x} cy={y} r="4" strokeWidth="2" />)}
+          <path d="M0 82L94 182H170L217 234H263M0 131L78 216H157L207 268H297" />
+          {[[48, 133], [170, 182], [263, 234], [297, 268]].map(([x, y]) => <circle key={x} cx={x} cy={y} r="4" strokeWidth="2" />)}
         </g>
       </svg>
       <svg data-cyber-icon="shield" x="0" y="82.5%" width="20.4%" height="17.5%"

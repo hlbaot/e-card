@@ -20,8 +20,8 @@ function onLand(longitude: number, latitude: number) {
 }
 
 const SILHOUETTE = "M440 0H1080V450C895 401 849 290 703 153C613 69 527 24 440 0Z";
-const FIELD = "M550 0H1080V360C1010 352 961 330 915 300C782 216 716 59 550 0Z";
-const SEAM = "M550 0C716 59 782 216 915 300C961 330 1010 352 1080 360";
+const FIELD = "M440 0H1080V350C1002 345 953 322 905 285C780 205 642 44 440 0Z";
+const SEAM = "M440 0C642 44 780 205 905 285C953 322 1002 345 1080 350";
 const GOLD_ROUTES = [
   { a: [744, 194], b: [881, -56], c: [1110, 104], nodes: [.32, .77] },
   { a: [770, 274], b: [926, 29], c: [1100, 245], nodes: [.43, .8] },
@@ -29,18 +29,20 @@ const GOLD_ROUTES = [
   { a: [823, 264], b: [981, 390], c: [1102, 182], nodes: [.57] },
 ];
 const DOTS = Array.from({ length: 128 * 208 }, (_, i) => {
-  const latitude = (Math.floor(i / 208) / 127 - .5) * Math.PI;
-  const longitude = -Math.PI / 2 + i % 208 / 207 * Math.PI;
+  const row = Math.floor(i / 208), column = i % 208;
+  const jitter = Math.sin(i * 12.9898 + 78.233) * .13;
+  const latitude = ((row + jitter) / 127 - .5) * Math.PI;
+  const longitude = -Math.PI / 2 + (column + (row % 2) * .5 + jitter) / 207 * Math.PI;
   const x = Math.cos(latitude) * Math.sin(longitude);
   const y = Math.sin(latitude), z = Math.cos(latitude) * Math.cos(longitude);
-  const pitch = -.32, tilt = -.22;
+  const pitch = .16, tilt = -.18;
   const py = y * Math.cos(pitch) - z * Math.sin(pitch);
   const depth = y * Math.sin(pitch) + z * Math.cos(pitch);
   const px = 1130 + 390 * (x * Math.cos(tilt) - py * Math.sin(tilt));
   const sy = 285 + 390 * (x * Math.sin(tilt) + py * Math.cos(tilt));
-  const land = onLand(longitude * 180 / Math.PI + 155, -latitude * 180 / Math.PI);
-  return { x: px, y: sy, land, r: land ? .7 + depth * .6 : .5,
-    opacity: land ? .25 + depth * .7 : .025 + depth * .08, depth };
+  const land = onLand(longitude * 180 / Math.PI + 125, -latitude * 180 / Math.PI);
+  return { x: px, y: sy, land, r: land ? .65 + depth * .48 : .45,
+    opacity: land ? (.2 + depth * .64) * (.85 + .15 * Math.sin(i * .73)) : .018 + depth * .055, depth };
 }).filter(dot => dot.depth > .04 && dot.x > 738 && dot.x < 1084 && dot.y > -4 && dot.y < 365);
 
 /** This entire scene is clipped to the existing corner silhouette. It does not
@@ -50,7 +52,7 @@ export function CyberMagazineTopRight({ id: ownerId, primaryColor }: { id: strin
   const native = isCyberMagazineDefaultColor(primaryColor);
   const colors = getCyberMagazineColors(primaryColor);
   const tint = (fallback: string, amount: number) => native ? fallback : toTint(primaryColor, amount);
-  const { cyan, light: ice } = colors;
+  const cyan = tint("#22CCE3", .4), ice = tint("#BFEAF7", .78);
   const url = (name: string) => `url(#${id}-${name})`;
   return <g data-cyber-top-right="magazine">
     <defs>
@@ -58,23 +60,26 @@ export function CyberMagazineTopRight({ id: ownerId, primaryColor }: { id: strin
       <clipPath id={`${id}-field`}><path d={FIELD} /></clipPath>
       <clipPath id={`${id}-sphere`}><circle cx="1130" cy="285" r="390" /></clipPath>
       <linearGradient id={`${id}-outer`} x1="0" y1="0" x2="1" y2="1">
-        <stop stopColor={colors.navy} /><stop offset="1" stopColor={colors.surface} />
+        <stop stopColor={native ? "#005B7A" : colors.navy} /><stop offset=".6" stopColor={native ? "#007B98" : colors.surface} /><stop offset="1" stopColor={native ? "#00A0B7" : colors.surface} />
       </linearGradient>
       <linearGradient id={`${id}-inner`} x1="0" y1="0" x2=".6" y2="1">
-        <stop stopColor={colors.deep} /><stop offset="1" stopColor={colors.navy} />
+        <stop stopColor={native ? "#042C4F" : colors.deep} /><stop offset="1" stopColor={native ? "#004763" : colors.navy} />
       </linearGradient>
       <linearGradient id={`${id}-navy`} x1="0" y1="0" x2=".8" y2="1">
-        <stop stopColor={colors.deep} /><stop offset=".5" stopColor={colors.navy} /><stop offset="1" stopColor={colors.blue} />
+        <stop stopColor={native ? "#032B4A" : colors.deep} /><stop offset=".5" stopColor={native ? "#003C59" : colors.navy} /><stop offset="1" stopColor={native ? "#005272" : colors.blue} />
       </linearGradient>
       <radialGradient id={`${id}-sphere-fill`} cx="82%" cy="48%" r="85%">
-        <stop stopColor={colors.surface} /><stop offset=".65" stopColor={colors.navy} /><stop offset="1" stopColor={colors.deep} />
+        <stop stopColor={native ? "#07516F" : colors.surface} /><stop offset=".65" stopColor={native ? "#003450" : colors.navy} /><stop offset="1" stopColor={native ? "#001D39" : colors.deep} />
       </radialGradient>
+      <linearGradient id={`${id}-land`} gradientUnits="userSpaceOnUse" x1="780" y1="0" x2="1120" y2="325">
+        <stop stopColor={cyan} /><stop offset=".42" stopColor={ice} /><stop offset="1" stopColor={cyan} stopOpacity=".6" />
+      </linearGradient>
       <radialGradient id={`${id}-atmosphere`}>
         <stop offset=".86" stopColor={cyan} stopOpacity="0" /><stop offset=".94" stopColor={cyan} stopOpacity=".04" />
         <stop offset=".97" stopColor={cyan} stopOpacity=".55" /><stop offset=".983" stopColor={ice} stopOpacity=".9" />
         <stop offset="1" stopColor={cyan} stopOpacity="0" />
       </radialGradient>
-      <linearGradient id={`${id}-gold`} gradientUnits="userSpaceOnUse" x1="550" y1="0" x2="1080" y2="360">
+      <linearGradient id={`${id}-gold`} gradientUnits="userSpaceOnUse" x1="440" y1="0" x2="1080" y2="350">
         <stop stopColor="#B8860B" /><stop offset=".25" stopColor="#E6C766" /><stop offset=".48" stopColor="#FFF4C0" />
         <stop offset=".62" stopColor="#C9A227" /><stop offset=".83" stopColor="#E6C766" /><stop offset="1" stopColor="#C9A227" />
       </linearGradient>
@@ -116,10 +121,10 @@ export function CyberMagazineTopRight({ id: ownerId, primaryColor }: { id: strin
         <circle cx="1130" cy="285" r="390" fill={url("sphere-fill")} />
         <g mask={url("details")}>
           <g clipPath={url("sphere")}>
-            {DOTS.map(({ x, y, r, opacity, land }, i) => <circle key={i} cx={x} cy={y} r={r} opacity={opacity} fill={land ? ice : cyan} />)}
-            <g stroke={ice} strokeWidth=".85" opacity=".18">
-              {[.32, .66, .9].map(n => <ellipse key={n} cx="1130" cy="285" rx={390 * n} ry="390" transform="rotate(24 1130 285)" />)}
-              {[-.5, 0, .5].map(n => <ellipse key={n} cx="1130" cy={285 + n * 350} rx={Math.sqrt(1 - n * n) * 390} ry="74" transform="rotate(18 1130 285)" />)}
+            {DOTS.map(({ x, y, r, opacity, land }, i) => <circle key={i} cx={x} cy={y} r={r} opacity={opacity} fill={land ? url("land") : cyan} />)}
+            <g stroke={ice} strokeWidth=".7" opacity=".13">
+              {[.38, .82].map(n => <ellipse key={n} cx="1130" cy="285" rx={390 * n} ry="390" transform="rotate(24 1130 285)" />)}
+              {[-.48, .32].map(n => <ellipse key={n} cx="1130" cy={285 + n * 350} rx={Math.sqrt(1 - n * n) * 390} ry="74" transform="rotate(18 1130 285)" />)}
             </g>
           </g>
           <circle cx="1130" cy="285" r="400" fill={url("atmosphere")} />
@@ -169,7 +174,7 @@ export function CyberMagazineTopRight({ id: ownerId, primaryColor }: { id: strin
       </g>
       {/* The gold seam sits above every detail and catches two small reflections. */}
       <path d={SEAM} stroke="#E6C766" strokeWidth="15" opacity=".09" />
-      <path d="M550 0C716 59 782 216 915 300C961 330 1010 352 1080 360V372C1006 363 953 340 909 310C775 224 708 65 550 3Z" fill={url("gold")} />
+      <path d="M440 0C642 44 780 205 905 285C953 322 1002 345 1080 350V361C1002 356 950 332 900 295C774 214 635 49 440 3Z" fill={url("gold")} />
       <path d={SEAM} stroke="#FFF1BB" strokeWidth=".9" opacity=".85" />
       {[[847, 247, 12], [1012, 347, 9]].map(([x, y, r]) => <g key={x}>
         <circle cx={x} cy={y} r={r} fill={url("node")} />

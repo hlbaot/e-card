@@ -190,17 +190,6 @@
   .employee-grid {
     gap: 15px;
   }
-  .employee-card h3 {
-    font-size: 12px;
-  }
-  .employee-card .position {
-    font-size: 10px;
-    min-height: 30px;
-  }
-  .employee-card .company {
-    font-size: 7px;
-    letter-spacing: 0.6px;
-  }
   .employee-card-footer {
     padding: 12px 10px;
     font-size: 9px;
@@ -220,10 +209,7 @@
     height: 65px !important;
     font-size: 19px !important;
   }
-  .employee-cover span {
-    font-size: 9px;
-    left: 12px;
-  }
+  .employee-cover span { left: 12px; }
   .footer .container {
     flex-direction: column;
     gap: 9px;

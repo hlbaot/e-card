@@ -412,11 +412,11 @@
 
 /* Magazine portrait: fine gold edge, white separation and a restrained halo. */
 .qtm-professional-card.qtm-cyber-controls .qtm-portrait .avatar {
-  border: 2.5px solid #d4ac32 !important;
-  outline: 1px solid #f5e4a1;
-  outline-offset: 4px;
-  box-shadow: 0 0 0 3px #fff, 0 0 0 10px #ffffff50,
-    0 0 15px 5px #e6c76655, 0 0 28px 9px #8fc7f038 !important;
+  border: 2px solid #d4ac32 !important;
+  outline: 1px solid #bfeaf740;
+  outline-offset: 7px;
+  box-shadow: 0 0 0 3px #fff, 0 0 0 10px #ffffff60,
+    0 0 12px 3px #e6c76638, 0 0 30px 11px #8fc7f045 !important;
 }
 .qtm-professional-card.qtm-cyber-controls .qtm-profile-brand img {
   filter: drop-shadow(0 0 1px #e6c76680) drop-shadow(0 0 4px #e6c76630);

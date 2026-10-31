@@ -17,6 +17,14 @@ import {
 } from "../src/i18n/config";
 import { translateErrorMessage } from "../src/i18n/error-map";
 import { writeClientLocaleCookie } from "../src/client/components/ui/LanguageSwitcher";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { EmployeeTable } from "../src/client/components/admin/EmployeeTable";
+import { TeamTable } from "../src/client/components/admin/dashboard/TeamTable";
+import { TeamRowCard } from "../src/client/components/admin/dashboard/TeamRowCard";
+import { EmployeePagination } from "../src/client/components/admin/EmployeePagination";
+import { CardActions } from "../src/client/components/card/CardActions";
+import { ActionGrid } from "../src/client/components/card/ActionGrid";
+import { contactDownloadUrl } from "../src/shared/utils/vcard";
 import { QrBusinessCard } from "../src/client/components/card/QrBusinessCard";
 import { CardListContent } from "../src/client/components/card/CardListItem";
 import { ContactList } from "../src/client/components/card/ContactList";
@@ -303,4 +311,49 @@ test("public directory and both exported card styles show names in the selected 
     }
     assert.equal(employee.fullName, "NGUYỄN TẤT HỒNG DƯƠNG");
   }
+});
+
+test("admin employee tables and mobile cards localize displayed names while preserving their source", () => {
+  const employee = { ...sampleEmployee, fullName: "TRẦN DUY NAM ANH" };
+  for (const locale of ["en", "vi"] as const) {
+    const expected = locale === "en" ? "TRAN DUY NAM ANH" : employee.fullName;
+    for (const element of [
+      createElement(EmployeeTable, { employees: [employee] }),
+      createElement(TeamTable, { employees: [employee] }),
+      createElement(TeamRowCard, { employee, onToggleActive() {}, onDeleteRequest() {} }),
+    ]) {
+      const client = new QueryClient();
+      try {
+        const html = renderWithLocale(locale, createElement(QueryClientProvider, { client }, element));
+        assert.ok(html.includes(expected));
+        if (locale === "en") assert.ok(!html.includes(employee.fullName));
+      } finally { client.clear(); }
+    }
+  }
+  assert.equal(employee.fullName, "TRẦN DUY NAM ANH");
+});
+
+test("employee pagination renders numbered pages, the current page and localized range", () => {
+  for (const locale of ["en", "vi"] as const) {
+    const html = renderWithLocale(locale, createElement(EmployeePagination, { page: 2, pageSize: 10, total: 23, onPageChange() {} }));
+    assert.ok(html.includes('aria-current="page"'));
+    assert.ok(html.includes(locale === "vi" ? "Trang 3" : "Page 3"));
+    assert.ok(html.includes("11–20"));
+    assert.ok(html.includes("23"));
+  }
+  const empty = renderWithLocale("en", createElement(EmployeePagination, { page: 1, pageSize: 10, total: 0, onPageChange() {} }));
+  assert.ok(empty.includes("0–0"));
+  assert.ok(!empty.includes("<nav"));
+});
+
+test("Save contact uses a real native VCF link in the current language; unsaved previews use the local fallback", () => {
+  for (const locale of ["vi", "en"] as const) {
+    const href = `/api/cards/${sampleEmployee.slug}/contact.vcf?lang=${locale}`;
+    assert.equal(contactDownloadUrl(sampleEmployee, locale), href);
+    for (const element of [createElement(CardActions, { employee: sampleEmployee }), createElement(ActionGrid, { employee: sampleEmployee })]) {
+      const html = renderWithLocale(locale, element);
+      assert.ok(html.includes(`href="${href}"`));
+    }
+  }
+  assert.equal(contactDownloadUrl({ ...sampleEmployee, id: "preview" }, "vi"), "");
 });

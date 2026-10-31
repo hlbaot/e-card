@@ -19,6 +19,8 @@ export function CardListContent({
 }) {
   const locale = resolveLocale(useLocale());
   const displayName = localizeEmployeeName(e.fullName, locale);
+  const position = capitalizeFirstLetter(localizeText(e.position, locale));
+  const company = localizeText(e.companyShort, locale);
   const tCommon = useTranslations("common");
   const tHome = useTranslations("home.directory");
   const isCyberSecurity = e.theme.businessCardType === "an-ninh-mang";
@@ -32,7 +34,7 @@ export function CardListContent({
           } as CSSProperties
         }
       >
-        <span>{isCyberSecurity ? tCommon("cyberMagazineUpper") : "QTM MEDIATECH"}</span>
+        <span title={isCyberSecurity ? tCommon("cyberMagazineUpper") : "QTM MEDIATECH"}>{isCyberSecurity ? tCommon("cyberMagazineUpper") : "QTM MEDIATECH"}</span>
         {showFooter && e.isActive && <i className="live-dot" />}
       </div>
       <Avatar
@@ -42,9 +44,11 @@ export function CardListContent({
         size={80}
         rounded={e.theme.avatarShape === "rounded"}
       />
-      <h3>{displayName.toUpperCase()}</h3>
-      <p className="position">{capitalizeFirstLetter(localizeText(e.position, locale))}</p>
-      <p className={`company ${showFooter ? "" : "pb-4"}`}>{localizeText(e.companyShort, locale)}</p>
+      <div className="employee-card-details">
+        <h3 title={displayName.toUpperCase()}>{displayName.toUpperCase()}</h3>
+        <p className="position" title={position}>{position}</p>
+        <p className="company" title={company}>{company}</p>
+      </div>
       {showFooter && (
         <div className="employee-card-footer">
           <span className="button-row">

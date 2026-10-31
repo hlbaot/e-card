@@ -1,10 +1,11 @@
 "use client";
-import { useDeferredValue, useMemo } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { useEmployeeStore } from "@/client/store/employee.store";
 import Link from "next/link";
 import { Plus, Search, ArrowRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEmployees } from "@/client/hooks/useEmployees";
+import { EmployeePagination } from "@/client/components/admin/EmployeePagination";
 import { EmployeeTable } from "@/client/components/admin/EmployeeTable";
 import { Skeleton } from "@/client/components/ui/Skeleton";
 import { slugify } from "@/shared/utils/slugify";
@@ -16,6 +17,7 @@ export function AdminEmployeesView() {
   const setSearch = useEmployeeStore(state => state.setEmployeeSearch);
   const t = useTranslations("admin.employees");
   const tRoot = useTranslations();
+  const [requestedPage, setPage] = useState(1);
   const deferredSearch = useDeferredValue(search);
   const normalizedSearch = useMemo(
     () => slugify(deferredSearch),
@@ -32,6 +34,9 @@ export function AdminEmployeesView() {
           ),
     [employees, normalizedSearch],
   );
+  const pageSize = 10;
+  const page = Math.min(requestedPage, Math.max(1, Math.ceil(filtered.length / pageSize)));
+  const visibleEmployees = filtered.slice((page - 1) * pageSize, page * pageSize);
   return (
     <div className="admin-fade-in">
       <div className="page-heading">
@@ -64,7 +69,7 @@ export function AdminEmployeesView() {
               aria-label={t("searchAria")}
               placeholder={t("searchPlaceholder")}
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             />
           </label>
           <p>{t("teamCount", { count: ready ? String(employees.length) : "…" })}</p>
@@ -73,10 +78,8 @@ export function AdminEmployeesView() {
           <Skeleton />
         ) : (
           <>
-            <EmployeeTable employees={filtered} />
-            <p className="table-bottom">
-              {t("showingCount", { shown: filtered.length, total: employees.length })}
-            </p>
+            <EmployeeTable employees={visibleEmployees} />
+            <EmployeePagination page={page} pageSize={pageSize} total={filtered.length} onPageChange={setPage} />
           </>
         )}
       </section>

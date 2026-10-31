@@ -2,15 +2,18 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { Employee } from "@/shared/types";
+import { resolveLocale } from "@/i18n/config";
+import { localizeEmployeeName } from "@/shared/utils/localize";
 import { cn } from "@/shared/utils/cn";
 
 export function ProfileInfo({ employee: e }: { employee: Employee }) {
+  const displayName = localizeEmployeeName(e.fullName, resolveLocale(useLocale()));
   const t = useTranslations("card.placeholders");
   const [avatarFailed, setAvatarFailed] = useState("");
 
-  const initials = (e.fullName || "QT")
+  const initials = (displayName || "QT")
     .trim()
     .split(/\s+/)
     .filter(Boolean)
@@ -47,7 +50,7 @@ export function ProfileInfo({ employee: e }: { employee: Employee }) {
           {e.avatarUrl && avatarFailed !== e.avatarUrl ? (
             <Image
               src={e.avatarUrl}
-              alt={e.fullName}
+              alt={displayName}
               fill
               sizes="200px"
               unoptimized
@@ -69,7 +72,7 @@ export function ProfileInfo({ employee: e }: { employee: Employee }) {
           className="ecard-fullname font-extrabold uppercase tracking-wide line-clamp-2 break-words pt-[0.08em]"
           style={{ color: "var(--pv-primary)" }}
         >
-          {e.fullName || t("fullName")}
+          {displayName || t("fullName")}
         </h1>
         <p
           className="ecard-position italic font-medium line-clamp-1"

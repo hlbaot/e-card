@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { absoluteUrl, siteConfig } from "@/config/site";
 import { getRequestLocale } from "@/i18n/request";
 import { cachedPublicCards } from "@/server/cards/cache";
+import { localizeEmployeeName } from "@/shared/utils/localize";
 import { CardView } from "@/views/CardView";
 
 // Luôn kiểm tra DB để card vừa ẩn hoặc xóa trả 404 ngay.
@@ -27,9 +28,10 @@ export async function generateMetadata({
     employee.theme.businessCardType === "an-ninh-mang"
       ? t("cardBrandCyber")
       : t("cardBrandQtm");
-  const pageTitle = `${employee.fullName} - ${employee.position} | ${brandName}`;
+  const displayName = localizeEmployeeName(employee.fullName, locale);
+  const pageTitle = `${displayName} - ${employee.position} | ${brandName}`;
   const pageDescription = t("cardDescription", {
-    name: employee.fullName,
+    name: displayName,
     position: employee.position,
     company: employee.company,
   });
@@ -60,7 +62,7 @@ export async function generateMetadata({
       images: [
         {
           url: ogImageUrl,
-          alt: employee.fullName,
+          alt: displayName,
         },
       ],
     },

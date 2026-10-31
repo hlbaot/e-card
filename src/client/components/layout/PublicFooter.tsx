@@ -5,7 +5,7 @@ export function PublicFooter() {
         <span>
           © 2026 <strong>QTM MediaTech.</strong> Bảo lưu mọi quyền.
         </span>
-        <span>CHẤT LƯỢNG · CÔNG NGHỆ · TƯ DUY</span>
+        <span>QUALITY · TECHNOLOGY · MINDSET</span>
       </div>
     </footer>
   );

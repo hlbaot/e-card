@@ -8,6 +8,7 @@ import { MapPin, Phone, Mail, Globe, QrCode, Share2, Pencil } from "lucide-react
 import { getPublicFields } from "@/shared/types";
 import type { Employee } from "@/shared/types";
 import { getTemplate, getThemeBackgroundCss } from "@/config/card-themes";
+import { getCyberMagazineColors } from "@/shared/constants/cyber-magazine";
 import { readableAccent } from "@/shared/utils/color";
 import { capitalizeFirstLetter } from "@/shared/utils/format-text";
 import { Avatar } from "@/client/components/ui/Avatar";
@@ -35,7 +36,8 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
   const template = getTemplate(theme.templateId);
   const pf = getPublicFields(e);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const accent = readableAccent(theme.primaryColor || template.defaultColor, false, "#E0E0E0");
+  const cyberColors = theme.decor[0] === "cyber-magazine" ? getCyberMagazineColors(theme.primaryColor) : null;
+  const accent = readableAccent(cyberColors?.navy || theme.primaryColor || template.defaultColor, false, "#E0E0E0");
   const Name = variant === "profile" ? "h1" : "h2";
   const isProfile = variant === "profile";
   const aos = (type: string, delay: number) =>
@@ -97,13 +99,14 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
 
   return (
     <div className="qtm-profile-surface" style={{
+      ...(cyberColors ? { "--cyber-deep": cyberColors.deep, "--cyber-navy": cyberColors.navy, "--cyber-blue": cyberColors.blue } : {}),
       "--card-accent": accent,
       "--card-primary": accent,
       "--card-background": getThemeBackgroundCss(theme),
       "--card-font": template.fontFamily || (template.fontStyle === "serif" ? "Georgia, serif" : template.fontStyle === "mono" ? "\"Courier New\", monospace" : "var(--font-body), Arial, sans-serif"),
       "--motif-opacity": (theme.showDecor === false ? 0 : (theme.decorOpacity ?? 35)) / 100,
     } as CSSProperties}>
-      <article className={`qtm-professional-card qtm-template-${theme.templateId}${variant === "preview" ? " qtm-fit-preview" : ""}`} aria-label={`Hồ sơ của ${e.fullName || "nhân viên"}`}>
+      <article className={`qtm-professional-card qtm-template-${theme.templateId}${theme.decor[0] === "cyber-magazine" ? " qtm-cyber-controls" : ""}${theme.decor[0] === "cyber-magazine" && theme.showDecor !== false && (theme.decorOpacity ?? 35) >= 20 ? " qtm-cyber-magazine" : ""}${variant === "preview" ? " qtm-fit-preview" : ""}`} aria-label={`Hồ sơ của ${e.fullName || "nhân viên"}`}>
         <ProfileDecorations theme={theme} />
         <div className="qtm-card-scroll" ref={scrollRef}>
           <div className="qtm-card-layout">

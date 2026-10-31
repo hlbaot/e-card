@@ -318,3 +318,48 @@
 .qtm-art-luxury { --style-mini-rule-width: 60px; --style-mini-rule-height: 1px; }
 .qtm-art-botanical { --style-mini-rule-width: 42px; --style-mini-rule-height: 3px; }
 .qtm-art-creative .art-rule { width: 48px; height: 3px; border-radius: 0; background: linear-gradient(90deg,var(--thumb-color) 65%,transparent 65%,transparent 73%,var(--thumb-color) 73%); }
+
+/* Selecting the magazine motif brings its navy and gold control treatment,
+   independently of the decoration opacity and structural template. */
+.qtm-professional-card.qtm-cyber-controls {
+  --cyber-gold: #e6c766;
+  --cyber-control-fill: linear-gradient(110deg, var(--cyber-deep, #0a1f44), var(--cyber-navy, #0b2a5b) 66%, var(--cyber-blue, #0f3a75));
+}
+.qtm-professional-card.qtm-cyber-controls .card-actions :is(a, button),
+.qtm-professional-card.qtm-cyber-controls .qtm-profile-tools :is(a, button) {
+  background: var(--cyber-control-fill) !important;
+  color: var(--cyber-gold) !important;
+  border: 1px solid #c9a227 !important;
+  box-shadow: 0 2px 6px #0f2a5c26 !important;
+}
+.qtm-professional-card.qtm-cyber-controls .card-actions :is(a, button):hover,
+.qtm-professional-card.qtm-cyber-controls .qtm-profile-tools :is(a, button):hover {
+  filter: brightness(1.12);
+}
+.qtm-professional-card.qtm-cyber-controls .card-actions svg,
+.qtm-professional-card.qtm-cyber-controls .qtm-profile-tools svg,
+.qtm-professional-card.qtm-cyber-controls .qtm-contact-icon svg {
+  color: var(--cyber-gold) !important;
+}
+.qtm-professional-card.qtm-cyber-controls .qtm-contact-icon {
+  background: var(--cyber-control-fill);
+  border: 1px solid #c9a227;
+}
+.qtm-professional-card.qtm-cyber-controls .qtm-identity-rule {
+  background: linear-gradient(90deg, #c9a227, #e6c766, #c9a227);
+}
+
+/* Magazine portrait: fine gold edge, white separation and a restrained halo. */
+.qtm-professional-card.qtm-cyber-controls .qtm-portrait .avatar {
+  border: 2px solid #d4ac32;
+  outline: 1px solid #f5e4a1;
+  outline-offset: 4px;
+  box-shadow: 0 0 0 3px #fff, 0 0 0 10px #ffffff50,
+    0 0 15px 5px #e6c76655, 0 0 28px 9px #8fc7f038;
+}
+.qtm-professional-card.qtm-cyber-controls .qtm-profile-brand img {
+  filter: drop-shadow(0 0 1px #e6c76680) drop-shadow(0 0 4px #e6c76630);
+}
+.qtm-professional-card.qtm-cyber-controls :is(.qtm-position, .qtm-company-short, .qtm-profile-identity h3, .qtm-contact strong, .qtm-contact > a, .qtm-contact > span:last-child, .qtm-contact-value) {
+  color: var(--card-accent);
+}

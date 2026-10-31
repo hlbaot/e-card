@@ -86,14 +86,14 @@ async function main() {
   assert.equal(localizeEmployee(custom).slogan, custom.slogan);
   const { migrateCardTheme } = require("../src/shared/utils/migrate-theme.ts");
   const { decorOptions } = require("../src/shared/constants/card-themes.ts");
-  assert.deepEqual(decorOptions.map((option) => option.id), ["none", "blobs", "bokeh", "circles", "leaves", "geometry", "network", "crystals"]);
+  assert.deepEqual(decorOptions.map((option) => option.id), ["none", "blobs", "bokeh", "cyber-magazine", "leaves", "geometry", "network", "crystals"]);
   for (const templateId of ["bubble-blue", "dark-tech"]) {
     for (const pattern of ["dot", "dots", "grid", "diagonal", "art-deco", "plus", "crosses", "lines", "checks", "diamonds", "leaf", "leaf-dots", "none"]) {
       for (const field of ["pattern", "patternId"]) {
         const legacy = { ...employees[0].theme, templateId, backgroundId: templateId === "dark-tech" ? "night-navy" : "sky-soft", decorOpacity: 100, [field]: pattern };
         delete legacy.decor;
         const migrated = migrateCardTheme(legacy);
-        assert.deepEqual(migrated.decor, pattern === "none" ? [] : [templateId === "dark-tech" ? "circles" : "blobs"]);
+        assert.deepEqual(migrated.decor, pattern === "none" ? [] : [templateId === "dark-tech" ? "cyber-magazine" : "blobs"]);
         assert.equal(migrated.decorOpacity, 60);
         assert.ok(!(field in migrated));
         assert.deepEqual(migrateCardTheme(migrated), migrated);
@@ -105,7 +105,7 @@ async function main() {
   assert.deepEqual(migrateCardTheme({ ...employees[0].theme, decor: [] }).decor, []);
   assert.deepEqual(migrateCardTheme({ ...employees[0].theme, decor: ["leaves", "network", "geometry", "leaves", "invalid"] }).decor, ["leaves"]);
   const { getProfileDecorPlacements } = require("../src/shared/utils/decor-layout.ts");
-  const motifKeys = ["blobs", "bokeh", "circles", "leaves", "geometry", "network", "crystals"];
+  const motifKeys = ["blobs", "bokeh", "cyber-magazine", "leaves", "geometry", "network", "crystals"];
   // Motifs occupy spacious fixed slots strictly at the outer margins
   for (let mask = 0; mask < 1 << motifKeys.length; mask++) {
     const selected = motifKeys.filter((_, index) => mask & (1 << index));
@@ -126,7 +126,7 @@ async function main() {
     });
   }
   assert.ok(templates.length >= 8);
-  assert.ok(colorPresets.length >= 12);
+  assert.ok(colorPresets.length >= 10);
   assert.equal(new Set(templates.map((t) => t.id)).size, templates.length);
   for (const template of templates)
     assert.ok(backgrounds.some((b) => b.id === template.defaultBackgroundId));

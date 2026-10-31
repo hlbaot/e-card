@@ -3,7 +3,7 @@ import type { DecorKey } from "@/shared/types";
 export const motifOrder: DecorKey[] = [
   "blobs",
   "bokeh",
-  "circles",
+  "cyber-magazine",
   "leaves",
   "geometry",
   "network",

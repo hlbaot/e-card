@@ -1,7 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { localizeEmployeeName } from "@/shared/utils/localize";
+import { resolveLocale } from "@/i18n/config";
 import type { BusinessCardType, Employee } from "@/shared/types";
 import { Spinner } from "@/client/components/ui/Spinner";
 import { Modal } from "@/client/components/ui/Modal";
@@ -21,6 +23,7 @@ export function BusinessCardPicker({ employee, isNew = false, onSave, onClose }:
   const pendingRef = useRef(false);
   const [error, setError] = useState("");
   const svgRef = useRef<SVGSVGElement>(null);
+  const locale = resolveLocale(useLocale());
   const t = useTranslations("admin.cardPicker");
   const tRoot = useTranslations();
   const preview = { ...employee, theme: { ...employee.theme, businessCardType: type ?? undefined } };
@@ -35,7 +38,7 @@ export function BusinessCardPicker({ employee, isNew = false, onSave, onClose }:
   }
   return <Modal width={800} title={t("title")} onClose={() => { if (!busy) onClose(); }}>
     <p className="mb-4 text-sm text-slate-400">
-      {t("description", { name: employee.fullName })}{" "}
+      {t("description", { name: localizeEmployeeName(employee.fullName, locale) })}{" "}
       {isNew && t("newNotice")}
     </p>
     <div role="group" aria-label={t("groupAria")} className="mb-4 grid grid-cols-2 gap-3">

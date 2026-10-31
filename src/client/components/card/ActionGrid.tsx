@@ -9,15 +9,17 @@ import {
   MapPin,
   ChevronRight,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { resolveLocale } from "@/i18n/config";
 import { getPublicFields } from "@/shared/types";
 import type { Employee } from "@/shared/types";
-import { saveContact, websiteUrl } from "@/shared/utils/vcard";
+import { saveContact, websiteUrl, contactDownloadUrl } from "@/shared/utils/vcard";
 import { useToast } from "@/client/components/ui/Toast";
 import { cn } from "@/shared/utils/cn";
 
 export function ActionGrid({ employee: e }: { employee: Employee }) {
   const toast = useToast();
+  const contactHref = contactDownloadUrl(e, resolveLocale(useLocale()));
   const t = useTranslations("card.actions");
   const tToast = useTranslations("toast");
   const pf = getPublicFields(e);
@@ -70,9 +72,9 @@ export function ActionGrid({ employee: e }: { employee: Employee }) {
       id: "save",
       label: t("saveContact"),
       icon: UserPlus,
-      href: "",
+      href: contactHref,
       external: false,
-      onClick: () => {
+      onClick: contactHref ? undefined : () => {
         saveContact(e);
         toast(tToast("contactSaved"));
       },
@@ -139,6 +141,7 @@ export function ActionGrid({ employee: e }: { employee: Employee }) {
               <div key={id} data-aos="zoom-in-up" data-aos-delay={delay}>
                 <a
                   href={href || "#"}
+                  onClick={id === "save" ? () => toast(tToast("contactSaved")) : undefined}
                   target={external ? "_blank" : undefined}
                   rel={external ? "noopener noreferrer" : undefined}
                   className={itemClass}

@@ -40,6 +40,7 @@
     "actions": "Thao tác",
     "status": "Trạng thái",
     "language": "Ngôn ngữ",
+    "changingLanguage": "Đang đổi ngôn ngữ…",
     "switchLanguage": "Chuyển ngôn ngữ",
     "switchToEnglish": "Chuyển sang Tiếng Anh",
     "switchToVietnamese": "Chuyển sang Tiếng Việt",
@@ -294,6 +295,7 @@
         "toggleAria": "Bật hoặc tắt hiển thị thẻ của {name}",
         "editAria": "Chỉnh sửa {name}",
         "deleteAria": "Xóa {name}",
+        "paginationAria": "Các trang nhân viên",
         "paginationSummary": "Hiển thị {start}–{end} / {total}",
         "prevPage": "Trang trước",
         "nextPage": "Trang sau",
@@ -874,6 +876,6 @@
     "qrDownloaded": "Đã tải mã QR PNG",
     "qrGenerateError": "Không thể tạo mã QR",
     "cardPngDownloaded": "Đã tải danh thiếp PNG.",
-    "contactSaved": "Đã tải tệp liên hệ vCard."
+    "contactSaved": "Mở tệp liên hệ và chọn Thêm vào danh bạ để lưu tên và số điện thoại."
   }
 }

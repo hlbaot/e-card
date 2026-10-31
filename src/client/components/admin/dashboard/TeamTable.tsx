@@ -6,7 +6,7 @@ import { Pencil, Trash2, ArrowUpRight } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import type { Employee } from "@/shared/types";
 import { resolveLocale } from "@/i18n/config";
-import { localizeText } from "@/shared/utils/localize";
+import { localizeText, localizeEmployeeName } from "@/shared/utils/localize";
 import { Avatar } from "@/client/components/ui/Avatar";
 import { Switch } from "@/client/components/ui/Switch";
 import { Badge } from "@/client/components/ui/Badge";
@@ -114,14 +114,14 @@ export function TeamTable({
                   <td className="py-3 pl-6 pr-4">
                     <div className="flex items-center gap-3">
                       <Avatar
-                        name={e.fullName}
+                        name={localizeEmployeeName(e.fullName, locale)}
                         src={e.avatarUrl}
                         size={36}
                         color={e.theme.primaryColor}
                       />
                       <div className="min-w-0">
                         <strong className="block truncate text-sm font-semibold uppercase text-[var(--ink)]">
-                          {e.fullName.toLocaleUpperCase("vi-VN")}
+                          {localizeEmployeeName(e.fullName, locale).toLocaleUpperCase("vi-VN")}
                         </strong>
                         <span className="mt-0.5 block truncate text-xs text-[var(--muted)]">
                           {localizeText(e.companyShort, locale)}
@@ -154,7 +154,7 @@ export function TeamTable({
                       <Switch
                         checked={e.isActive}
                       disabled={isToggling(e.id)}
-                        label={t("toggleAria", { name: e.fullName })}
+                        label={t("toggleAria", { name: localizeEmployeeName(e.fullName, locale) })}
                         onChange={() => handleToggle(e)}
                       />
                       <span
@@ -182,16 +182,16 @@ export function TeamTable({
                     <div className="inline-flex items-center justify-end gap-1.5">
                       <Link
                         href={routes.employee(e.id)}
-                        title={t("editAria", { name: e.fullName })}
-                        aria-label={t("editAria", { name: e.fullName })}
+                        title={t("editAria", { name: localizeEmployeeName(e.fullName, locale) })}
+                        aria-label={t("editAria", { name: localizeEmployeeName(e.fullName, locale) })}
                         className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-transparent bg-white/[0.04] text-[var(--text-body)] transition-all hover:border-cyan-400/40 hover:bg-cyan-400/12 hover:text-white"
                       >
                         <Pencil size={15} />
                       </Link>
                       <button
                         type="button"
-                        title={t("deleteAria", { name: e.fullName })}
-                        aria-label={t("deleteAria", { name: e.fullName })}
+                        title={t("deleteAria", { name: localizeEmployeeName(e.fullName, locale) })}
+                        aria-label={t("deleteAria", { name: localizeEmployeeName(e.fullName, locale) })}
                         onClick={() => setDeleting(e)}
                         className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-transparent bg-white/[0.04] text-rose-400/90 transition-all hover:border-rose-400/40 hover:bg-rose-500/15 hover:text-rose-300 cursor-pointer"
                       >
@@ -228,7 +228,7 @@ export function TeamTable({
       {deleting && (
         <Modal title={t("deleteModalTitle")} onClose={closeDelete}>
           <p className="confirmation">
-            {t("deleteConfirmPrefix")} <strong className="uppercase">{deleting.fullName.toUpperCase()}</strong>?{" "}
+            {t("deleteConfirmPrefix")} <strong className="uppercase">{localizeEmployeeName(deleting.fullName, locale).toUpperCase()}</strong>?{" "}
             {t("deleteConfirmSuffix")}
           </p>
           <div className="button-row justify-end">

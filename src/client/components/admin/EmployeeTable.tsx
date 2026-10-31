@@ -5,7 +5,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import type { Employee } from "@/shared/types";
 import { resolveLocale } from "@/i18n/config";
-import { localizeText } from "@/shared/utils/localize";
+import { localizeText, localizeEmployeeName } from "@/shared/utils/localize";
 import { Avatar } from "@/client/components/ui/Avatar";
 import { Switch } from "@/client/components/ui/Switch";
 import { Spinner } from "@/client/components/ui/Spinner";
@@ -46,13 +46,13 @@ export function EmployeeTable({ employees }: { employees: Employee[] }) {
                 <td>
                   <div className="employee-cell">
                     <Avatar
-                      name={e.fullName}
+                      name={localizeEmployeeName(e.fullName, locale)}
                       src={e.avatarUrl}
                       size={37}
                       color={e.theme.primaryColor}
                     />
                     <div>
-                      <strong className="uppercase">{e.fullName.toLocaleUpperCase("vi-VN")}</strong>
+                      <strong className="uppercase">{localizeEmployeeName(e.fullName, locale).toLocaleUpperCase("vi-VN")}</strong>
                       <small>{localizeText(e.companyShort, locale)}</small>
                     </div>
                   </div>
@@ -67,7 +67,7 @@ export function EmployeeTable({ employees }: { employees: Employee[] }) {
                     <Switch
                       checked={e.isActive}
                       disabled={isToggling(e.id)}
-                      label={t("toggleAria", { name: e.fullName })}
+                      label={t("toggleAria", { name: localizeEmployeeName(e.fullName, locale) })}
                       onChange={async () => {
                         try {
                           await toggleActive(e.id);
@@ -94,13 +94,13 @@ export function EmployeeTable({ employees }: { employees: Employee[] }) {
                     <Link
                       className="icon-button"
                       href={routes.employee(e.id)}
-                      aria-label={t("editAria", { name: e.fullName })}
+                      aria-label={t("editAria", { name: localizeEmployeeName(e.fullName, locale) })}
                     >
                       <Pencil size={15} />
                     </Link>
                     <button
                       className="icon-button"
-                      aria-label={t("deleteAria", { name: e.fullName })}
+                      aria-label={t("deleteAria", { name: localizeEmployeeName(e.fullName, locale) })}
                       onClick={() => setDeleting(e)}
                     >
                       <Trash2 size={15} />
@@ -118,7 +118,7 @@ export function EmployeeTable({ employees }: { employees: Employee[] }) {
       {deleting && (
         <Modal title={t("deleteModalTitle")} onClose={closeDelete}>
           <p className="confirmation">
-            {t("deleteConfirmPrefix")} <strong className="uppercase">{deleting.fullName.toUpperCase()}</strong>?{" "}
+            {t("deleteConfirmPrefix")} <strong className="uppercase">{localizeEmployeeName(deleting.fullName, locale).toUpperCase()}</strong>?{" "}
             {t("deleteConfirmSuffix")}
           </p>
           <div className="button-row justify-end">

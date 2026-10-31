@@ -451,3 +451,8 @@ tbody tr:last-child td {
   margin-top: 9px;
   font-size: 12px;
 }
+
+.pagination-button { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; min-width: 34px; height: 34px; padding: 0 8px; border: 1px solid #ffffff20; border-radius: 8px; color: #cbd5e1; cursor: pointer; }
+.pagination-button:hover:not(:disabled), .pagination-button[aria-current="page"] { border-color: #22d3ee; background: #22d3ee20; color: #67e8f9; }
+.pagination-button:disabled { opacity: .35; cursor: default; }
+.pagination-button:focus-visible { outline: 2px solid #22d3ee; outline-offset: 2px; }

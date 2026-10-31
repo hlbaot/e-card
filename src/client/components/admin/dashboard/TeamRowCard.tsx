@@ -6,7 +6,7 @@ import { Pencil, Trash2, Phone, Mail } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import type { Employee } from "@/shared/types";
 import { resolveLocale } from "@/i18n/config";
-import { localizeText } from "@/shared/utils/localize";
+import { localizeText, localizeEmployeeName } from "@/shared/utils/localize";
 import { Avatar } from "@/client/components/ui/Avatar";
 import { Switch } from "@/client/components/ui/Switch";
 import { routes } from "@/shared/constants/routes";
@@ -32,14 +32,14 @@ export const TeamRowCard = memo(function TeamRowCard({
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <Avatar
-            name={e.fullName}
+            name={localizeEmployeeName(e.fullName, locale)}
             src={e.avatarUrl}
             size={36}
             color={e.theme.primaryColor}
           />
           <div className="min-w-0">
             <strong className="block truncate text-sm font-semibold uppercase text-[var(--ink)]">
-              {e.fullName.toLocaleUpperCase("vi-VN")}
+              {localizeEmployeeName(e.fullName, locale).toLocaleUpperCase("vi-VN")}
             </strong>
             <span className="mt-0.5 block truncate text-xs text-[var(--muted)]">
               {localizeText(e.companyShort, locale)}
@@ -51,16 +51,16 @@ export const TeamRowCard = memo(function TeamRowCard({
         <div className="flex items-center gap-1.5 shrink-0">
           <Link
             href={routes.employee(e.id)}
-            title={t("editAria", { name: e.fullName })}
-            aria-label={t("editAria", { name: e.fullName })}
+            title={t("editAria", { name: localizeEmployeeName(e.fullName, locale) })}
+            aria-label={t("editAria", { name: localizeEmployeeName(e.fullName, locale) })}
             className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-[var(--text-body)] transition-all hover:border-cyan-400/40 hover:bg-cyan-400/12 hover:text-white"
           >
             <Pencil size={15} />
           </Link>
           <button
             type="button"
-            title={t("deleteAria", { name: e.fullName })}
-            aria-label={t("deleteAria", { name: e.fullName })}
+            title={t("deleteAria", { name: localizeEmployeeName(e.fullName, locale) })}
+            aria-label={t("deleteAria", { name: localizeEmployeeName(e.fullName, locale) })}
             onClick={() => onDeleteRequest(e)}
             className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-rose-400/90 transition-all hover:border-rose-400/40 hover:bg-rose-500/15 hover:text-rose-300 cursor-pointer"
           >
@@ -95,7 +95,7 @@ export const TeamRowCard = memo(function TeamRowCard({
           <Switch
             checked={e.isActive}
             disabled={toggling}
-            label={t("toggleAria", { name: e.fullName })}
+            label={t("toggleAria", { name: localizeEmployeeName(e.fullName, locale) })}
             onChange={() => onToggleActive(e)}
           />
           <span

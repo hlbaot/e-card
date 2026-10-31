@@ -40,6 +40,7 @@
     "actions": "Actions",
     "status": "Status",
     "language": "Language",
+    "changingLanguage": "Changing language…",
     "switchLanguage": "Switch language",
     "switchToEnglish": "Switch to English",
     "switchToVietnamese": "Switch to Vietnamese",
@@ -294,6 +295,7 @@
         "toggleAria": "Toggle card visibility for {name}",
         "editAria": "Edit {name}",
         "deleteAria": "Delete {name}",
+        "paginationAria": "Employee pages",
         "paginationSummary": "Showing {start}–{end} of {total}",
         "prevPage": "Previous page",
         "nextPage": "Next page",
@@ -874,6 +876,6 @@
     "qrDownloaded": "QR PNG downloaded.",
     "qrGenerateError": "Unable to generate QR code.",
     "cardPngDownloaded": "Business card PNG downloaded.",
-    "contactSaved": "Contact vCard downloaded."
+    "contactSaved": "Open the contact file and choose Add to Contacts to save the name and phone number."
   }
 }

@@ -7,10 +7,11 @@ import {
   Globe,
   MapPin,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { resolveLocale } from "@/i18n/config";
 import { getPublicFields } from "@/shared/types";
 import type { Employee } from "@/shared/types";
-import { saveContact, websiteUrl } from "@/shared/utils/vcard";
+import { saveContact, websiteUrl, contactDownloadUrl } from "@/shared/utils/vcard";
 import { useToast } from "@/client/components/ui/Toast";
 
 export function CardActions({
@@ -21,6 +22,7 @@ export function CardActions({
   animate?: boolean;
 }) {
   const toast = useToast();
+  const contactHref = contactDownloadUrl(e, resolveLocale(useLocale()));
   const t = useTranslations("card.actions");
   const tToast = useTranslations("toast");
   const pf = getPublicFields(e);
@@ -61,7 +63,7 @@ export function CardActions({
           },
         ]
       : []),
-    { id: "save", label: t("saveContact"), icon: ContactRound, href: "", external: false },
+    { id: "save", label: t("saveContact"), icon: ContactRound, href: contactHref, external: false },
     ...(pf.website && websiteUrl(e.website)
       ? [
           {
@@ -102,6 +104,7 @@ export function CardActions({
           <a
             key={id}
             href={href}
+            onClick={id === "save" ? () => toast(tToast("contactSaved")) : undefined}
             target={external ? "_blank" : undefined}
             rel={external ? "noopener noreferrer" : undefined}
             {...aosProps}

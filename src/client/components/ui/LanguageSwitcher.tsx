@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useTransition, type KeyboardEvent } from "react";
+import { useContext, useRef, useTransition, type KeyboardEvent } from "react";
 import { AppRouterContext } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useLocale, useTranslations } from "next-intl";
 import {
@@ -15,6 +15,8 @@ import {
   useClientLocaleSwitch,
   writeClientLocale,
 } from "@/client/components/providers/I18nProvider";
+import { createPortal } from "react-dom";
+import { Spinner } from "@/client/components/ui/Spinner";
 import { cn } from "@/shared/utils/cn";
 
 export interface LanguageSwitcherProps {
@@ -42,18 +44,24 @@ export function LanguageSwitcher({
   const router = useContext(AppRouterContext);
   const [isPending, startTransition] = useTransition();
 
-  const handleSelect = async (nextLocale: Locale) => {
-    if (nextLocale === activeLocale || isPending) return;
-    writeClientLocaleCookie(nextLocale);
-    writeClientLocale(nextLocale);
-    localeSwitch?.setLocale(nextLocale);
-    try {
-      await setLocaleCookie(nextLocale);
-    } catch {
-      // Cookie was already written via document.cookie as fallback
-    }
-    startTransition(() => {
-      router?.refresh();
+  const switchingRef = useRef(false);
+  const handleSelect = (nextLocale: Locale) => {
+    if (nextLocale === activeLocale || isPending || switchingRef.current) return;
+    switchingRef.current = true;
+    startTransition(async () => {
+      try {
+        writeClientLocaleCookie(nextLocale);
+        writeClientLocale(nextLocale);
+        localeSwitch?.setLocale(nextLocale);
+        try {
+          await setLocaleCookie(nextLocale);
+        } catch {
+          // The client cookie still persists the selected language when offline.
+        }
+        startTransition(() => { router?.refresh(); });
+      } finally {
+        switchingRef.current = false;
+      }
     });
   };
 
@@ -69,6 +77,7 @@ export function LanguageSwitcher({
 
   return (
     <div
+      aria-busy={isPending}
       role="group"
       aria-label={t("switchLanguage")}
       onKeyDown={handleKeyDown}
@@ -118,6 +127,11 @@ export function LanguageSwitcher({
           </button>
         );
       })}
+      {isPending && typeof document !== "undefined" && createPortal(
+        <div role="status" aria-live="polite" className="pointer-events-none fixed bottom-6 left-1/2 z-[200] flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full border border-cyan-400/30 bg-slate-950/95 px-5 py-3 text-sm font-medium text-white shadow-xl">
+          <Spinner size={18} />{t("changingLanguage")}
+        </div>, document.body,
+      )}
     </div>
   );
 }

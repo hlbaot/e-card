@@ -104,3 +104,36 @@ test("public cards migrate stored circles and accept cyber-magazine", async () =
     assert.deepEqual((await service.bySlug(card.slug))!.theme.decor, ["cyber-magazine"]);
   }
 });
+
+test("native contact file includes name and mobile number, respects language and rejects hidden cards", async () => {
+  process.env.DATABASE_URL = "postgresql://localhost:5432/cards_tests_never_connected";
+  process.env.JWT_SECRET = "test-only-secret-with-at-least-32-bytes";
+  const { publicCards } = await import("../src/server/cards/runtime");
+  const { GET } = await import("../src/app/api/cards/[slug]/contact.vcf/route");
+  const original = publicCards.bySlug;
+  const service = createCardsService({ ...repository, async bySlug(slug) {
+    const record = await repository.bySlug(slug);
+    return record ? { ...record, fullName: "NGUYỄN ĐỨC AN", phone: "0917 895 579" } : null;
+  } });
+  publicCards.bySlug = service.bySlug;
+  const get = (slug: string, locale = "vi") => GET(new Request(`http://localhost/api/cards/${slug}/contact.vcf?lang=${locale}`), { params: Promise.resolve({ slug }) });
+  try {
+    for (const locale of ["vi", "en"]) {
+      const response = await get(card.slug, locale);
+      assert.equal(response.status, 200);
+      assert.equal(response.headers.get("Content-Type"), "text/vcard; charset=utf-8");
+      assert.equal(response.headers.get("Cache-Control"), "no-store");
+      assert.equal(response.headers.get("Content-Disposition"), 'inline; filename="public-card.vcf"');
+      const text = await response.text();
+      assert.ok(text.startsWith("BEGIN:VCARD\r\nVERSION:3.0\r\n"));
+      assert.ok(text.includes(`FN:${locale === "vi" ? "NGUYỄN ĐỨC AN" : "NGUYEN DUC AN"}\r\n`));
+      assert.ok(text.includes("TEL;TYPE=CELL:0917895579\r\n"));
+      assert.ok(text.endsWith("END:VCARD\r\n"));
+    }
+    for (const slug of ["hidden", "deleted", "missing"]) assert.equal((await get(slug)).status, 404);
+    publicCards.bySlug = async () => { throw new Error("private database details"); };
+    const failure = await get(card.slug);
+    assert.equal(failure.status, 503);
+    assert.ok(!(await failure.text()).includes("private database details"));
+  } finally { publicCards.bySlug = original; }
+});

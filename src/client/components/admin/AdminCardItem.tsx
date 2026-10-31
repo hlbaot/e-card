@@ -3,7 +3,9 @@ import { memo, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Eye, QrCode, Download, Pencil } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { localizeEmployeeName } from "@/shared/utils/localize";
+import { resolveLocale } from "@/i18n/config";
 import type { Employee } from "@/shared/types";
 import { CardListContent } from "@/client/components/card/CardListItem";
 import { CopyButton } from "@/client/components/ui/CopyButton";
@@ -24,6 +26,7 @@ export const AdminCardItem = memo(function AdminCardItem({
 }) {
   const [open, setOpen] = useState(false);
   const toast = useToast();
+  const locale = resolveLocale(useLocale());
   const t = useTranslations("admin.cards");
   const tCommon = useTranslations("common");
   const tToast = useTranslations("toast");
@@ -35,8 +38,8 @@ export const AdminCardItem = memo(function AdminCardItem({
       <Link
         href={routes.employee(e.id)}
         className="admin-card-edit-btn"
-        title={t("editCardAria", { name: e.fullName })}
-        aria-label={t("editCardAria", { name: e.fullName })}
+        title={t("editCardAria", { name: localizeEmployeeName(e.fullName, locale) })}
+        aria-label={t("editCardAria", { name: localizeEmployeeName(e.fullName, locale) })}
       >
         <Pencil size={12} />
         <span>{t("editCard")}</span>
@@ -98,7 +101,7 @@ export const AdminCardItem = memo(function AdminCardItem({
       </div>
       {open && (
         <Modal
-          title={t("qrModalTitle", { name: e.fullName })}
+          title={t("qrModalTitle", { name: localizeEmployeeName(e.fullName, locale) })}
           onClose={() => setOpen(false)}
         >
           <QRPanel slug={e.slug} />

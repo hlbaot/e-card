@@ -1,3 +1,5 @@
+import { resolveLocale, type Locale } from "@/i18n/config";
+import { normalizePhone } from "./phone";
 import { getPublicFields } from "@/shared/types";
 import type { Employee } from "@/shared/types";
 
@@ -31,7 +33,7 @@ export function createVCard(e: Employee) {
   ];
 
   if (pf.phone && e.phone.trim()) {
-    lines.push(`TEL;TYPE=CELL:${escape(e.phone)}`);
+    lines.push(`TEL;TYPE=CELL:${escape(normalizePhone(e.phone))}`);
   }
   if (pf.email && e.email.trim()) {
     lines.push(`EMAIL:${escape(e.email)}`);
@@ -61,8 +63,17 @@ export function downloadBlob(blob: Blob, name: string) {
   const a = document.createElement("a");
   a.href = url;
   a.download = name;
+  document.body.appendChild(a);
   a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  a.remove();
+  // Mobile browsers may hand the file to Contacts after the click completes.
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
+}
+
+/** A real .vcf URL lets mobile browsers hand the contact to the system viewer. */
+export function contactDownloadUrl(e: Employee, locale: Locale): string {
+  if (!e.slug || e.id === "preview" || e.slug === "xem-truoc") return "";
+  return `/api/cards/${encodeURIComponent(e.slug)}/contact.vcf?lang=${resolveLocale(locale)}`;
 }
 
 export function saveContact(e: Employee) {

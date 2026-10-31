@@ -1,6 +1,6 @@
 import { CyberMagazineTopRight } from "./CyberMagazineTopRight";
 import { useId } from "react";
-import { getCyberMagazineColors } from "@/shared/constants/cyber-magazine";
+import { getCyberMagazineColors, isCyberMagazineDefaultColor } from "@/shared/constants/cyber-magazine";
 import type { CardTheme } from "@/shared/types";
 import { migrateCardTheme } from "@/shared/utils/migrate-theme";
 
@@ -20,6 +20,7 @@ export function CyberMagazineArtwork({ className, primaryColor = "#0F4C75", thum
   decorOpacity?: number;
 }) {
   const id = `cyber-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
+  const native = isCyberMagazineDefaultColor(primaryColor);
   const { deep, navy, blue, surface, cyan, light } = getCyberMagazineColors(primaryColor);
   const paint = (name: string) => `url(#${id}-${name})`;
   const stars = [[837, 83, 9], [910, 160, 8], [998, 224, 7], [1038, 291, 7], [913, 279, 10], [762, 128, 6], [81, 1200, 9], [170, 1402, 7], [876, 1374, 8], [960, 1391, 7], [1044, 1380, 9]];
@@ -29,13 +30,13 @@ export function CyberMagazineArtwork({ className, primaryColor = "#0F4C75", thum
       data-decor="cyber-magazine" data-thumbnail={thumbnail || undefined} aria-hidden="true" fill="none" pointerEvents="none">
       <defs>
         <linearGradient id={`${id}-blue`} x1="0" y1="1" x2="1" y2="0">
-          <stop stopColor={deep} /><stop offset=".55" stopColor={navy} /><stop offset=".86" stopColor={blue} /><stop offset="1" stopColor={surface} />
+          <stop stopColor={deep} /><stop offset=".55" stopColor={native ? "#00344F" : navy} /><stop offset=".86" stopColor={native ? "#005B76" : blue} /><stop offset="1" stopColor={native ? "#007A92" : surface} />
         </linearGradient>
         <linearGradient id={`${id}-navy`} x1="0" y1="0" x2="0" y2="1">
           <stop stopColor={deep} /><stop offset=".6" stopColor={navy} /><stop offset="1" stopColor={deep} />
         </linearGradient>
         <linearGradient id={`${id}-teal`} x1="0" y1="0" x2="1" y2="1">
-          <stop stopColor={surface} /><stop offset=".45" stopColor={blue} /><stop offset="1" stopColor={navy} />
+          <stop stopColor={native ? "#009BB2" : surface} /><stop offset=".45" stopColor={native ? "#00627E" : blue} /><stop offset="1" stopColor={native ? "#003651" : navy} />
         </linearGradient>
         <linearGradient id={`${id}-gold`} x1="0" y1="0" x2="1" y2=".3">
           <stop stopColor="#C9A227" /><stop offset=".25" stopColor="#E6C766" /><stop offset=".48" stopColor="#FFF3B0" /><stop offset=".7" stopColor="#C9A227" /><stop offset="1" stopColor="#E6C766" />
@@ -54,8 +55,8 @@ export function CyberMagazineArtwork({ className, primaryColor = "#0F4C75", thum
 
 
       {/* A transparent center, with a pale blue wash restricted to the margins. */}
-      <path d="M0 0H170L75 220L0 280ZM0 480L65 510L44 1090L120 1290H0Z" fill={paint("edge")} />
-      <path d="M1080 420L1018 490L1040 1070L945 1320H1080Z" fill={paint("edge")} />
+      <rect width="150" height="1440" fill={paint("edge")} />
+      <rect width="150" height="1440" transform="translate(1080 0) scale(-1 1)" fill={paint("edge")} />
 
       {/* Fine circuit traces at all four outer edges. */}
       <g stroke={blue} strokeWidth="1.15" opacity=".35">
@@ -74,7 +75,7 @@ export function CyberMagazineArtwork({ className, primaryColor = "#0F4C75", thum
       <path d="M0 1253C140 1325 167 1384 351 1352C540 1313 669 1335 802 1352C934 1368 1021 1339 1080 1301V1440H0Z" fill={paint("blue")} />
       <path d="M0 1338C227 1282 306 1366 492 1354C682 1341 766 1422 1080 1440H0Z" fill={navy} />
       <path d="M0 1267C110 1295 171 1392 337 1341C562 1272 694 1366 811 1351C949 1332 1016 1310 1080 1255" stroke={paint("gold")} strokeWidth="2" />
-      <path d="M211 1373C386 1260 525 1337 694 1353C838 1368 898 1434 1080 1440H991C848 1408 793 1373 684 1361C488 1337 391 1290 211 1373Z" fill={paint("gold")} />
+      <path d="M208 1375C371 1296 510 1322 686 1352C850 1380 939 1428 1080 1440H1026C882 1423 819 1384 681 1361C505 1333 366 1312 208 1375Z" fill={paint("gold")} />
       <path d="M0 1325C259 1272 389 1392 599 1356S928 1453 1080 1322M0 1368C216 1299 371 1404 564 1373S924 1445 1080 1352" stroke={cyan} strokeWidth="1" opacity=".7" />
       <path d="M0 1300H1080V1440H0Z" fill={paint("dots")} opacity=".22" />
 
@@ -123,7 +124,7 @@ export function CyberMagazineArtwork({ className, primaryColor = "#0F4C75", thum
         {[[71, 1218], [132, 1240], [169, 1316], [141, 1392], [72, 1425], [15, 1280]].map(([x, y]) => <circle key={x} cx={x} cy={y} r="3" fill={light} />)}
       </g>
       <g stroke={cyan} strokeLinejoin="round">
-        <path d="M73 1267Q96 1288 127 1292V1338Q124 1382 73 1408Q22 1382 19 1338V1292Q50 1288 73 1267Z" strokeWidth="9" opacity=".18" />
+        <path d="M73 1267Q96 1288 127 1292V1338Q124 1382 73 1408Q22 1382 19 1338V1292Q50 1288 73 1267Z" strokeWidth="12" opacity=".18" />
         <path d="M73 1267Q96 1288 127 1292V1338Q124 1382 73 1408Q22 1382 19 1338V1292Q50 1288 73 1267Z" fill={navy} fillOpacity=".8" strokeWidth="3" />
         <path d="M73 1277Q96 1295 118 1299V1338Q114 1374 73 1398Q32 1374 28 1338V1299Q50 1295 73 1277Z" stroke={light} strokeWidth="1.4" />
         <path d="M73 1285L109 1306V1339Q104 1370 73 1389Q42 1370 37 1339V1306Z" fill={paint("dots")} strokeWidth=".7" />

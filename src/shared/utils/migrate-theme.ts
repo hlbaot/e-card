@@ -8,7 +8,7 @@ import {
 const validMotifs: DecorKey[] = [
   "blobs",
   "bokeh",
-  "circles",
+  "cyber-magazine",
   "leaves",
   "geometry",
   "network",
@@ -30,7 +30,7 @@ export function migrateCardTheme(stored: StoredTheme): CardTheme {
 
   let selected: DecorKey[] = [];
   if (Array.isArray(decor)) {
-    const mapped = decor.map((k) => (k === "waves" ? "blobs" : k));
+    const mapped = decor.map((k) => (k === "waves" ? "blobs" : k === "circles" ? "cyber-magazine" : k));
     const filtered = mapped.filter(
       (key): key is DecorKey =>
         key !== "skyline" && validMotifs.includes(key as DecorKey),
@@ -41,7 +41,9 @@ export function migrateCardTheme(stored: StoredTheme): CardTheme {
     selected =
       oldPattern === "none"
         ? []
-        : [styleId === "dark-tech" || styleId === "luxury" ? "circles" : "blobs"];
+        : oldPattern === "circles" || oldPattern === "cyber-magazine"
+          ? ["cyber-magazine"]
+          : [styleId === "dark-tech" || styleId === "luxury" ? "cyber-magazine" : "blobs"];
   } else {
     selected = [...template.defaultDecor.filter((k) => k !== "skyline" && k !== "waves").slice(0, 1)];
     if (selected.length === 0) selected = ["blobs"];

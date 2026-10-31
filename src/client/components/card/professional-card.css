@@ -713,3 +713,9 @@
 }
 
 .qtm-brand-footer .anm-profile-motto + .qtm-platform-motto { margin-top: 12px; }
+
+/* Contrast over the magazine's navy upper-right and footer ribbons. */
+.qtm-cyber-magazine .qtm-culture { color: #e5f5ff; border-color: #8fc7f080; text-shadow: 0 1px 2px #0f2a5c; }
+.qtm-cyber-magazine .qtm-profile-motto { color: #e5f5ff; text-shadow: 0 1px 2px #0f2a5c; }
+
+.qtm-cyber-magazine .qtm-creative { background: #ffffffde; border-radius: 4px; }

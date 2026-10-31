@@ -1,3 +1,4 @@
+import { CyberMagazineArtwork } from "./CyberMagazineArtwork";
 import type { CardTheme, DecorKey } from "@/shared/types";
 
 function AmbientCluster({ position }: { position: string }) {
@@ -31,7 +32,7 @@ function AmbientCluster({ position }: { position: string }) {
 
 /** A flexible illustration occupies only the space left below the contact buttons. */
 export function ProfileConnectionArtwork({ theme }: { theme: CardTheme }) {
-  if (theme.showDecor === false || !theme.decor?.length) return null;
+  if (theme.showDecor === false || !theme.decor?.length || theme.decor[0] === "cyber-magazine") return null;
 
   return (
     <div className="qtm-connection-art" aria-hidden="true">
@@ -129,6 +130,10 @@ export function ProfileDecorations({ theme }: { theme: CardTheme }) {
 
   if (activeDecor === "none") {
     return null;
+  }
+
+  if (activeDecor === "cyber-magazine") {
+    return <CyberMagazineArtwork className="qtm-safe-decor" primaryColor={theme.primaryColor} decorOpacity={theme.showDecor === false ? 0 : theme.decorOpacity ?? 35} />;
   }
 
   /* 7. KHUNG TINH THỂ ĐA GIÁC (Crystal / Faceted Polygonal Geometric Frame - Works on Mobile & Desktop) */
@@ -270,37 +275,6 @@ export function ProfileDecorations({ theme }: { theme: CardTheme }) {
           <circle cx="365" cy="275" r="7" opacity="0.40" />
           <circle cx="22" cy="385" r="5.5" opacity="0.38" />
           <circle cx="370" cy="445" r="6" opacity="0.42" />
-        </g>
-      )}
-
-      {/* 3. VÒNG TRÒN MẢNH (Delicate Minimal Orbital Rings) */}
-      {activeDecor === "circles" && (
-        <g stroke="currentColor" fill="none">
-          {/* Mảng 1: Phía sau avatar */}
-          <circle cx="195" cy="138" r="92" strokeWidth="1.6" opacity="0.55" />
-          <circle cx="195" cy="138" r="114" strokeWidth="1.2" strokeDasharray="8 10" opacity="0.42" />
-          <circle cx="195" cy="138" r="134" strokeWidth="1.0" opacity="0.32" />
-
-          {/* Satellite node dots */}
-          <circle cx="287" cy="138" r="4.5" fill="currentColor" stroke="none" opacity="0.65" />
-          <circle cx="103" cy="138" r="4.5" fill="currentColor" stroke="none" opacity="0.65" />
-          <circle cx="195" cy="46" r="3.5" fill="currentColor" stroke="none" opacity="0.60" />
-          <circle cx="275" cy="88" r="4" fill="currentColor" stroke="none" opacity="0.62" />
-          <circle cx="115" cy="188" r="4" fill="currentColor" stroke="none" opacity="0.62" />
-
-          {/* Mảng 2: Góc trên phải */}
-          <circle cx="362" cy="55" r="42" strokeWidth="1.5" opacity="0.45" />
-          <circle cx="362" cy="55" r="24" strokeWidth="1.0" strokeDasharray="4 6" opacity="0.35" />
-
-          {/* Mảng 3: Rìa trái & rìa phải */}
-          <circle cx="15" cy="285" r="38" strokeWidth="1.4" opacity="0.40" />
-          <circle cx="15" cy="285" r="20" strokeWidth="0.9" opacity="0.30" />
-          <circle cx="370" cy="365" r="28" strokeWidth="1.2" opacity="0.35" />
-
-          {/* Chấm tròn mảnh ở rìa */}
-          <circle cx="335" cy="118" r="4" fill="currentColor" stroke="none" opacity="0.55" />
-          <circle cx="34" cy="365" r="3.5" fill="currentColor" stroke="none" opacity="0.48" />
-          <circle cx="368" cy="460" r="4" fill="currentColor" stroke="none" opacity="0.50" />
         </g>
       )}
 

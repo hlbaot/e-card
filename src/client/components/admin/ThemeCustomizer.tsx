@@ -10,7 +10,7 @@ import {
   colorPresets,
   getTemplate,
 } from "@/shared/constants/card-themes";
-import type { CardTheme } from "@/shared/types";
+import type { CardTheme, DecorKey } from "@/shared/types";
 import { CardDecorations } from "@/client/components/card/CardDecorations";
 import { DecorSwatch } from "@/client/components/card/DecorIllustration";
 import { cn } from "@/shared/utils/cn";
@@ -133,6 +133,19 @@ export const ThemeCustomizer = memo(function ThemeCustomizer({
     [rawTheme, set],
   );
 
+  const handleSelectDecor = useCallback((id: DecorKey | "none") => {
+    set({
+      decor: id === "none" ? [] : [id],
+      ...(id === "cyber-magazine" ? {
+        primaryColor: "#0F4C75",
+        backgroundId: "white-clean",
+        paletteId: "default-qtm",
+        buttonStyle: "filled" as const,
+        showDecor: true,
+      } : {}),
+    });
+  }, [set]);
+
   const template = getTemplate(theme.templateId);
   const decorOpacity = theme.decorOpacity ?? template.defaultDecorOpacity;
 
@@ -253,22 +266,14 @@ export const ThemeCustomizer = memo(function ThemeCustomizer({
               <label
                 key={option.id}
                 className={cn("decor-option cursor-pointer", isSelected && "selected")}
-                onClick={() => {
-                  set({
-                    decor: option.id === "none" ? [] : [option.id],
-                  });
-                }}
+                onClick={() => handleSelectDecor(option.id)}
               >
                 <input
                   type="radio"
                   name="card-decor-selection"
                   value={option.id}
                   checked={isSelected}
-                  onChange={() => {
-                    set({
-                      decor: option.id === "none" ? [] : [option.id],
-                    });
-                  }}
+                  onChange={() => handleSelectDecor(option.id)}
                 />
                 <span className="decor-thumbnail pointer-events-none" style={{ color: theme.primaryColor }}>
                   {option.id === "none" ? (
@@ -276,7 +281,7 @@ export const ThemeCustomizer = memo(function ThemeCustomizer({
                       <path d="M29 36L51 14" stroke="currentColor" strokeWidth="1.5" />
                     </svg>
                   ) : (
-                    <DecorSwatch decor={option.id} />
+                    <DecorSwatch decor={option.id} primaryColor={theme.primaryColor} />
                   )}
                 </span>
                 <span className="pointer-events-none">{option.name}</span>

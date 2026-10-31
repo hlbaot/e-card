@@ -96,3 +96,11 @@ test("public detail reads current visibility and content in one repository query
     assert.equal(reads, 3);
   } finally { cardsRepository.bySlug = original; }
 });
+
+test("public cards migrate stored circles and accept cyber-magazine", async () => {
+  for (const key of ["circles", "cyber-magazine"]) {
+    const record = { ...card, theme: { ...card.theme!, decor: [key] } };
+    const service = createCardsService({ async list() { return [record]; }, async bySlug() { return record; } });
+    assert.deepEqual((await service.bySlug(card.slug))!.theme.decor, ["cyber-magazine"]);
+  }
+});

@@ -1,7 +1,9 @@
+import { CyberMagazineArtwork } from "./CyberMagazineArtwork";
 import type { DecorKey } from "@/shared/types";
 
 /** Shared vector drawings: the selector and the profile use the same artwork. */
 export function DecorIllustration({ decor, variant = "halo" }: { decor: DecorKey; variant?: "halo" | "edge" }) {
+  if (decor === "cyber-magazine") return <CyberMagazineArtwork />;
   switch (decor) {
     case "blobs":
       return (
@@ -32,16 +34,6 @@ export function DecorIllustration({ decor, variant = "halo" }: { decor: DecorKey
           )}
         </g>
       );
-    case "circles":
-      return <g transform="translate(60 50) scale(1.18) translate(-60 -50)" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <circle cx="52" cy="49" r="34" opacity=".5" />
-        <circle cx="52" cy="49" r="26" opacity=".3" />
-        <circle cx="52" cy="49" r="18" opacity=".2" />
-        <circle cx="87" cy="65" r="22" opacity=".38" />
-        <circle cx="87" cy="65" r="14" opacity=".2" />
-        <circle cx="100" cy="20" r="8" fill="currentColor" stroke="none" opacity=".18" />
-        <circle cx="12" cy="78" r="6" fill="currentColor" stroke="none" opacity=".3" />
-      </g>;
     case "bokeh":
       return <g fill="currentColor">
         <path d="M56 14Q58 42 78 45Q58 48 56 76Q53 48 33 45Q53 42 56 14Z" opacity=".5" />
@@ -119,7 +111,8 @@ export function DecorIllustration({ decor, variant = "halo" }: { decor: DecorKey
   }
 }
 
-export function DecorSwatch({ decor }: { decor: DecorKey }) {
+export function DecorSwatch({ decor, primaryColor }: { decor: DecorKey; primaryColor?: string }) {
+  if (decor === "cyber-magazine") return <CyberMagazineArtwork primaryColor={primaryColor} thumbnail />;
   return <svg viewBox="0 0 160 90" fill="none" aria-hidden="true">
     <g transform="translate(24 -3) scale(.96)"><DecorIllustration decor={decor} /></g>
   </svg>;

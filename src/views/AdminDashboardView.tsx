@@ -1,15 +1,19 @@
 "use client";
 
 import { useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { useEmployees } from "@/client/hooks/useEmployees";
 import { Skeleton } from "@/client/components/ui/Skeleton";
 import { PageHeader } from "@/client/components/admin/dashboard/PageHeader";
 import { StatGrid } from "@/client/components/admin/dashboard/StatGrid";
 import { PromoBanner } from "@/client/components/admin/dashboard/PromoBanner";
 import { TeamTable } from "@/client/components/admin/dashboard/TeamTable";
+import { translateErrorMessage } from "@/i18n/error-map";
 
 export function AdminDashboardView() {
   const { employees, ready, error } = useEmployees();
+  const t = useTranslations("admin.dashboard");
+  const tRoot = useTranslations();
 
   const { total, active, inactive } = useMemo(() => {
     const totalCount = employees.length;
@@ -28,11 +32,15 @@ export function AdminDashboardView() {
 
   return (
     <div className="admin-fade-in mx-auto w-full max-w-[1280px] space-y-6">
-      {error && <p role="alert" className="panel text-red-400">{error}</p>}
+      {error && (
+        <p role="alert" className="panel text-red-400">
+          {translateErrorMessage(error, tRoot)}
+        </p>
+      )}
       <div>
         <PageHeader
-          title="Tổng quan"
-          subtitle="Chào mừng bạn đến với không gian quản trị E-card."
+          title={t("title")}
+          subtitle={t("subtitle")}
         />
       </div>
 

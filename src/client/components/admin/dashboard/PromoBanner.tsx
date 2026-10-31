@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { Plus, ArrowUpRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { routes } from "@/shared/constants/routes";
 
 export function PromoBanner() {
+  const t = useTranslations("admin.dashboard.promo");
   return (
     <section
-      aria-label="Kết nối không giới hạn"
+      aria-label={t("aria")}
       className="relative overflow-hidden rounded-[20px] border border-cyan-300/20 bg-gradient-to-br from-[#07152E] via-[#0B2942] to-[#0F3D52] px-6 py-6 sm:px-8 sm:py-7 shadow-[0_18px_44px_rgba(2,6,23,0.45)]"
     >
       {/* Subtle technical grid overlay */}
@@ -38,16 +40,15 @@ export function PromoBanner() {
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1.3fr_0.7fr] items-center gap-6">
         {/* Left Column: Copy + CTA Buttons */}
         <div>
-          <div className="eyebrow">KẾT NỐI KHÔNG GIỚI HẠN</div>
+          <div className="eyebrow">{t("eyebrow")}</div>
           <h2 className="mt-2.5 max-w-[520px] text-balance text-2xl sm:text-[28px] font-bold leading-[1.28] tracking-tight text-white">
-            Mỗi thành viên là một{" "}
+            {t("titlePrefix")}{" "}
             <span className="qtm-gradient-text">
-              đại diện thương&nbsp;hiệu.
+              {t("titleHighlight")}
             </span>
           </h2>
           <p className="mt-2.5 max-w-[520px] text-sm leading-relaxed text-[var(--text-body)]">
-            Tạo danh thiếp số mang dấu ấn QTM. Chia sẻ dễ dàng, cập nhật tức thì
-            và luôn sẵn sàng cho kết nối tiếp theo.
+            {t("description")}
           </p>
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
@@ -56,13 +57,13 @@ export function PromoBanner() {
               className="btn btn-primary group text-xs"
             >
               <Plus size={16} />
-              <span>Thêm nhân viên</span>
+              <span>{t("addEmployee")}</span>
             </Link>
             <Link
               href={routes.cards}
               className="btn btn-secondary group text-xs"
             >
-              <span>Danh thiếp số</span>
+              <span>{t("digitalCards")}</span>
               <ArrowUpRight
                 size={15}
                 className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"

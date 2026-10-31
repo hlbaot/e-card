@@ -1,7 +1,7 @@
 "use client";
 
 import { formatPhone } from "@/shared/utils/phone";
-
+import { useTranslations } from "next-intl";
 import { MapPin, Phone, Mail, Globe } from "lucide-react";
 import { getPublicFields } from "@/shared/types";
 import type { Employee } from "@/shared/types";
@@ -16,14 +16,15 @@ export function ContactList({
   employee: e,
   onOpenAddresses,
 }: ContactListProps) {
+  const t = useTranslations("card");
   const pf = getPublicFields(e);
   const webHref = websiteUrl(e.website);
   const headOffice =
     e.offices[0]?.address ||
-    "Số 22 Hồ Giám, phường Văn Miếu - Quốc Tử Giám, Hà Nội, Việt Nam";
+    t("placeholders.defaultHeadOfficeAddress");
   const hanoiOffice =
     e.offices[1]?.address ||
-    "Số 01 Lê Đức Thọ, phường Từ Liêm, Hà Nội, Việt Nam";
+    t("placeholders.defaultBranchOfficeAddress");
 
   const translateOfficeLabel = (
     rawLabel: string | undefined,
@@ -31,8 +32,8 @@ export function ContactList({
   ) => {
     if (!rawLabel) return fallback;
     const normalized = rawLabel.trim().toLowerCase();
-    if (normalized === "head office") return "Head Office";
-    if (normalized === "hanoi office") return "Hanoi Office";
+    if (normalized === "head office") return t("labels.headOffice");
+    if (normalized === "hanoi office") return t("labels.hanoiOffice");
     return rawLabel;
   };
 
@@ -41,7 +42,7 @@ export function ContactList({
       ? [
           {
             id: "head-office",
-            label: translateOfficeLabel(e.offices[0]?.label, "Head Office"),
+            label: translateOfficeLabel(e.offices[0]?.label, t("labels.headOffice")),
             value: headOffice,
             icon: MapPin,
             href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(headOffice)}`,
@@ -52,7 +53,7 @@ export function ContactList({
             id: "hanoi-office",
             label: translateOfficeLabel(
               e.offices[1]?.label,
-              "Hanoi Office",
+              t("labels.hanoiOffice"),
             ),
             value: hanoiOffice,
             icon: MapPin,
@@ -66,8 +67,8 @@ export function ContactList({
       ? [
           {
             id: "mobile",
-            label: "Phone",
-            value: formatPhone(e.phone) || "Chưa cập nhật",
+            label: t("labels.phone"),
+            value: formatPhone(e.phone) || t("placeholders.notUpdated"),
             icon: Phone,
             href: e.phone ? `tel:${e.phone.replace(/\s/g, "")}` : "",
             external: false,
@@ -79,8 +80,8 @@ export function ContactList({
       ? [
           {
             id: "email",
-            label: "Email",
-            value: e.email || "Chưa cập nhật",
+            label: t("labels.email"),
+            value: e.email || t("placeholders.notUpdated"),
             icon: Mail,
             href: e.email ? `mailto:${e.email}` : "",
             external: false,
@@ -92,7 +93,7 @@ export function ContactList({
       ? [
           {
             id: "website",
-            label: "Website",
+            label: t("labels.website"),
             value: e.website || "qtmmedia.vn",
             icon: Globe,
             href: webHref || "https://qtmmedia.vn",

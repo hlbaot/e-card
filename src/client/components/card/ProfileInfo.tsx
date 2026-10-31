@@ -2,10 +2,12 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import type { Employee } from "@/shared/types";
 import { cn } from "@/shared/utils/cn";
 
 export function ProfileInfo({ employee: e }: { employee: Employee }) {
+  const t = useTranslations("card.placeholders");
   const [avatarFailed, setAvatarFailed] = useState("");
 
   const initials = (e.fullName || "QT")
@@ -19,7 +21,6 @@ export function ProfileInfo({ employee: e }: { employee: Employee }) {
 
   return (
     <div className="flex flex-col items-center md:items-start text-center md:text-left min-w-0 shrink-0">
-      {/* Large circular avatar centered on mobile, left-aligned on desktop */}
       <div
         data-aos="zoom-in"
         data-aos-delay="150"
@@ -59,7 +60,6 @@ export function ProfileInfo({ employee: e }: { employee: Employee }) {
         </div>
       </div>
 
-      {/* Full Name UPPERCASE, bold; below is italic position; below is short accent divider */}
       <div
         data-aos="fade-up"
         data-aos-delay="250"
@@ -69,13 +69,13 @@ export function ProfileInfo({ employee: e }: { employee: Employee }) {
           className="ecard-fullname font-extrabold uppercase tracking-wide line-clamp-2 break-words pt-[0.08em]"
           style={{ color: "var(--pv-primary)" }}
         >
-          {e.fullName || "HỌ TÊN NHÂN VIÊN"}
+          {e.fullName || t("fullName")}
         </h1>
         <p
           className="ecard-position italic font-medium line-clamp-1"
           style={{ color: "var(--pv-body)" }}
         >
-          {e.position || "Chức vụ"}
+          {e.position || t("position")}
         </p>
         <div
           className="mx-auto md:mx-0 mt-[clamp(5px,1dvh,12px)] h-[2.5px] w-10 rounded-full"
@@ -84,7 +84,6 @@ export function ProfileInfo({ employee: e }: { employee: Employee }) {
         />
       </div>
 
-      {/* Keep the subtitle slot even when the optional short name is empty. */}
       <div
         data-aos="fade-up"
         data-aos-delay="300"
@@ -94,7 +93,7 @@ export function ProfileInfo({ employee: e }: { employee: Employee }) {
           className="ecard-company-name font-extrabold uppercase tracking-wide line-clamp-2 break-words"
           style={{ color: "var(--pv-strong)" }}
         >
-          {e.company || "CÔNG TY CỔ PHẦN CÔNG NGHỆ TRUYỀN THÔNG QTM"}
+          {e.company || t("qtmCompany")}
         </h2>
         <p
           className="ecard-company-short font-bold uppercase tracking-[0.14em] line-clamp-1"

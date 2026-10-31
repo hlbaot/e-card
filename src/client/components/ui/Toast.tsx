@@ -21,7 +21,7 @@ export const useToast = () => useContext(ToastContext);
 
 function inferToastVariant(message: string, explicit?: ToastVariant): ToastVariant {
   if (explicit) return explicit;
-  return /^(không thể|chưa thể|lỗi|vui lòng|chọn ảnh|đã có lỗi|yêu cầu thất bại)/i.test(
+  return /^(không thể|chưa thể|lỗi|vui lòng|chọn ảnh|đã có lỗi|yêu cầu thất bại|unable to|cannot|could not|error|please|failed|something went wrong|invalid|the system is busy)/i.test(
     message.trim(),
   )
     ? "error"

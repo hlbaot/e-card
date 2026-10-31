@@ -1,7 +1,9 @@
 "use client";
 import { useEffect, useRef, useId } from "react";
 import { X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { ToastViewport } from "./Toast";
+
 export function Modal({
   title,
   children,
@@ -13,6 +15,7 @@ export function Modal({
   children: React.ReactNode;
   onClose: () => void;
 }) {
+  const tCommon = useTranslations("common");
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   useEffect(() => {
@@ -30,7 +33,10 @@ export function Modal({
       aria-labelledby={titleId}
       className="modal"
       style={width ? { width: `min(${width}px, calc(100vw - 30px))` } : undefined}
-      onCancel={(e) => { e.preventDefault(); onClose(); }}
+      onCancel={(e) => {
+        e.preventDefault();
+        onClose();
+      }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -40,7 +46,7 @@ export function Modal({
         <button
           type="button"
           className="icon-button"
-          aria-label="Đóng hộp thoại"
+          aria-label={tCommon("closeDialog")}
           onClick={onClose}
         >
           <X size={20} />

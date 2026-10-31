@@ -10,16 +10,23 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/client/hooks/useAuth";
 import { useToast } from "@/client/components/ui/Toast";
 import { Alert } from "@/client/components/ui/Alert";
 import { authApi } from "@/api/auth.api";
 import { Skeleton } from "@/client/components/ui/Skeleton";
 import { PasswordMatchMeter } from "@/client/components/auth/PasswordMatchMeter";
+import { translateErrorMessage } from "@/i18n/error-map";
 
 export function AdminProfileView() {
   const { ready, user } = useAuth();
   const toast = useToast();
+  const t = useTranslations("admin.profile");
+  const tAuth = useTranslations("auth.login");
+  const tValidation = useTranslations("validation");
+  const tToast = useTranslations("toast");
+  const tRoot = useTranslations();
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -40,32 +47,32 @@ export function AdminProfileView() {
     setSuccess("");
 
     if (!currentPassword) {
-      setError("Vui lòng nhập mật khẩu hiện tại.");
+      setError(tValidation("currentPasswordRequired"));
       return;
     }
     if (newPassword.length < 8) {
-      setError("Mật khẩu mới phải có ít nhất 8 ký tự.");
+      setError(tValidation("newPasswordMinLength"));
       return;
     }
     if (newPassword !== confirmPassword) {
-      setError("Mật khẩu xác nhận không khớp.");
+      setError(tValidation("passwordMismatch"));
       return;
     }
     if (currentPassword === newPassword) {
-      setError("Mật khẩu mới không được trùng với mật khẩu hiện tại.");
+      setError(tValidation("passwordUnchanged"));
       return;
     }
 
     setLoading(true);
     try {
       await authApi.changePassword(currentPassword, newPassword);
-      setSuccess("Đổi mật khẩu thành công. Vui lòng đăng nhập lại.");
-      toast("Đổi mật khẩu thành công. Vui lòng đăng nhập lại.");
+      setSuccess(tToast("passwordChanged"));
+      toast(tToast("passwordChanged"));
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Không thể đổi mật khẩu.";
+      const msg = translateErrorMessage(err, tRoot, "toast.passwordChangeError");
       setError(msg);
       toast(msg, "error");
     } finally {
@@ -79,9 +86,9 @@ export function AdminProfileView() {
         <div>
           <div className="eyebrow mb-2">QTM MEDIATECH PLATFORM</div>
           <h1>
-            Hồ sơ &amp; <span className="qtm-gradient-text">Bảo mật</span>
+            {t("titlePrefix")} <span className="qtm-gradient-text">{t("titleHighlight")}</span>
           </h1>
-          <p>Xem thông tin tài khoản quản trị và cập nhật mật khẩu đăng nhập.</p>
+          <p>{t("subtitle")}</p>
         </div>
       </div>
 
@@ -90,7 +97,7 @@ export function AdminProfileView() {
         <section className="panel md:col-span-5">
           <div className="panel-heading mb-4 flex items-center gap-2 border-b border-white/10 pb-3">
             <ShieldCheck size={20} className="text-[#22D3EE]" />
-            <h2 className="text-base font-semibold text-white">Thông tin quản trị viên</h2>
+            <h2 className="text-base font-semibold text-white">{t("accountInfoTitle")}</h2>
           </div>
 
           <div className="space-y-4 text-sm">
@@ -99,7 +106,7 @@ export function AdminProfileView() {
                 <User size={22} />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="font-semibold text-white">Quản trị viên QTM</div>
+                <div className="font-semibold text-white">{t("adminName")}</div>
                 <div className="truncate text-xs text-slate-400">{user?.email}</div>
               </div>
             </div>
@@ -107,27 +114,27 @@ export function AdminProfileView() {
             <div className="space-y-3 pt-2">
               <div className="flex items-start justify-between gap-2 border-b border-white/5 pb-2.5">
                 <span className="flex items-center gap-2 text-slate-400">
-                  <Mail size={15} /> Thư điện tử:
+                  <Mail size={15} /> {t("emailLabel")}
                 </span>
                 <span className="font-mono text-xs text-white">{user?.email || "—"}</span>
               </div>
 
               <div className="flex items-start justify-between gap-2 border-b border-white/5 pb-2.5">
                 <span className="flex items-center gap-2 text-slate-400">
-                  <ShieldCheck size={15} /> Vai trò:
+                  <ShieldCheck size={15} /> {t("roleLabel")}
                 </span>
                 <span className="inline-flex items-center rounded-md bg-[#22D3EE]/10 px-2 py-0.5 text-xs font-medium text-[#22D3EE]">
-                  Super Admin
+                  {t("roleValue")}
                 </span>
               </div>
 
               <div className="flex items-start justify-between gap-2 border-b border-white/5 pb-2.5">
                 <span className="flex items-center gap-2 text-slate-400">
-                  <Lock size={15} /> Trạng thái:
+                  <Lock size={15} /> {t("statusLabel")}
                 </span>
                 <span className="inline-flex items-center gap-1.5 text-xs text-emerald-400">
                   <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                  Đang hoạt động
+                  {t("statusActive")}
                 </span>
               </div>
             </div>
@@ -138,7 +145,7 @@ export function AdminProfileView() {
         <section className="panel md:col-span-7">
           <div className="panel-heading mb-4 flex items-center gap-2 border-b border-white/10 pb-3">
             <KeyRound size={20} className="text-[#22D3EE]" />
-            <h2 className="text-base font-semibold text-white">Thay đổi mật khẩu</h2>
+            <h2 className="text-base font-semibold text-white">{t("changePasswordTitle")}</h2>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
@@ -155,12 +162,12 @@ export function AdminProfileView() {
             )}
 
             <div className="field">
-              <label htmlFor="currentPassword">Mật khẩu hiện tại</label>
+              <label htmlFor="currentPassword">{t("currentPasswordLabel")}</label>
               <div className="relative">
                 <input
                   id="currentPassword"
                   type={showCurrent ? "text" : "password"}
-                  placeholder="Nhập mật khẩu hiện tại"
+                  placeholder={t("currentPasswordPlaceholder")}
                   value={currentPassword}
                   onChange={(e) => { setCurrentPassword(e.target.value); setError(""); setSuccess(""); }}
                   autoComplete="current-password"
@@ -172,7 +179,7 @@ export function AdminProfileView() {
                   tabIndex={-1}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
                   onClick={() => setShowCurrent(!showCurrent)}
-                  aria-label={showCurrent ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                  aria-label={showCurrent ? tAuth("hidePasswordAria") : tAuth("showPasswordAria")}
                 >
                   {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -180,12 +187,12 @@ export function AdminProfileView() {
             </div>
 
             <div className="field">
-              <label htmlFor="newPassword">Mật khẩu mới (tối thiểu 8 ký tự)</label>
+              <label htmlFor="newPassword">{t("newPasswordLabel")}</label>
               <div className="relative">
                 <input
                   id="newPassword"
                   type={showNew ? "text" : "password"}
-                  placeholder="Nhập mật khẩu mới"
+                  placeholder={t("newPasswordPlaceholder")}
                   value={newPassword}
                   onChange={(e) => { setNewPassword(e.target.value); setError(""); setSuccess(""); }}
                   autoComplete="new-password"
@@ -198,7 +205,7 @@ export function AdminProfileView() {
                   tabIndex={-1}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
                   onClick={() => setShowNew(!showNew)}
-                  aria-label={showNew ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                  aria-label={showNew ? tAuth("hidePasswordAria") : tAuth("showPasswordAria")}
                 >
                   {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -206,12 +213,12 @@ export function AdminProfileView() {
             </div>
 
             <div className="field">
-              <label htmlFor="confirmPassword">Nhập lại mật khẩu mới</label>
+              <label htmlFor="confirmPassword">{t("confirmPasswordLabel")}</label>
               <div className="relative">
                 <input
                   id="confirmPassword"
                   type={showConfirm ? "text" : "password"}
-                  placeholder="Xác nhận mật khẩu mới"
+                  placeholder={t("confirmPasswordPlaceholder")}
                   value={confirmPassword}
                   onChange={(e) => { setConfirmPassword(e.target.value); setError(""); setSuccess(""); }}
                   autoComplete="new-password"
@@ -224,7 +231,7 @@ export function AdminProfileView() {
                   tabIndex={-1}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
                   onClick={() => setShowConfirm(!showConfirm)}
-                  aria-label={showConfirm ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                  aria-label={showConfirm ? tAuth("hidePasswordAria") : tAuth("showPasswordAria")}
                 >
                   {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -238,7 +245,7 @@ export function AdminProfileView() {
                 disabled={loading}
                 className="btn btn-primary w-full justify-center md:w-auto"
               >
-                {loading ? "Đang xử lý…" : "Cập nhật mật khẩu"}
+                {loading ? t("submitting") : t("submitButton")}
               </button>
             </div>
           </form>

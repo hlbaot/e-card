@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { ArrowLeft, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { restoreSession, useAuth } from "@/client/hooks/useAuth";
 import { useAos } from "@/client/hooks/useAos";
@@ -11,11 +12,15 @@ import { Alert } from "@/client/components/ui/Alert";
 import { useToast } from "@/client/components/ui/Toast";
 import { Spinner } from "@/client/components/ui/Spinner";
 import { LoadingOverlay } from "@/client/components/ui/LoadingOverlay";
+import { LanguageSwitcher } from "@/client/components/ui/LanguageSwitcher";
 import { HeroArt } from "@/client/components/layout/HeroArt";
-
+import { translateErrorMessage } from "@/i18n/error-map";
 
 export function LoginView() {
   const { login, authenticated } = useAuth();
+  const tRoot = useTranslations();
+  const t = useTranslations("auth.login");
+  const tToast = useTranslations("toast");
   useAos(true);
   const toast = useToast();
   const [email, setEmail] = useState("");
@@ -32,33 +37,31 @@ export function LoginView() {
     void restoreSession().then(() => {
       if (active) setSessionVerified(true);
     }).catch(() => {
-      if (active) setError("Không thể kiểm tra phiên. Bạn có thể thử đăng nhập lại.");
+      if (active) setError(t("sessionCheckFailed"));
     }).finally(() => {
       if (active) setCheckingSession(false);
     });
     return () => { active = false; };
-  }, []);
+  }, [t]);
 
   useEffect(() => {
-    // Verify current cookies before trusting a previously authenticated store.
     if (sessionVerified && authenticated) window.location.replace("/admin");
   }, [sessionVerified, authenticated]);
 
   return (
     <main className="login-page">
-      <LoadingOverlay show={busy} label="Đang đăng nhập…" />
+      <LoadingOverlay show={busy} label={t("submitting")} />
       <section className="login-story">
         <Brand />
         <div data-aos="fade-right" data-aos-delay="100">
-          <Badge>MỖI KẾT NỐI · MỘT CƠ HỘI TĂNG TRƯỞNG</Badge>
+          <Badge>{t("storyBadge")}</Badge>
           <h1>
-            Danh thiếp nhỏ.
+            {t("storyTitleLine1")}
             <br />
-            <span className="qtm-gradient-text">Giá trị lớn.</span>
+            <span className="qtm-gradient-text">{t("storyTitleHighlight")}</span>
           </h1>
           <p>
-            Mang bản sắc doanh nghiệp Công nghệ Truyền thông vào từng kết nối
-            với nền tảng danh thiếp số của QTM MediaTech.
+            {t("storyDescription")}
           </p>
           <HeroArt />
         </div>
@@ -74,38 +77,39 @@ export function LoginView() {
             e.preventDefault();
             setError("");
             if (!email.trim() || !password) {
-              setError("Vui lòng nhập email và mật khẩu.");
+              setError(t("missingCredentials"));
               return;
             }
             setBusy(true);
             try {
               await login(email, password);
-              toast("Đăng nhập thành công!");
+              toast(tToast("loginSuccess"));
               setSessionVerified(true);
             } catch (err) {
-              setError(
-                err instanceof Error ? err.message : "Đăng nhập không thành công. Vui lòng thử lại.",
-              );
+              setError(translateErrorMessage(err, tRoot, "errors.loginFailed"));
             } finally {
               setBusy(false);
             }
           }}
         >
-          <Link href="/" prefetch={true} className="login-back">
-            <ArrowLeft size={14} />
-            Về trang công khai
-          </Link>
+          <div className="mb-4 flex items-center justify-between gap-2">
+            <Link href="/" prefetch={true} className="login-back !mb-0">
+              <ArrowLeft size={14} />
+              {t("backPublic")}
+            </Link>
+            <LanguageSwitcher />
+          </div>
           <h2>
-            Chào mừng <span className="qtm-gradient-text">trở lại</span>
+            {t("titlePrefix")} <span className="qtm-gradient-text">{t("titleHighlight")}</span>
           </h2>
-          <p>Đăng nhập để quản lý đội ngũ và danh thiếp số E-card.</p>
+          <p>{t("subtitle")}</p>
           <div className="field">
-            <label htmlFor="email">Thư điện tử quản trị</label>
+            <label htmlFor="email">{t("emailLabel")}</label>
             <input
               id="email"
               type="email"
               autoComplete="username"
-              placeholder="Nhập địa chỉ thư điện tử"
+              placeholder={t("emailPlaceholder")}
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
@@ -115,13 +119,13 @@ export function LoginView() {
             />
           </div>
           <div className="field">
-            <label htmlFor="password">Mật khẩu</label>
+            <label htmlFor="password">{t("passwordLabel")}</label>
             <div className="relative">
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
-                placeholder="Nhập mật khẩu"
+                placeholder={t("passwordPlaceholder")}
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
@@ -134,7 +138,7 @@ export function LoginView() {
                 type="button"
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors cursor-pointer p-1 rounded-md focus:outline-none focus:ring-1 focus:ring-cyan-400 flex items-center justify-center"
                 onClick={() => setShowPassword((prev) => !prev)}
-                aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                aria-label={showPassword ? t("hidePassword") : t("showPassword")}
                 tabIndex={-1}
               >
                 {showPassword ? (
@@ -155,7 +159,7 @@ export function LoginView() {
             </Alert>
           )}
           <button disabled={busy || checkingSession} className="btn btn-primary group">
-            {busy ? "Đang đăng nhập…" : checkingSession ? "Đang kiểm tra phiên…" : "Đăng nhập"}
+            {busy ? t("submitting") : checkingSession ? t("checkingSession") : t("submit")}
             {busy || checkingSession ? (
               <Spinner />
             ) : (

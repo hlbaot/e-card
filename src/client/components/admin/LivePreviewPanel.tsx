@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import type { Employee } from "@/shared/types";
 import { ECard } from "@/client/components/card/ECard";
 import { PreviewToggleButton } from "./PreviewToggleButton";
@@ -100,9 +101,10 @@ export const LivePreviewPanel = memo(function LivePreviewPanel({
   onOpenModal,
   toggleButtonRef,
 }: LivePreviewPanelProps) {
+  const t = useTranslations("admin.preview");
   return (
     <aside
-      aria-label="Khung xem trước trực tiếp"
+      aria-label={t("panelAria")}
       className="live-preview-panel h-full w-full overflow-hidden flex flex-col justify-between rounded-2xl border border-[var(--line)] bg-[var(--surface)]/75 backdrop-blur-xl px-3.5 py-3 shadow-[0_16px_44px_rgba(2,6,23,0.45)]"
     >
       {/* Top header */}
@@ -114,7 +116,7 @@ export const LivePreviewPanel = memo(function LivePreviewPanel({
         />
         <span className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-teal-400 shrink-0">
           <span className="h-1.5 w-1.5 rounded-full bg-teal-400 shadow-[0_0_8px_#2dd4bf]" />
-          Cập nhật tức thì
+          {t("instantUpdate")}
         </span>
       </div>
 
@@ -125,8 +127,7 @@ export const LivePreviewPanel = memo(function LivePreviewPanel({
 
       {/* Bottom caption */}
       <p className="shrink-0 pt-1.5 border-t border-white/[0.06] text-center font-mono text-[10px] tracking-[0.04em] text-[var(--muted)]">
-        Mọi thay đổi sẽ được hiển thị ngay tại đây · Bấm biểu tượng con mắt để
-        phóng to
+        {t("caption")}
       </p>
     </aside>
   );

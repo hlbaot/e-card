@@ -1,14 +1,18 @@
 "use client";
 import { useRef } from "react";
+import { useTranslations } from "next-intl";
 import { QRCodeCanvas } from "qrcode.react";
 import { Download, ShieldCheck } from "lucide-react";
 import { cardUrl, downloadQR } from "@/shared/utils/qr";
 import { CopyButton } from "@/client/components/ui/CopyButton";
 import { useToast } from "@/client/components/ui/Toast";
+
 export function QRPanel({ slug }: { slug: string }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const url = cardUrl(slug);
   const toast = useToast();
+  const t = useTranslations("card.qr");
+  const tToast = useTranslations("toast");
   return (
     <div className="qr-panel">
       <div className="qr-code">
@@ -18,11 +22,11 @@ export function QRPanel({ slug }: { slug: string }) {
           size={512}
           level="H"
           marginSize={4}
-          title={`Mã QR hồ sơ ${slug}`}
+          title={t("canvasTitle", { slug })}
         />
       </div>
-      <h3>Kết nối chỉ với một lần quét</h3>
-      <p>Quét mã để mở trang hồ sơ cá nhân và lưu thông tin liên hệ.</p>
+      <h3>{t("panelTitle")}</h3>
+      <p>{t("panelSubtitle")}</p>
       <a
         className="qr-link"
         href={url}
@@ -38,16 +42,16 @@ export function QRPanel({ slug }: { slug: string }) {
           className="btn btn-primary"
           onClick={() => {
             downloadQR(ref.current, slug);
-            toast("Đã tải mã QR PNG");
+            toast(tToast("qrDownloaded"));
           }}
         >
           <Download size={16} />
-          Tải QR (PNG)
+          {t("downloadQrPng")}
         </button>
       </div>
       <small>
         <ShieldCheck size={14} />
-        Liên kết cố định, thông tin luôn cập nhật
+        {t("panelFootnote")}
       </small>
     </div>
   );

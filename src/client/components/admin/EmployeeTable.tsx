@@ -2,7 +2,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Pencil, Trash2 } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import type { Employee } from "@/shared/types";
+import { resolveLocale } from "@/i18n/config";
+import { localizeText } from "@/shared/utils/localize";
 import { Avatar } from "@/client/components/ui/Avatar";
 import { Switch } from "@/client/components/ui/Switch";
 import { Spinner } from "@/client/components/ui/Spinner";
@@ -10,23 +13,31 @@ import { Modal } from "@/client/components/ui/Modal";
 import { useToast } from "@/client/components/ui/Toast";
 import { useEmployeeMutations } from "@/client/hooks/useEmployeeMutations";
 import { routes } from "@/shared/constants/routes";
+import { translateErrorMessage } from "@/i18n/error-map";
+
 export function EmployeeTable({ employees }: { employees: Employee[] }) {
   const [deleting, setDeleting] = useState<Employee | null>(null);
   const [removing, setRemoving] = useState(false);
   const closeDelete = () => { if (!removing) setDeleting(null); };
   const { remove, toggleActive, isToggling } = useEmployeeMutations();
   const toast = useToast();
+  const locale = resolveLocale(useLocale());
+  const t = useTranslations("admin.employees");
+  const tCommon = useTranslations("common");
+  const tToast = useTranslations("toast");
+  const tRoot = useTranslations();
+
   return (
     <>
       <div className="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Nhân viên</th>
-              <th>Chức vụ</th>
-              <th>Liên hệ</th>
-              <th>Trạng thái</th>
-              <th>Thao tác</th>
+              <th>{t("columns.employee")}</th>
+              <th>{t("columns.position")}</th>
+              <th>{t("columns.contact")}</th>
+              <th>{t("columns.status")}</th>
+              <th>{t("columns.actions")}</th>
             </tr>
           </thead>
           <tbody>
@@ -41,12 +52,12 @@ export function EmployeeTable({ employees }: { employees: Employee[] }) {
                       color={e.theme.primaryColor}
                     />
                     <div>
-                      <strong>{e.fullName}</strong>
-                      <small>{e.companyShort}</small>
+                      <strong className="uppercase">{e.fullName.toLocaleUpperCase("vi-VN")}</strong>
+                      <small>{localizeText(e.companyShort, locale)}</small>
                     </div>
                   </div>
                 </td>
-                <td>{e.position}</td>
+                <td>{localizeText(e.position, locale)}</td>
                 <td>
                   <div>{e.phone}</div>
                   <small className="muted">{e.email}</small>
@@ -56,25 +67,25 @@ export function EmployeeTable({ employees }: { employees: Employee[] }) {
                     <Switch
                       checked={e.isActive}
                       disabled={isToggling(e.id)}
-                      label={`Bật danh thiếp của ${e.fullName}`}
+                      label={t("toggleAria", { name: e.fullName })}
                       onChange={async () => {
                         try {
                           await toggleActive(e.id);
                           toast(
                             e.isActive
-                              ? "Đã tắt danh thiếp"
-                              : "Đã bật danh thiếp",
+                              ? tToast("cardDeactivated")
+                              : tToast("cardActivated"),
                           );
                         } catch (err) {
                           toast(
-                            err instanceof Error ? err.message : "Không thể đổi trạng thái",
+                            translateErrorMessage(err, tRoot, "toast.statusChangeError"),
                             "error",
                           );
                         }
                       }}
                     />
                     <span className={`status ${e.isActive ? "" : "off"}`}>
-                      {e.isActive ? "Đang bật" : "Đã tắt"}
+                      {e.isActive ? tCommon("enabled") : tCommon("disabled")}
                     </span>
                   </div>
                 </td>
@@ -83,13 +94,13 @@ export function EmployeeTable({ employees }: { employees: Employee[] }) {
                     <Link
                       className="icon-button"
                       href={routes.employee(e.id)}
-                      aria-label={`Sửa ${e.fullName}`}
+                      aria-label={t("editAria", { name: e.fullName })}
                     >
                       <Pencil size={15} />
                     </Link>
                     <button
                       className="icon-button"
-                      aria-label={`Xóa ${e.fullName}`}
+                      aria-label={t("deleteAria", { name: e.fullName })}
                       onClick={() => setDeleting(e)}
                     >
                       <Trash2 size={15} />
@@ -101,14 +112,14 @@ export function EmployeeTable({ employees }: { employees: Employee[] }) {
           </tbody>
         </table>
         {employees.length === 0 && (
-          <div className="empty">Không có nhân viên phù hợp.</div>
+          <div className="empty">{t("empty")}</div>
         )}
       </div>
       {deleting && (
-        <Modal title="Xác nhận xóa nhân viên" onClose={closeDelete}>
+        <Modal title={t("deleteModalTitle")} onClose={closeDelete}>
           <p className="confirmation">
-            Bạn có chắc muốn xóa nhân viên <strong>{deleting.fullName}</strong> không?
-            Danh thiếp và liên kết của nhân viên này sẽ không còn khả dụng.
+            {t("deleteConfirmPrefix")} <strong className="uppercase">{deleting.fullName.toUpperCase()}</strong>?{" "}
+            {t("deleteConfirmSuffix")}
           </p>
           <div className="button-row justify-end">
             <button
@@ -116,7 +127,7 @@ export function EmployeeTable({ employees }: { employees: Employee[] }) {
               disabled={removing}
               onClick={closeDelete}
             >
-              Hủy
+              {tCommon("cancel")}
             </button>
             <button
               className="btn btn-danger"
@@ -126,10 +137,10 @@ export function EmployeeTable({ employees }: { employees: Employee[] }) {
                 try {
                   await remove(deleting.id);
                   setDeleting(null);
-                  toast("Đã xóa nhân viên");
+                  toast(tToast("employeeDeleted"));
                 } catch (err) {
                   toast(
-                    err instanceof Error ? err.message : "Không thể xóa nhân viên",
+                    translateErrorMessage(err, tRoot, "toast.employeeDeleteError"),
                     "error",
                   );
                 } finally {
@@ -138,7 +149,7 @@ export function EmployeeTable({ employees }: { employees: Employee[] }) {
               }}
             >
               {removing ? <Spinner size={14} /> : null}
-              {removing ? "Đang xóa…" : "Xóa nhân viên"}
+              {removing ? tCommon("deleting") : t("deleteConfirmButton")}
             </button>
           </div>
         </Modal>

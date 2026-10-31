@@ -1,4 +1,6 @@
+"use client";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 /** Shared logo lockup for cards, live previews and the public profile. */
 export function QtmBrand() {
@@ -16,12 +18,17 @@ export function QtmBrand() {
   );
 }
 
-
 export function CyberSecurityBrand() {
+  const t = useTranslations("common");
   return (
-    <div className="qtm-card-brand anm-card-brand" aria-label="An ninh mạng Việt Nam">
-      <Image src="/logo_anninhmang.png" width={1672} height={941}
-        alt="Logo An ninh mạng Việt Nam" unoptimized />
+    <div className="qtm-card-brand anm-card-brand" aria-label={t("cyberMagazineName")}>
+      <Image
+        src="/logo_anninhmang.png"
+        width={1672}
+        height={941}
+        alt={t("cyberMagazineName")}
+        unoptimized
+      />
     </div>
   );
 }

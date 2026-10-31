@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { LucideIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/shared/utils/cn";
 
 export interface StatCardProps {
@@ -25,6 +26,7 @@ export function StatCard({
   progress,
 }: StatCardProps) {
   const [displayValue, setDisplayValue] = useState(value);
+  const t = useTranslations("admin.dashboard.stats");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -124,7 +126,7 @@ export function StatCard({
 
         {ratio !== null && (
           <div
-            aria-label={`Tỉ lệ đang bật ${ratio}%`}
+            aria-label={t("activeRatioAria", { ratio })}
             className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-white/[0.08]"
           >
             <div

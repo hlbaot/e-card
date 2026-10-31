@@ -1,8 +1,10 @@
 "use client";
 
 import { CyberMagazineExportDecor } from "./CyberMagazineArtwork";
+import { resolveLocale } from "@/i18n/config";
+import { localizeEmployeeName } from "@/shared/utils/localize";
 import { formatPhone } from "@/shared/utils/phone";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { QRCodeSVG } from "qrcode.react";
 import { useId, type Ref, type SVGProps } from "react";
 import { getPublicFields, type Employee } from "@/shared/types";
@@ -72,9 +74,14 @@ export function QrBusinessCard(props: {
   url: string;
   svgRef?: Ref<SVGSVGElement>;
 }) {
+  const locale = resolveLocale(useLocale());
+  const localizedProps = {
+    ...props,
+    employee: { ...props.employee, fullName: localizeEmployeeName(props.employee.fullName, locale) },
+  };
   return props.employee.theme.businessCardType === "an-ninh-mang"
-    ? <CyberSecurityBusinessCard {...props} />
-    : <QtmBusinessCard {...props} />;
+    ? <CyberSecurityBusinessCard {...localizedProps} />
+    : <QtmBusinessCard {...localizedProps} />;
 }
 
 function QtmBusinessCard({ employee: e, url, svgRef }: {

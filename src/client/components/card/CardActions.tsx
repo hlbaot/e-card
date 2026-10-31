@@ -108,7 +108,8 @@ export function CardActions({
           >
             <span className="action-btn-content">
               <Icon size={16} />
-              <span>{label}</span>
+              <span className="action-btn-divider" aria-hidden="true" />
+              <span className="action-btn-label">{label}</span>
             </span>
           </a>
         ) : (
@@ -123,7 +124,8 @@ export function CardActions({
           >
             <span className="action-btn-content">
               <Icon size={16} />
-              <span>{label}</span>
+              <span className="action-btn-divider" aria-hidden="true" />
+              <span className="action-btn-label">{label}</span>
             </span>
           </button>
         );

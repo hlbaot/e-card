@@ -117,7 +117,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
               try {
                 await logout();
                 client.clear();
-                window.location.replace(routes.login);
+                window.location.replace(routes.home);
               } catch {
                 toast(tErrors("logoutFailed"), "error");
                 setLoggingOut(false);

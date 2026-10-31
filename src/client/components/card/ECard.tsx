@@ -37,12 +37,17 @@ export function ECard({ employee: rawEmployee, variant = "preview", onOpenQr, on
   const locale = resolveLocale(useLocale());
   const e = localizeEmployee(rawEmployee, locale);
   const t = useTranslations("card");
-  const theme = migrateCardTheme(e.theme);
-  const isCyberSecurity = theme.businessCardType === "an-ninh-mang";
+  const rawTheme = migrateCardTheme(e.theme);
+  const isCyberSecurity = rawTheme.businessCardType === "an-ninh-mang";
+  const theme =
+    isCyberSecurity && (!rawTheme.decor?.length || rawTheme.decor[0] === "blobs")
+      ? { ...rawTheme, decor: ["cyber-magazine" as const] }
+      : rawTheme;
+  const isCyberStyle = isCyberSecurity || theme.decor[0] === "cyber-magazine";
   const template = getTemplate(theme.templateId);
   const pf = getPublicFields(e);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const cyberColors = theme.decor[0] === "cyber-magazine" ? getCyberMagazineColors(theme.primaryColor) : null;
+  const cyberColors = isCyberStyle ? getCyberMagazineColors(theme.primaryColor) : null;
   const accent = readableAccent(cyberColors?.navy || theme.primaryColor || template.defaultColor, false, "#E0E0E0");
   const Name = variant === "profile" ? "h1" : "h2";
   const isProfile = variant === "profile";
@@ -110,7 +115,7 @@ export function ECard({ employee: rawEmployee, variant = "preview", onOpenQr, on
       "--card-font": template.fontFamily || (template.fontStyle === "serif" ? "Georgia, serif" : template.fontStyle === "mono" ? "\"Courier New\", monospace" : "var(--font-body), Arial, sans-serif"),
       "--motif-opacity": (theme.showDecor === false ? 0 : (theme.decorOpacity ?? 35)) / 100,
     } as CSSProperties}>
-      <article className={`qtm-professional-card qtm-template-${theme.templateId}${theme.decor[0] === "cyber-magazine" ? " qtm-cyber-controls" : ""}${theme.decor[0] === "cyber-magazine" && theme.showDecor !== false && (theme.decorOpacity ?? 35) >= 20 ? " qtm-cyber-magazine" : ""}${variant === "preview" ? " qtm-fit-preview" : ""}`} aria-label={t("profileAria", { name: e.fullName || t("placeholders.employee") })}>
+      <article className={`qtm-professional-card qtm-template-${theme.templateId}${isCyberStyle ? " qtm-cyber-controls" : ""}${isCyberStyle && theme.showDecor !== false && (theme.decorOpacity ?? 35) >= 20 ? " qtm-cyber-magazine" : ""}${variant === "preview" ? " qtm-fit-preview" : ""}`} aria-label={t("profileAria", { name: e.fullName || t("placeholders.employee") })}>
         <ProfileDecorations theme={theme} />
         <div className="qtm-card-scroll" ref={scrollRef}>
           <div className="qtm-card-layout">
@@ -136,10 +141,12 @@ export function ECard({ employee: rawEmployee, variant = "preview", onOpenQr, on
               <p className="qtm-position">{capitalizeFirstLetter(e.position || t("placeholders.position"))}</p>
               <span className="qtm-identity-rule" aria-hidden="true" />
               <h3>{e.company || (isCyberSecurity ? t("placeholders.cyberCompany") : t("placeholders.qtmCompany"))}</h3>
-              <p className="qtm-company-short" aria-hidden={!e.companyShort.trim()}
-                style={e.companyShort.trim() ? undefined : { visibility: "hidden" }}>
-                {e.companyShort.trim() || "\u00a0"}
-              </p>
+              {(!isCyberSecurity || e.companyShort.trim()) && (
+                <p className="qtm-company-short" aria-hidden={!e.companyShort.trim()}
+                  style={e.companyShort.trim() ? undefined : { visibility: "hidden" }}>
+                  {e.companyShort.trim() || "\u00a0"}
+                </p>
+              )}
             </section>
             {rows.length > 0 && <section className="qtm-profile-contacts" aria-label={t("sections.contactInfo")}>
               {rows.map(({ key, Icon, label, value, href }, index) => (

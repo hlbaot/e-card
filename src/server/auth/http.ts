@@ -7,11 +7,49 @@ import { isAllowedAuthOrigin } from "./origin";
 
 export const ACCESS_COOKIE = "ecard_access";
 export const REFRESH_COOKIE = "ecard_refresh";
-const cookieOptions = { httpOnly: true, secure: env.NODE_ENV === "production", sameSite: "lax" as const };
+export const SESSION_COOKIE = "ecard_session";
+const isHttpsSite = env.NEXT_PUBLIC_SITE_URL.startsWith("https://");
+const cookieOptions = {
+  httpOnly: true,
+  secure: env.NODE_ENV === "production" && isHttpsSite,
+  sameSite: "lax" as const,
+};
 export function assertSameOrigin(request: NextRequest) {
+  const fetchSite = request.headers.get("sec-fetch-site");
+  let origin = request.headers.get("origin");
+  if (!origin && fetchSite === "same-origin") {
+    const referer = request.headers.get("referer");
+    if (referer) {
+      try {
+        origin = new URL(referer).origin;
+      } catch {
+        origin = null;
+      }
+    }
+    if (!origin) {
+      try {
+        origin = new URL(request.url).origin;
+      } catch {
+        origin = null;
+      }
+    }
+  }
+  if (
+    fetchSite === "same-origin" &&
+    origin &&
+    (() => {
+      try {
+        return origin === new URL(request.url).origin;
+      } catch {
+        return false;
+      }
+    })()
+  ) {
+    return;
+  }
   if (!isAllowedAuthOrigin(
-    request.headers.get("origin"), request.url, env.NEXT_PUBLIC_SITE_URL,
-    env.NODE_ENV, request.headers.get("sec-fetch-site"),
+    origin, request.url, env.NEXT_PUBLIC_SITE_URL,
+    env.NODE_ENV, fetchSite,
   )) {
     throw new AuthError("Bạn không có quyền thực hiện thao tác này.", 403);
   }
@@ -22,11 +60,13 @@ export function authJson(body: unknown, status = 200) {
 export function setAuthCookies(response: NextResponse, tokens: { accessToken: string; refreshToken: string }) {
   response.cookies.set(ACCESS_COOKIE, tokens.accessToken, { ...cookieOptions, path: "/", maxAge: ACCESS_TTL });
   response.cookies.set(REFRESH_COOKIE, tokens.refreshToken, { ...cookieOptions, path: "/api/auth", maxAge: REFRESH_TTL });
+  response.cookies.set(SESSION_COOKIE, tokens.accessToken, { ...cookieOptions, path: "/", maxAge: REFRESH_TTL });
   return response;
 }
 export function clearAuthCookies(response: NextResponse) {
   response.cookies.set(ACCESS_COOKIE, "", { ...cookieOptions, path: "/", maxAge: 0 });
   response.cookies.set(REFRESH_COOKIE, "", { ...cookieOptions, path: "/api/auth", maxAge: 0 });
+  response.cookies.set(SESSION_COOKIE, "", { ...cookieOptions, path: "/", maxAge: 0 });
   return response;
 }
 export async function authHandler(action: () => Promise<NextResponse>) {

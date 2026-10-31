@@ -15,7 +15,7 @@ export type AvatarShape = "circle" | "rounded";
 export type ButtonStyle = "filled" | "soft" | "outline";
 export type DecorKey =
   | "blobs"
-  | "circles"
+  | "cyber-magazine"
   | "skyline"
   | "waves"
   | "bokeh"

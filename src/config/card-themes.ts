@@ -241,16 +241,7 @@ export const palettes: CardPalette[] = [
     textColor: "#065F46",
     borderColor: "#0E9F6E",
   },
-  {
-    id: "paper-classic",
-    name: "Cát ấm trang nhã",
-    backgroundId: "paper-cream",
-    backgroundCss: "linear-gradient(180deg,#FFFDF9 0%,#FAF5EB 100%)",
-    primaryColor: "#A78B6D",
-    accentColor: "#D4AF6A",
-    textColor: "#443525",
-    borderColor: "#A78B6D",
-  },
+
   {
     id: "lavender-mist",
     name: "Xanh trời thanh khiết",
@@ -261,16 +252,7 @@ export const palettes: CardPalette[] = [
     textColor: "#0C4A6E",
     borderColor: "#0284C7",
   },
-  {
-    id: "peach-blush",
-    name: "Vàng champagne nhã nhặn",
-    backgroundId: "peach-blush",
-    backgroundCss: "linear-gradient(145deg,#FFFDF7,#FAF3E6)",
-    primaryColor: "#B58A38",
-    accentColor: "#D4AF6A",
-    textColor: "#422006",
-    borderColor: "#B58A38",
-  },
+
   {
     id: "sage-garden",
     name: "Xanh lá dịu nhẹ",
@@ -281,16 +263,7 @@ export const palettes: CardPalette[] = [
     textColor: "#1A2E05",
     borderColor: "#3F6212",
   },
-  {
-    id: "royal-gold",
-    name: "Vàng kim sang trọng",
-    backgroundId: "sand-warm",
-    backgroundCss: "linear-gradient(180deg,#FFFDF7 0%,#FAF4E7 100%)",
-    primaryColor: "#B58A38",
-    accentColor: "#FACC15",
-    textColor: "#422006",
-    borderColor: "#B58A38",
-  },
+
   {
     id: "charcoal-slate",
     name: "Xám ngọc trai thanh lịch",
@@ -355,13 +328,8 @@ export const colorPresets = [
   { name: "Xanh ngọc tươi", hex: "#10B981" },
   { name: "Bạc hà dịu", hex: "#6EE7B7" },
   { name: "Xanh xô thơm", hex: "#65A30D" },
-  { name: "Vàng champagne", hex: "#D4AF6A" },
-  { name: "Vàng cát ấm", hex: "#CA8A04" },
-  { name: "Hổ phách dịu", hex: "#D97706" },
-  { name: "Nâu cát", hex: "#A78B6D" },
   { name: "Xám đá", hex: "#64748B" },
   { name: "Bạc ánh kim", hex: "#94A3B8" },
-  { name: "Kem ngọc trai", hex: "#E2D9C8" },
 ];
 
 export function getTemplate(id: TemplateId | StyleId): ThemeTemplate {

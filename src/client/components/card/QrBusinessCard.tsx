@@ -1,5 +1,7 @@
 "use client";
 
+import { CyberMagazineExportDecor } from "./CyberMagazineArtwork";
+
 import { formatPhone } from "@/shared/utils/phone";
 
 import { QRCodeSVG } from "qrcode.react";
@@ -130,6 +132,7 @@ function QtmBusinessCard({ employee: e, url, svgRef }: {
       <g clipPath={`url(#${id}-clip)`}>
         <rect width="1050" height="640" fill="#ffffff" />
 
+        <CyberMagazineExportDecor theme={e.theme} />
         <g fill="#c7e7f2">
           {connectedBlobs.map((d, i) => <path key={i} d={d} />)}
         </g>

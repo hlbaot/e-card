@@ -18,7 +18,7 @@ export const themeInput = z.object({
   primaryColor: z.string().regex(/^#[a-fA-F0-9]{6}$/, "Mã màu không hợp lệ."),
   avatarSize: z.enum(["sm", "md", "lg"]), avatarShape: z.enum(["circle", "rounded"]),
   buttonStyle: z.enum(["filled", "soft", "outline"]),
-  decor: z.array(z.enum(["blobs", "circles", "skyline", "waves", "bokeh", "leaves", "network", "geometry", "crystals"])).max(8),
+  decor: z.array(z.enum(["blobs", "cyber-magazine", "circles", "skyline", "waves", "bokeh", "leaves", "network", "geometry", "crystals"])).max(8).transform(keys => keys.map(key => key === "circles" ? "cyber-magazine" as const : key)),
   shapes: z.record(z.string().max(64), z.boolean()).refine((value) => Object.keys(value).length <= 32),
   showDecor: z.boolean().default(true), decorOpacity: z.number().int().min(0).max(100).default(35),
 }).strict().transform(({ styleId, paletteId: _paletteId, ...rest }) => {

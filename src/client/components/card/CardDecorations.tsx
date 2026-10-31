@@ -1,3 +1,4 @@
+import { CyberMagazineArtwork } from "./CyberMagazineArtwork";
 import type { CSSProperties } from "react";
 import type { CardTheme, DecorKey } from "@/shared/types";
 import { getThemeBackgroundCss } from "@/config/card-themes";
@@ -6,9 +7,10 @@ import { DecorIllustration } from "./DecorIllustration";
 import { cn } from "@/shared/utils/cn";
 
 /** Stable artwork shared with the profile; opacity never changes its placement. */
-export function DecorArtwork({ decor, className, fieldIndex = 0, fieldCount = 1 }: {
-  decor: DecorKey; className?: string; seed?: string; fieldIndex?: number; fieldCount?: number;
+export function DecorArtwork({ decor, className, fieldIndex = 0, fieldCount = 1, primaryColor }: {
+  decor: DecorKey; className?: string; seed?: string; fieldIndex?: number; fieldCount?: number; primaryColor?: string;
 }) {
+  if (decor === "cyber-magazine") return <CyberMagazineArtwork primaryColor={primaryColor} className={cn("decor-artwork decor-field", className)} />;
   const bottom = decor === "skyline" || decor === "waves";
   const areas = fieldCount <= 3 ? [
     { x: 110, y: 18, width: 200, height: 155 },
@@ -59,8 +61,9 @@ export function CardDecorations({ theme: rawTheme, showDecor, opacity, variant =
   return (
     <div aria-hidden="true" className={cn("card-decorations", `decor-${variant}`, className)}
       style={{ background: getThemeBackgroundCss(theme), "--decor-accent": theme.primaryColor, color: "var(--decor-accent)" } as CSSProperties}>
+      {theme.decor.includes("cyber-magazine") && <CyberMagazineArtwork className="decor-artwork decor-field" primaryColor={theme.primaryColor} decorOpacity={(showDecor ?? theme.showDecor ?? true) ? scale * 100 : 0} />}
       <div className="decor-motifs" style={{ opacity: scale }}>
-        {theme.decor.map((decor) => <DecorArtwork key={decor} decor={decor} seed={theme.templateId} fieldIndex={fields.findIndex(key => key === decor)} fieldCount={fields.length} />)}
+        {theme.decor.filter(decor => decor !== "cyber-magazine").map((decor) => <DecorArtwork key={decor} decor={decor} primaryColor={theme.primaryColor} seed={theme.templateId} fieldIndex={fields.findIndex(key => key === decor)} fieldCount={fields.length} />)}
         <DecorArtwork decor="skyline" className="permanent-skyline" />
         {(showDecor ?? theme.showDecor ?? true) && <>
           {frame && <div className="decor-single-frame" />}

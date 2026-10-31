@@ -9,7 +9,7 @@
     "lint": "eslint",
     "test": "node --test tests/aos.test.cjs && node scripts/smoke.cjs && pnpm test:auth && pnpm test:cards && pnpm test:admin && pnpm test:cache",
     "test:admin": "node --test tests/employee-card-flow.test.cjs && node --conditions=react-server --import tsx --test tests/admin.test.ts tests/admin-client.test.ts",
-    "test:cards": "node --conditions=react-server --import tsx --test tests/cards.test.ts",
+    "test:cards": "node --import tsx --test tests/cyber-magazine.test.tsx && node --conditions=react-server --import tsx --test tests/cards.test.ts",
     "test:auth": "node --test tests/auth-navigation.test.cjs && node --conditions=react-server --import tsx --test tests/auth.test.ts tests/auth-client.test.ts",
     "db:validate": "prisma validate",
     "db:generate": "prisma generate",

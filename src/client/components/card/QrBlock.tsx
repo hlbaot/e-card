@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { QRCodeCanvas } from "qrcode.react";
 import { Download } from "lucide-react";
 
@@ -10,6 +11,7 @@ interface QrBlockProps {
 }
 
 export function QrBlock({ url, onOpenQr, onDownloadQr }: QrBlockProps) {
+  const t = useTranslations("card.qr");
   return (
     <div
       data-aos="fade-up"
@@ -19,7 +21,7 @@ export function QrBlock({ url, onOpenQr, onDownloadQr }: QrBlockProps) {
       <button
         type="button"
         onClick={onOpenQr}
-        aria-label="Phóng to mã QR"
+        aria-label={t("enlargeQrAria")}
         className="ecard-qr-thumb rounded-xl bg-white p-1 border border-slate-200/80 shrink-0 flex items-center justify-center cursor-pointer"
       >
         <QRCodeCanvas
@@ -31,9 +33,9 @@ export function QrBlock({ url, onOpenQr, onDownloadQr }: QrBlockProps) {
         />
       </button>
       <div className="min-w-0">
-        <p className="text-xs font-bold text-[#0A2540]">Quét để lưu hồ sơ</p>
+        <p className="text-xs font-bold text-[#0A2540]">{t("scanToSaveShort")}</p>
         <p className="text-[11px] text-[#5B7A94] mt-0.5">
-          Mở nhanh trên điện thoại
+          {t("openQuicklyOnMobile")}
         </p>
         <button
           type="button"
@@ -41,7 +43,7 @@ export function QrBlock({ url, onOpenQr, onDownloadQr }: QrBlockProps) {
           className="mt-1.5 inline-flex items-center gap-1.5 rounded-lg bg-[#E2F0FC] hover:bg-[#D2E8FA] text-[#0F4C75] px-2.5 py-1 text-[11px] font-semibold transition cursor-pointer"
         >
           <Download size={12} />
-          Tải QR PNG
+          {t("downloadQrPng")}
         </button>
       </div>
     </div>

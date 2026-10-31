@@ -1,20 +1,26 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import type { AuthUser } from "@/shared/types";
 import { QueryProvider } from "@/client/providers/QueryProvider";
 import { AuthGuard } from "@/client/components/layout/AuthGuard";
 import { AdminSidebar } from "@/client/components/layout/AdminSidebar";
+import { getRequestLocale } from "@/i18n/request";
 import { ACCESS_COOKIE, REFRESH_COOKIE } from "@/server/auth/http";
 import { serverAuth } from "@/server/auth/runtime";
 
-export const metadata: Metadata = {
-  title: "Quản trị hệ thống",
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale();
+  const t = await getTranslations({ locale, namespace: "meta" });
+  return {
+    title: t("adminTitle"),
+    robots: {
+      index: false,
+      follow: false,
+    },
+  };
+}
 
 export default async function AdminLayout({
   children,

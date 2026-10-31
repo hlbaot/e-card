@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import type { AuthUser } from "@/shared/types";
 import {
   hydrateAuthUser,
@@ -18,8 +19,7 @@ export function AuthGuard({
   initialUser?: AuthUser | null;
   children: React.ReactNode;
 }) {
-  // Hydrate initialUser từ Server Component ngay khi khởi tạo (không đợi useEffect)
-  // để các hook dữ liệu (useEmployees, useEmployee) có userId ngay ở lần render đầu tiên.
+  const t = useTranslations("auth.guard");
   const [hydratedUserId, setHydratedUserId] = useState<string | null>(() => {
     if (typeof window === "undefined") {
       if (initialUser) {
@@ -52,7 +52,6 @@ export function AuthGuard({
         localStorage.setItem("ecard_logged_in", "1");
       } catch {}
     } else {
-      // Server could not verify access; ignore stale client state until restore finishes.
       void restoreSession().then(() => {
         if (active) setSessionRestored(true);
       }).catch(() => {
@@ -60,7 +59,6 @@ export function AuthGuard({
       });
     }
 
-    // Đăng ký duy nhất 1 listener visibilitychange tại AuthGuard kèm throttle 60s.
     const checkSession = () => {
       if (document.visibilityState === "visible" && shouldCheckSessionOnVisibility()) {
         void restoreSession().catch(() => {});
@@ -74,14 +72,15 @@ export function AuthGuard({
   }, [initialUser]);
 
   useEffect(() => {
-    // Chờ kiểm tra phiên hoàn tất để tránh chuyển về login khi request refresh còn đang chạy.
     if ((initialUser || sessionRestored) && ready && !authenticated) window.location.replace("/login");
   }, [initialUser, sessionRestored, ready, authenticated]);
 
   if (sessionError && !initialUser) return (
     <div role="alert" className="p-8 text-center">
-      <p>Không thể kiểm tra phiên đăng nhập. Vui lòng thử lại.</p>
-      <button type="button" className="btn btn-primary mt-4" onClick={() => window.location.reload()}>Thử lại</button>
+      <p>{t("sessionError")}</p>
+      <button type="button" className="btn btn-primary mt-4" onClick={() => window.location.reload()}>
+        {t("retry")}
+      </button>
     </div>
   );
   if ((!initialUser && !sessionRestored) || !ready || !authenticated) return <Skeleton />;

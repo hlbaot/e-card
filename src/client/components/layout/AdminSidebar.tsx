@@ -5,6 +5,7 @@ import { createAdminNavigationPrefetcher } from "@/client/queries/admin-navigati
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   LayoutDashboard,
   Users,
@@ -21,6 +22,7 @@ import { routes } from "@/shared/constants/routes";
 import { useToast } from "@/client/components/ui/Toast";
 import { Spinner } from "@/client/components/ui/Spinner";
 import { LoadingOverlay } from "@/client/components/ui/LoadingOverlay";
+import { LanguageSwitcher } from "@/client/components/ui/LanguageSwitcher";
 
 export function AdminSidebar({ children }: { children: React.ReactNode }) {
   const client = useQueryClient();
@@ -31,6 +33,8 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
   const { logout, authenticated } = useAuth();
   const toast = useToast();
   const router = useRouter();
+  const t = useTranslations("admin.sidebar");
+  const tErrors = useTranslations("errors");
   const prefetch = useMemo(
     () => authenticated && userId
       ? createAdminNavigationPrefetcher(client, router)
@@ -38,28 +42,27 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
     [client, router, userId, authenticated],
   );
   const nav = [
-    { href: routes.admin, label: "Tổng quan", icon: LayoutDashboard },
-    { href: routes.employees, label: "Nhân viên", icon: Users },
-    { href: routes.cards, label: "Danh thiếp số", icon: ContactRound },
-    { href: routes.profile, label: "Tài khoản", icon: UserCog },
+    { href: routes.admin, label: t("dashboard"), icon: LayoutDashboard },
+    { href: routes.employees, label: t("employees"), icon: Users },
+    { href: routes.cards, label: t("cards"), icon: ContactRound },
+    { href: routes.profile, label: t("profile"), icon: UserCog },
   ];
 
   return (
     <div className="admin-shell">
-      <LoadingOverlay show={loggingOut} label="Đang đăng xuất…" />
+      <LoadingOverlay show={loggingOut} label={t("loggingOut")} />
       {open && (
         <button
           className="mobile-overlay"
-          aria-label="Đóng menu"
+          aria-label={t("closeMenu")}
           onClick={() => setOpen(false)}
         />
       )}
 
-      {/* Nút mở menu trên mobile khi ở chế độ responsive */}
       <button
         type="button"
         className="admin-mobile-trigger lg:hidden"
-        aria-label="Mở menu quản trị"
+        aria-label={t("openMenu")}
         aria-expanded={open}
         onClick={() => setOpen(true)}
       >
@@ -72,16 +75,16 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
           <button
             type="button"
             className="sidebar-close-btn lg:hidden"
-            aria-label="Đóng menu"
+            aria-label={t("closeMenu")}
             onClick={() => setOpen(false)}
           >
             <X size={18} />
           </button>
         </div>
 
-        <div className="sidebar-label">KHÔNG GIAN QUẢN TRỊ</div>
+        <div className="sidebar-label">{t("eyebrow")}</div>
 
-        <nav aria-label="Điều hướng quản trị">
+        <nav aria-label={t("navAria")}>
           {nav.map(({ href, label, icon: Icon }) => (
             <Link
               href={href}
@@ -103,7 +106,8 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
           ))}
         </nav>
 
-        <div className="sidebar-footer">
+        <div className="sidebar-footer flex flex-col gap-2.5">
+          <LanguageSwitcher variant="sidebar" />
           <button
             type="button"
             className="sidebar-logout-btn"
@@ -115,18 +119,16 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
                 client.clear();
                 window.location.replace(routes.login);
               } catch {
-                toast("Chưa thể đăng xuất. Vui lòng thử lại.", "error");
+                toast(tErrors("logoutFailed"), "error");
                 setLoggingOut(false);
               }
             }}
           >
             {loggingOut ? <Spinner size={18} /> : <LogOut size={18} />}
-            <span>{loggingOut ? "Đang đăng xuất…" : "Đăng xuất"}</span>
+            <span>{loggingOut ? t("loggingOut") : t("logout")}</span>
           </button>
         </div>
       </aside>
-
-
 
       <main className="admin-content">{children}</main>
     </div>

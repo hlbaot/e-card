@@ -1,6 +1,7 @@
 "use client";
 
 import { Users, ContactRound, EyeOff } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { StatCard } from "./StatCard";
 
 export interface StatGridProps {
@@ -10,30 +11,31 @@ export interface StatGridProps {
 }
 
 export function StatGrid({ total, active, inactive }: StatGridProps) {
+  const t = useTranslations("admin.dashboard.stats");
   return (
     <section
-      aria-label="Thống kê tổng quan"
+      aria-label={t("aria")}
       className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
     >
       <StatCard
-        label="Tổng số nhân viên"
+        label={t("totalLabel")}
         value={total}
-        note="Thành viên trong đội ngũ"
+        note={t("totalNote")}
         icon={Users}
         tone="cyan"
       />
       <StatCard
-        label="Danh thiếp đang bật"
+        label={t("activeLabel")}
         value={active}
-        note="Sẵn sàng để kết nối"
+        note={t("activeNote")}
         icon={ContactRound}
         tone="teal"
         progress={{ current: active, total }}
       />
       <StatCard
-        label="Danh thiếp đã tắt"
+        label={t("inactiveLabel")}
         value={inactive}
-        note="Không hiển thị công khai"
+        note={t("inactiveNote")}
         icon={EyeOff}
         tone="muted"
       />

@@ -10,6 +10,7 @@ import {
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   UserRound,
   Building2,
@@ -35,6 +36,7 @@ import { EmployeeFormLayout } from "./EmployeeFormLayout";
 import { PreviewToggleButton } from "./PreviewToggleButton";
 import { formatPhone, normalizePhone } from "@/shared/utils/phone";
 import { websiteUrl } from "@/shared/utils/vcard";
+import { translateErrorMessage } from "@/i18n/error-map";
 
 const ThemeCustomizer = dynamic(() =>
   import("./ThemeCustomizer").then((m) => m.ThemeCustomizer),
@@ -120,6 +122,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
   const [uploading, setUploading] = useState(false);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
 
+  const fullNameComposingRef = useRef(false);
   const desktopToggleRef = useRef<HTMLButtonElement>(null);
   const mobileFabRef = useRef<HTMLButtonElement>(null);
   const lastTriggerRef = useRef<HTMLElement | null>(null);
@@ -127,6 +130,11 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
   const { create, update, uploadAvatar } = useEmployeeMutations();
   const toast = useToast();
   const router = useRouter();
+  const t = useTranslations("admin.form");
+  const tCommon = useTranslations("common");
+  const tValidation = useTranslations("validation");
+  const tToast = useTranslations("toast");
+  const tRoot = useTranslations();
 
   const set = <K extends keyof EmployeeInput>(
     key: K,
@@ -173,6 +181,21 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
   );
   const deferredPreview = useDeferredValue(preview);
 
+  const uppercaseFullName = (element: HTMLInputElement) => {
+    const value = element.value;
+    const start = element.selectionStart;
+    const end = element.selectionEnd;
+    const direction = element.selectionDirection ?? undefined;
+    set("fullName", value.toLocaleUpperCase("vi-VN"));
+    if (start !== null && end !== null) {
+      const nextStart = value.slice(0, start).toLocaleUpperCase("vi-VN").length;
+      const nextEnd = value.slice(0, end).toLocaleUpperCase("vi-VN").length;
+      requestAnimationFrame(() => {
+        if (document.activeElement === element) element.setSelectionRange(nextStart, nextEnd, direction);
+      });
+    }
+  };
+
   const input = (
     key: TextField,
     label: string,
@@ -186,7 +209,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
         {requiredFields.includes(key) && (
           <>
             <span className="text-red-500" aria-hidden="true"> *</span>
-            <span className="sr-only"> (bắt buộc)</span>
+            <span className="sr-only"> ({tCommon("required")})</span>
           </>
         )}
       </label>
@@ -194,10 +217,24 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
         id={key}
         type={type}
         style={key === "fullName" ? { textTransform: "uppercase" } : undefined}
+        autoCapitalize={key === "fullName" ? "characters" : undefined}
+        onCompositionStart={key === "fullName" ? () => { fullNameComposingRef.current = true; } : undefined}
+        onCompositionEnd={key === "fullName" ? (e) => {
+          fullNameComposingRef.current = false;
+          uppercaseFullName(e.currentTarget);
+        } : undefined}
         required={requiredFields.includes(key)}
         value={key === "phone" ? formatPhone(form.phone) : form[key]}
         placeholder={placeholder}
         onChange={(e) => {
+          if (key === "fullName") {
+            if (fullNameComposingRef.current || (e.nativeEvent as InputEvent).isComposing) {
+              set(key, e.target.value);
+            } else {
+              uppercaseFullName(e.currentTarget);
+            }
+            return;
+          }
           if (key !== "phone") { set(key, e.target.value); return; }
           const element = e.currentTarget;
           const cursor = element.selectionStart ?? element.value.length;
@@ -239,27 +276,27 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
     if (busy || uploading || cardPickerEmployee || (employee && !isDirty)) return;
     setFormError("");
     const next: Partial<Record<TextField, string>> = {};
-    if (!form.fullName.trim()) next.fullName = "Vui lòng nhập họ tên.";
+    if (!form.fullName.trim()) next.fullName = tValidation("fullNameRequired");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()))
-      next.email = "Vui lòng nhập địa chỉ thư điện tử hợp lệ.";
+      next.email = tValidation("emailInvalid");
     if (!/^(?=.*\d)[+\d][\d +]*$/.test(form.phone.trim()))
-      next.phone = "SĐT chỉ gồm số, dấu cách và dấu +.";
+      next.phone = tValidation("phoneInvalid");
     if (form.website.trim()) {
       const url = websiteUrl(form.website.trim());
       if (!url || !new URL(url).hostname.includes("."))
-        next.website = "Vui lòng nhập địa chỉ trang web hợp lệ.";
+        next.website = tValidation("websiteInvalid");
     }
     setErrors(next);
     if (Object.keys(next).length) {
       document.getElementById(Object.keys(next)[0])?.focus();
-      const msg = "Vui lòng kiểm tra và điền đầy đủ các thông tin bắt buộc.";
+      const msg = tValidation("formRequired");
       setFormError(msg);
       toast(msg, "error");
       return;
     }
     const clean = {
       ...form,
-      fullName: form.fullName.trim(),
+      fullName: form.fullName.trim().toLocaleUpperCase("vi-VN"),
       email: form.email.trim(),
       phone: normalizePhone(form.phone),
       website: form.website.trim(),
@@ -275,14 +312,11 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
       const saved = await update(employee.id, clean);
       setForm({ ...saved, theme: migrateCardTheme(saved.theme) });
       setSavedFingerprint(formFingerprint(saved));
-      toast("Đã lưu thay đổi nhân viên thành công");
+      toast(tToast("employeeUpdated"));
       router.push(`/admin/employees/${saved.id}`);
       router.refresh();
     } catch (err) {
-      const msg =
-        err instanceof Error
-          ? err.message
-          : "Không thể lưu dữ liệu. Vui lòng thử lại.";
+      const msg = translateErrorMessage(err, tRoot, "toast.saveError");
       setFormError(msg);
       toast(msg, "error");
     } finally {
@@ -295,17 +329,17 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
       <div className="breadcrumb">
         <Link href="/admin/employees" className="button-row">
           <ArrowLeft size={13} />
-          Nhân viên
+          {t("breadcrumbEmployees")}
         </Link>
         <span>/</span>
-        <span>{employee ? "Chỉnh sửa" : "Thêm mới"}</span>
+        <span>{employee ? t("breadcrumbEdit") : t("breadcrumbNew")}</span>
       </div>
       <div className="page-heading">
         <div>
-          <h1>{employee ? "Chỉnh sửa nhân viên" : "Thêm nhân viên mới"}</h1>
-          <p>Thông tin chuyên nghiệp. Dấu ấn của riêng bạn.</p>
+          <h1>{employee ? t("editTitle") : t("newTitle")}</h1>
+          <p>{t("subtitle")}</p>
         </div>
-        <span className="demo-badge">THIẾT KẾ HỒ SƠ</span>
+        <span className="demo-badge">{t("badge")}</span>
       </div>
     </>
   );
@@ -324,14 +358,14 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
       <section className="panel form-section">
         <h2>
           <UserRound size={18} />
-          <span>01</span>Thông tin nhân viên
+          <span>01</span>{t("sectionEmployee")}
         </h2>
         <div className="avatar-upload">
           <div className="relative inline-flex items-center">
             <label
               className="group relative inline-flex cursor-pointer rounded-full focus-within:ring-2 focus-within:ring-cyan-400 focus-within:ring-offset-2 focus-within:ring-offset-[#071026]"
-              title={uploading ? "Đang tải ảnh…" : "Nhấn để tải hoặc đổi ảnh đại diện"}
-              aria-label={uploading ? "Đang tải ảnh…" : "Tải hoặc đổi ảnh đại diện"}
+              title={uploading ? t("avatarUploading") : t("avatarUploadTitle")}
+              aria-label={uploading ? t("avatarUploading") : t("avatarUploadAria")}
             >
               <Avatar
                 name={form.fullName}
@@ -367,17 +401,17 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
                     ) ||
                     file.size > 2 * 1024 * 1024
                   ) {
-                    toast("Chọn ảnh JPG, PNG hoặc WebP tối đa 2 MB", "error");
+                    toast(tValidation("avatarInvalid"), "error");
                     return;
                   }
                   const input = e.currentTarget;
                   setUploading(true);
                   try {
                     set("avatarUrl", await uploadAvatar(file));
-                    toast("Đã tải ảnh lên");
+                    toast(tToast("avatarUploaded"));
                   } catch (error) {
                     toast(
-                      error instanceof Error ? error.message : "Không thể tải ảnh",
+                      translateErrorMessage(error, tRoot, "toast.avatarUploadError"),
                       "error",
                     );
                   } finally {
@@ -390,8 +424,8 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
             {form.avatarUrl && (
               <button
                 type="button"
-                aria-label="Xóa ảnh đại diện"
-                title="Xóa ảnh đại diện"
+                aria-label={t("avatarRemoveAria")}
+                title={t("avatarRemoveAria")}
                 onClick={() => set("avatarUrl", "")}
                 className="ml-3 inline-flex h-9 w-9 items-center justify-center rounded-xl border border-rose-500/35 bg-rose-500/12 text-rose-400 transition-all hover:border-rose-400/60 hover:bg-rose-500/22 hover:text-rose-300 cursor-pointer"
               >
@@ -401,38 +435,38 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
           </div>
           <div>
             <p className="!mt-0 text-xs font-medium text-slate-300">
-              Ảnh đại diện
+              {t("avatarLabel")}
             </p>
-            <p>JPG, PNG hoặc WebP · Tối đa 2 MB</p>
+            <p>{t("avatarHint")}</p>
           </div>
         </div>
         <div className="fields">
-          {input("fullName", "Họ và tên", "Nguyễn Văn An", true)}
-          {input("position", "Chức vụ", "Trưởng ban Hợp tác Phát triển", true)}
-          {input("company", "Tên công ty", "", true)}
-          {input("companyShort", "Tên công ty viết tắt", "", true)}
-          {input("phone", "Số điện thoại", "0900 000 000", false, "tel")}
-          {input("email", "Thư điện tử", "name@qtmmedia.vn", false, "email")}
-          {input("zalo", "Zalo", "0900000000")}
-          {input("website", "Trang web", "qtmmedia.vn")}
-          {input("slogan", "Khẩu hiệu", "Your Journey Partner", true)}
+          {input("fullName", t("fullName"), t("fullNamePlaceholder"), true)}
+          {input("position", t("position"), t("positionPlaceholder"), true)}
+          {input("company", t("company"), "", true)}
+          {input("companyShort", t("companyShort"), "", true)}
+          {input("phone", t("phone"), t("phonePlaceholder"), false, "tel")}
+          {input("email", t("email"), t("emailPlaceholder"), false, "email")}
+          {input("zalo", t("zalo"), t("zaloPlaceholder"))}
+          {input("website", t("website"), t("websitePlaceholder"))}
+          {input("slogan", t("slogan"), t("sloganPlaceholder"), true)}
           {employee && <div className="field full">
-            <span id="business-card-type-label" className="text-sm font-semibold">Mẫu card xuất</span>
+            <span id="business-card-type-label" className="text-sm font-semibold">{t("businessCardTypeLabel")}</span>
             <div role="group" aria-labelledby="business-card-type-label" className="mt-2 grid grid-cols-2 gap-3">
-              {([["qtm", "QTM"], ["an-ninh-mang", "An ninh mạng"]] as const).map(([value, label]) =>
+              {([["qtm", t("cardTypeQtm")], ["an-ninh-mang", t("cardTypeCyber")]] as const).map(([value, label]) =>
                 <button key={value} type="button" disabled={busy || uploading}
                   aria-pressed={(form.theme.businessCardType ?? "qtm") === value}
                   className={`btn ${(form.theme.businessCardType ?? "qtm") === value ? "btn-primary" : "btn-secondary"}`}
                   onClick={() => set("theme", { ...form.theme, businessCardType: value })}>{label}</button>)}
             </div>
-            <small>Chọn lại mẫu nếu đã tạo nhầm, rồi bấm Lưu thay đổi. Đường dẫn và QR được giữ nguyên.</small>
+            <small>{t("businessCardTypeHelp")}</small>
           </div>}
           {employee && (
             <div className="field full">
-              <label htmlFor="slug">Đường dẫn hồ sơ · cố định</label>
+              <label htmlFor="slug">{t("slugLabel")}</label>
               <input id="slug" readOnly value={employee.slug} />
               <small>
-                Đường dẫn và mã QR được giữ nguyên khi cập nhật thông tin.
+                {t("slugHelp")}
               </small>
             </div>
           )}
@@ -442,18 +476,18 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
       <section className="panel form-section">
         <h2>
           <Building2 size={18} />
-          <span>02</span>Thông tin văn phòng
+          <span>02</span>{t("sectionOffice")}
         </h2>
         {form.offices.map((office, index) => (
           <div className="office-row" key={index}>
             <div className="field">
               <label htmlFor={`office-label-${index}`}>
-                Văn phòng
+                {t("officeLabel")}
               </label>
               <input
                 id={`office-label-${index}`}
                 value={office.label}
-                placeholder="Tên văn phòng"
+                placeholder={t("officeNamePlaceholder")}
                 onChange={(e) =>
                   set(
                     "offices",
@@ -464,12 +498,12 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
                 }
               />
               <label className="sr-only" htmlFor={`office-address-${index}`}>
-                Địa chỉ văn phòng {index + 1}
+                {t("officeAddressAria", { index: index + 1 })}
               </label>
               <textarea
                 id={`office-address-${index}`}
                 value={office.address}
-                placeholder="Địa chỉ"
+                placeholder={t("officeAddressPlaceholder")}
                 rows={2}
                 onChange={(e) =>
                   set(
@@ -484,7 +518,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
             <button
               type="button"
               className="icon-button"
-              aria-label={`Xóa văn phòng ${index + 1}`}
+              aria-label={t("officeRemoveAria", { index: index + 1 })}
               onClick={() =>
                 set(
                   "offices",
@@ -504,7 +538,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
           }
         >
           <Plus size={15} />
-          Thêm văn phòng
+          {t("addOffice")}
         </button>
       </section>
 
@@ -516,20 +550,20 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
       <section className="panel form-section">
         <h2>
           <ShieldCheck size={18} />
-          <span>04</span>Hiển thị
+          <span>04</span>{t("sectionVisibility")}
         </h2>
 
         <div className="shape-row !mt-0">
           <div>
             <strong className="text-sm text-[var(--ink)]">
-              Hiển thị danh thiếp công khai
+              {t("publicCardTitle")}
             </strong>
             <p className="field-note mt-1">
-              Cho phép người dùng truy cập danh thiếp qua đường dẫn và mã QR.
+              {t("publicCardHelp")}
             </p>
           </div>
           <Switch
-            label="Hiển thị danh thiếp công khai"
+            label={t("publicCardTitle")}
             checked={form.isActive}
             onChange={(v) => set("isActive", v)}
           />
@@ -540,10 +574,12 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
         <section className="panel form-section">
           <h2>
             <QrCode size={18} />
-            <span>05</span>QR / Liên kết cố định
+            <span>05</span>{t("sectionQr")}
           </h2>
           <button type="button" className="btn btn-secondary mb-4" onClick={() => setCardPickerEmployee(preview)}>
-            Đổi mẫu / Xuất card · {form.theme.businessCardType === "an-ninh-mang" ? "An ninh mạng" : "QTM"}
+            {t("switchExportCardWithType", {
+              type: form.theme.businessCardType === "an-ninh-mang" ? t("cardTypeCyber") : t("cardTypeQtm"),
+            })}
           </button>
           <QRPanel slug={employee.slug} />
         </section>
@@ -554,20 +590,20 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
   const actionBar = (
     <div className="flex items-center justify-between gap-3">
       <Link href="/admin/employees" className="btn btn-secondary">
-        Hủy
+        {tCommon("cancel")}
       </Link>
       {employee && <button type="button" className="btn btn-secondary" disabled={busy || uploading}
-        onClick={() => setCardPickerEmployee(preview)}>Đổi mẫu / Xuất card</button>}
+        onClick={() => setCardPickerEmployee(preview)}>{t("switchExportCard")}</button>}
       <button type="submit" className="btn btn-primary" disabled={busy || uploading || !!cardPickerEmployee || (!!employee && !isDirty)}>
         {busy ? <Spinner /> : <Save size={16} />}
-        {busy ? (employee ? "Đang cập nhật…" : "Đang tạo nhân viên…") : employee ? "Lưu thay đổi" : "Tạo nhân viên"}
+        {busy ? (employee ? t("updating") : t("creating")) : employee ? tCommon("saveChanges") : t("createEmployee")}
       </button>
     </div>
   );
 
   return (
     <>
-      <LoadingOverlay show={busy} label={employee ? "Đang cập nhật nhân viên…" : "Đang tạo nhân viên…"} />
+      <LoadingOverlay show={busy} label={employee ? t("updatingOverlay") : t("creatingOverlay")} />
       <EmployeeFormLayout
         header={headerSection}
         formContent={formSections}
@@ -583,7 +619,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
           <PreviewToggleButton
             ref={mobileFabRef}
             variant="fab"
-            label="Xem trước"
+            label={t("previewFab")}
             onClick={handleOpenMobilePreview}
           />
         }
@@ -606,7 +642,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
               setForm({ ...saved, theme: migrateCardTheme(saved.theme) });
               setSavedFingerprint(formFingerprint(saved));
               setCardPickerEmployee(null);
-              toast(employee ? "Đã cập nhật mẫu card" : "Đã tạo nhân viên và lưu mẫu card");
+              toast(employee ? tToast("cardTemplateUpdated") : tToast("employeeCreatedAndCardSaved"));
               router.push(`/admin/employees/${saved.id}`);
               router.refresh();
             } finally {

@@ -4,6 +4,7 @@ import { formatPhone } from "@/shared/utils/phone";
 
 import Link from "next/link";
 import { useLayoutEffect, useRef, type CSSProperties } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { MapPin, Phone, Mail, Globe, QrCode, Share2, Pencil } from "lucide-react";
 import { getPublicFields } from "@/shared/types";
 import type { Employee } from "@/shared/types";
@@ -11,6 +12,8 @@ import { getTemplate, getThemeBackgroundCss } from "@/config/card-themes";
 import { getCyberMagazineColors } from "@/shared/constants/cyber-magazine";
 import { readableAccent } from "@/shared/utils/color";
 import { capitalizeFirstLetter } from "@/shared/utils/format-text";
+import { resolveLocale } from "@/i18n/config";
+import { localizeEmployee } from "@/shared/utils/localize";
 import { Avatar } from "@/client/components/ui/Avatar";
 import { migrateCardTheme } from "@/shared/utils/migrate-theme";
 import { websiteUrl } from "@/shared/utils/vcard";
@@ -24,13 +27,16 @@ import "./card-styles.css";
 
 /** Mobile composition is shared with previews; public desktop expands to two columns.
  * Templates retain their typography, decorations and action treatments. */
-export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onOpenAddresses }: {
+export function ECard({ employee: rawEmployee, variant = "preview", onOpenQr, onShare, onOpenAddresses }: {
   employee: Employee;
   variant?: "preview" | "profile";
   onOpenQr?: () => void;
   onShare?: () => void;
   onOpenAddresses?: () => void;
 }) {
+  const locale = resolveLocale(useLocale());
+  const e = localizeEmployee(rawEmployee, locale);
+  const t = useTranslations("card");
   const theme = migrateCardTheme(e.theme);
   const isCyberSecurity = theme.businessCardType === "an-ninh-mang";
   const template = getTemplate(theme.templateId);
@@ -50,12 +56,12 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
   const rows = [
     ...(pf.offices ? e.offices.map((office, index) => ({
       key: `office-${index}`, Icon: MapPin,
-      label: office.label || "Office",
+      label: office.label || t("labels.office"),
       value: office.address.trim(), href: "",
     })).filter(office => office.value) : []),
-    ...(pf.phone && e.phone.trim() ? [{ key: "phone", Icon: Phone, label: "Phone", value: formatPhone(e.phone), href: e.phone ? `tel:${e.phone.replace(/\s/g, "")}` : "" }] : []),
-    ...(pf.email && e.email.trim() ? [{ key: "email", Icon: Mail, label: "Email", value: e.email, href: e.email ? `mailto:${e.email}` : "" }] : []),
-    ...(pf.website && e.website.trim() ? [{ key: "website", Icon: Globe, label: "Website", value: e.website, href: websiteUrl(e.website) }] : []),
+    ...(pf.phone && e.phone.trim() ? [{ key: "phone", Icon: Phone, label: t("labels.phone"), value: formatPhone(e.phone), href: e.phone ? `tel:${e.phone.replace(/\s/g, "")}` : "" }] : []),
+    ...(pf.email && e.email.trim() ? [{ key: "email", Icon: Mail, label: t("labels.email"), value: e.email, href: e.email ? `mailto:${e.email}` : "" }] : []),
+    ...(pf.website && e.website.trim() ? [{ key: "website", Icon: Globe, label: t("labels.website"), value: e.website, href: websiteUrl(e.website) }] : []),
   ];
   useLayoutEffect(() => {
     if (variant !== "preview") return;
@@ -70,7 +76,6 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
       setSpacing(1);
       if (layout.scrollHeight <= viewport.clientHeight) return;
 
-      // Keep the largest gaps that fit, preserving the text size and full values.
       let low = 0;
       let high = 1;
       for (let i = 0; i < 10; i++) {
@@ -80,7 +85,6 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
         else low = middle;
       }
       setSpacing(low);
-      // Exceptionally large profiles still show the complete card in the preview.
       if (layout.scrollHeight > viewport.clientHeight) {
         layout.style.setProperty("--preview-scale", String(viewport.clientHeight / layout.scrollHeight));
       }
@@ -106,7 +110,7 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
       "--card-font": template.fontFamily || (template.fontStyle === "serif" ? "Georgia, serif" : template.fontStyle === "mono" ? "\"Courier New\", monospace" : "var(--font-body), Arial, sans-serif"),
       "--motif-opacity": (theme.showDecor === false ? 0 : (theme.decorOpacity ?? 35)) / 100,
     } as CSSProperties}>
-      <article className={`qtm-professional-card qtm-template-${theme.templateId}${theme.decor[0] === "cyber-magazine" ? " qtm-cyber-controls" : ""}${theme.decor[0] === "cyber-magazine" && theme.showDecor !== false && (theme.decorOpacity ?? 35) >= 20 ? " qtm-cyber-magazine" : ""}${variant === "preview" ? " qtm-fit-preview" : ""}`} aria-label={`Hồ sơ của ${e.fullName || "nhân viên"}`}>
+      <article className={`qtm-professional-card qtm-template-${theme.templateId}${theme.decor[0] === "cyber-magazine" ? " qtm-cyber-controls" : ""}${theme.decor[0] === "cyber-magazine" && theme.showDecor !== false && (theme.decorOpacity ?? 35) >= 20 ? " qtm-cyber-magazine" : ""}${variant === "preview" ? " qtm-fit-preview" : ""}`} aria-label={t("profileAria", { name: e.fullName || t("placeholders.employee") })}>
         <ProfileDecorations theme={theme} />
         <div className="qtm-card-scroll" ref={scrollRef}>
           <div className="qtm-card-layout">
@@ -118,26 +122,26 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
               {!isCyberSecurity && <p className="qtm-creative" {...aos("fade-right", 160)}><strong>QTM<br />MEDIATECH</strong><br />CREATIVE<br />+ AI TECH<span /></p>}
               <Avatar name={e.fullName} src={e.avatarUrl} color={accent} size={130} priority={isProfile} />
               <div className="qtm-profile-tools" {...aos("fade-left", 160)}>
-                {onOpenQr && <button type="button" aria-label="Mở mã QR" onClick={onOpenQr}><QrCode /></button>}
-                {onShare && <button type="button" aria-label="Chia sẻ hồ sơ" onClick={onShare}><Share2 /></button>}
+                {onOpenQr && <button type="button" aria-label={t("actions.showQrAria")} onClick={onOpenQr}><QrCode /></button>}
+                {onShare && <button type="button" aria-label={t("actions.shareProfileAria")} onClick={onShare}><Share2 /></button>}
                 {variant === "profile" && authenticated && (
-                  <Link href={routes.employee(e.id)} aria-label="Tuỳ chỉnh danh thiếp" title="Tuỳ chỉnh danh thiếp">
+                  <Link href={routes.employee(e.id)} aria-label={t("actions.customizeCardAria")} title={t("actions.customizeCardAria")}>
                     <Pencil size={18} />
                   </Link>
                 )}
               </div>
             </div>
-            <section className="qtm-profile-identity" aria-label="Thông tin cá nhân" {...aos("fade-up", 180)}>
-              <Name>{(e.fullName || "HỌ TÊN NHÂN VIÊN").toUpperCase()}</Name>
-              <p className="qtm-position">{capitalizeFirstLetter(e.position || "Chức vụ")}</p>
+            <section className="qtm-profile-identity" aria-label={t("sections.personalInfo")} {...aos("fade-up", 180)}>
+              <Name>{(e.fullName || t("placeholders.fullName")).toUpperCase()}</Name>
+              <p className="qtm-position">{capitalizeFirstLetter(e.position || t("placeholders.position"))}</p>
               <span className="qtm-identity-rule" aria-hidden="true" />
-              <h3>{e.company || (isCyberSecurity ? "TẠP CHÍ ĐIỆN TỬ AN NINH MẠNG VIỆT NAM" : "CÔNG TY CỔ PHẦN CÔNG NGHỆ TRUYỀN THÔNG QTM")}</h3>
+              <h3>{e.company || (isCyberSecurity ? t("placeholders.cyberCompany") : t("placeholders.qtmCompany"))}</h3>
               <p className="qtm-company-short" aria-hidden={!e.companyShort.trim()}
                 style={e.companyShort.trim() ? undefined : { visibility: "hidden" }}>
                 {e.companyShort.trim() || "\u00a0"}
               </p>
             </section>
-            {rows.length > 0 && <section className="qtm-profile-contacts" aria-label="Thông tin liên hệ">
+            {rows.length > 0 && <section className="qtm-profile-contacts" aria-label={t("sections.contactInfo")}>
               {rows.map(({ key, Icon, label, value, href }, index) => (
                 <div className="qtm-contact" key={key} {...aos("fade-left", 220 + index * 60)}>
                   <span className="qtm-contact-icon"><Icon aria-hidden="true" /></span>
@@ -150,7 +154,7 @@ export function ECard({ employee: e, variant = "preview", onOpenQr, onShare, onO
             <ProfileConnectionArtwork theme={theme} />
             <footer className="qtm-profile-footer qtm-brand-footer" {...aos("fade-up", 420)}>
               {isCyberSecurity ? (
-                <p className="qtm-profile-motto anm-profile-motto">TIN CẬY - TIÊN PHONG - KHÁT VỌNG</p>
+                <p className="qtm-profile-motto anm-profile-motto">{t("placeholders.cyberMotto")}</p>
               ) : (
                 <p className="qtm-profile-motto qtm-platform-motto">QUALITY - TECHNOLOGY - MINDSET</p>
               )}

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { absoluteUrl, siteConfig } from "@/config/site";
+import { getRequestLocale } from "@/i18n/request";
 import { cachedPublicCards } from "@/server/cards/cache";
 import { CardView } from "@/views/CardView";
 
@@ -19,10 +21,18 @@ export async function generateMetadata({
     notFound();
   }
 
-  // All cards are public and indexable.
-  const brandName = employee.theme.businessCardType === "an-ninh-mang" ? "An ninh mạng Việt Nam" : "QTM MediaTech";
+  const locale = await getRequestLocale();
+  const t = await getTranslations({ locale, namespace: "meta" });
+  const brandName =
+    employee.theme.businessCardType === "an-ninh-mang"
+      ? t("cardBrandCyber")
+      : t("cardBrandQtm");
   const pageTitle = `${employee.fullName} - ${employee.position} | ${brandName}`;
-  const pageDescription = `${employee.fullName} — ${employee.position} tại ${employee.company}. Danh thiếp điện tử chính thức trên E-card.`;
+  const pageDescription = t("cardDescription", {
+    name: employee.fullName,
+    position: employee.position,
+    company: employee.company,
+  });
   const canonicalUrl = absoluteUrl(`/card/${employee.slug}`);
   const ogImageUrl = employee.avatarUrl
     ? absoluteUrl(employee.avatarUrl)
@@ -42,7 +52,7 @@ export async function generateMetadata({
     },
     openGraph: {
       type: "profile",
-      locale: siteConfig.locale,
+      locale: t("ogLocale"),
       url: canonicalUrl,
       siteName: siteConfig.name,
       title: pageTitle,

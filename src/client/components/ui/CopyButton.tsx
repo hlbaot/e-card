@@ -1,14 +1,20 @@
 "use client";
 import { Copy } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useToast } from "./Toast";
+
 export function CopyButton({
   value,
-  label = "Sao chép liên kết",
+  label,
 }: {
   value: string;
   label?: string;
 }) {
   const toast = useToast();
+  const tCommon = useTranslations("common");
+  const tToast = useTranslations("toast");
+  const buttonLabel = label ?? tCommon("copyLink");
+
   return (
     <button
       type="button"
@@ -16,14 +22,14 @@ export function CopyButton({
       onClick={async () => {
         try {
           await navigator.clipboard.writeText(value);
-          toast("Đã sao chép liên kết");
+          toast(tToast("linkCopied"));
         } catch {
-          toast("Không thể sao chép. Hãy chọn và sao chép liên kết.", "error");
+          toast(tToast("copyFailed"), "error");
         }
       }}
     >
       <Copy size={16} />
-      {label}
+      {buttonLabel}
     </button>
   );
 }

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { ArrowLeft, QrCode, Share2 } from "lucide-react";
 
 interface CardHeaderProps {
@@ -11,11 +12,11 @@ interface CardHeaderProps {
 }
 
 export function CardHeader({ onOpenQr, onShare }: CardHeaderProps) {
-
+  const tCommon = useTranslations("common");
+  const tCard = useTranslations("card.actions");
   return (
     <div className="shrink-0">
       <header className="flex items-start justify-between gap-2">
-        {/* Left: QTM Brand Lockup (Logo + QTM / MEDIATECH / CREATIVE / + AI TECH with underline) */}
         <div
           data-aos="fade-right"
           data-aos-delay="50"
@@ -62,7 +63,6 @@ export function CardHeader({ onOpenQr, onShare }: CardHeaderProps) {
           </div>
         </div>
 
-        {/* Right: 4-line "VĂN HÓA / CÔNG NGHỆ / TRUYỀN THÔNG / SỰ KIỆN" with left vertical bar + compact QR & Share buttons */}
         <div
           data-aos="fade-left"
           data-aos-delay="100"
@@ -75,41 +75,41 @@ export function CardHeader({ onOpenQr, onShare }: CardHeaderProps) {
               color: "var(--pv-primary)",
             }}
           >
-            <div>VĂN HÓA</div>
-            <div>CÔNG NGHỆ</div>
-            <div>TRUYỀN THÔNG</div>
-            <div>SỰ KIỆN</div>
+            <div>CULTURE</div>
+            <div>TECHNOLOGY</div>
+            <div>MEDIA</div>
+            <div>EVENT</div>
           </div>
 
           <div className="flex items-center gap-1.5">
             <Link
               href="/"
-              aria-label="Về trang chủ"
-              title="Về trang chủ"
+              aria-label={tCommon("backHome")}
+              title={tCommon("backHome")}
               className="ecard-header-btn inline-flex items-center justify-center rounded-full h-8 w-8 md:h-9 md:w-auto md:px-3 gap-1.5 text-xs font-semibold shadow-2xs transition"
             >
               <ArrowLeft size={14} aria-hidden="true" />
-              <span className="hidden md:inline">Trang chủ</span>
+              <span className="hidden md:inline">{tCommon("home")}</span>
             </Link>
             <button
               type="button"
               onClick={onOpenQr}
-              aria-label="Mở mã QR"
-              title="Mã QR"
+              aria-label={tCard("showQrAria")}
+              title={tCard("qrCode")}
               className="ecard-header-btn inline-flex items-center justify-center rounded-full h-8 w-8 md:h-9 md:w-auto md:px-3 gap-1.5 text-xs font-semibold shadow-2xs transition cursor-pointer"
             >
               <QrCode size={14} />
-              <span className="hidden md:inline">Mã QR</span>
+              <span className="hidden md:inline">{tCard("qrCode")}</span>
             </button>
             <button
               type="button"
               onClick={onShare}
-              aria-label="Chia sẻ hồ sơ"
-              title="Chia sẻ"
+              aria-label={tCard("shareProfileAria")}
+              title={tCard("share")}
               className="ecard-header-btn inline-flex items-center justify-center rounded-full h-8 w-8 md:h-9 md:w-auto md:px-3 gap-1.5 text-xs font-semibold shadow-2xs transition cursor-pointer"
             >
               <Share2 size={14} />
-              <span className="hidden md:inline">Chia sẻ</span>
+              <span className="hidden md:inline">{tCard("share")}</span>
             </button>
           </div>
         </div>

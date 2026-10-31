@@ -44,6 +44,7 @@ tbody tr:last-child td {
   color: var(--ink);
   font-size: 13px;
   display: block;
+  text-transform: uppercase;
 }
 .employee-cell small {
   font-family: var(--font-mono-tech), monospace;

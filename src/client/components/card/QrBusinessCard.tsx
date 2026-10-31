@@ -1,9 +1,8 @@
 "use client";
 
 import { CyberMagazineExportDecor } from "./CyberMagazineArtwork";
-
 import { formatPhone } from "@/shared/utils/phone";
-
+import { useTranslations } from "next-intl";
 import { QRCodeSVG } from "qrcode.react";
 import { useId, type Ref, type SVGProps } from "react";
 import { getPublicFields, type Employee } from "@/shared/types";
@@ -43,27 +42,19 @@ function wrapText(value: string, limit: number, maxLines = 2) {
 
 const INK = "#17566d";
 
-// Logo QTM vẽ bằng vector để bản xem trước và PNG tải về giống nhau.
 const dumbbells = [
   { a: [203, 50], b: [57, 203] },
   { a: [253, 230], b: [107, 375] },
   { a: [423, 277], b: [277, 425] },
 ];
 
-// Connected silhouettes keep the soft, narrow necks visible in both SVG and PNG.
 const connectedBlobs = [
-  // Small upper bulb connected to the larger bulb below it.
   "M1018 115C1031 115 1040 124 1040 137C1040 149 1030 155 1028 166C1024 180 1030 188 1040 197C1060 215 1051 243 1028 253C1004 263 979 247 979 224C979 206 991 196 1002 182C1010 171 1009 160 1001 151C986 135 995 115 1018 115Z",
-  // Branching cluster at the right edge, with a small hanging bulb.
   "M964 267C981 267 992 277 1000 288C1013 306 1030 301 1044 287L1065 271V336C1050 324 1039 319 1025 320C1003 321 994 337 982 350C974 360 975 369 982 377C994 391 986 410 969 411C951 412 941 397 949 382C956 369 958 359 950 349C943 341 930 337 930 319C930 293 941 267 964 267Z",
-  // A narrow waist joins the two bulbs beside the contact block.
   "M871 333C884 333 893 343 893 355C893 366 884 373 881 383C877 395 884 403 895 414C915 435 901 468 876 470C851 472 834 451 846 428C853 414 865 403 864 389C864 378 850 371 850 356C850 343 859 333 871 333Z",
-  // Linked round forms rising from the bottom edge.
   "M691 640C690 617 706 601 726 601C745 601 751 615 769 614C784 613 787 600 798 592C812 582 831 589 835 604C839 620 826 628 829 640Z",
-  // Fill the lower-left QR gap with a small linked pair, leaving its white margin clear.
   "M851 500C860 500 867 507 867 516C867 525 859 530 860 540C861 551 875 556 878 569C883 587 867 600 851 595C835 591 830 575 838 562C844 552 852 547 851 538C850 529 837 526 837 516C837 507 843 500 851 500Z",
   "M803 640C804 624 817 614 831 617C845 620 849 633 861 632C875 631 877 616 891 615C906 613 918 624 918 640Z",
-  // Large curved cluster continuing beyond the bottom/right edges.
   "M1050 405C1026 403 1011 419 1012 440C1013 459 1028 465 1029 482C1030 499 1011 506 1001 520C985 541 998 559 989 574C981 588 965 582 956 569C946 554 929 554 921 567C912 581 920 595 934 602C949 610 952 623 950 640H1050Z",
 ];
 const blobDots: Array<[number, number, number]> = [
@@ -91,6 +82,7 @@ function QtmBusinessCard({ employee: e, url, svgRef }: {
   url: string;
   svgRef?: Ref<SVGSVGElement>;
 }) {
+  const t = useTranslations("card");
   const id = useId().replace(/:/g, "");
   const pf = getPublicFields(e);
   const website = e.website.replace(/^https?:\/\//, "").replace(/\/$/, "");
@@ -98,12 +90,12 @@ function QtmBusinessCard({ employee: e, url, svgRef }: {
   const rows: Row[] = [
     ...(pf.offices
       ? e.offices.filter((o) => o.address).slice(0, 3).map((o, i): Row => ({
-          Icon: i === 0 ? MapPin : null, label: o.label || "Office", value: o.address,
+          Icon: i === 0 ? MapPin : null, label: o.label || t("labels.office"), value: o.address,
         }))
       : []),
-    ...(pf.phone && e.phone ? [{ Icon: Phone, label: "Mobile", value: formatPhone(e.phone) }] : []),
-    ...(pf.email && e.email ? [{ Icon: Mail, label: "Email", value: e.email }] : []),
-    ...(pf.website && website ? [{ Icon: Globe, label: "Web", value: website }] : []),
+    ...(pf.phone && e.phone ? [{ Icon: Phone, label: t("labels.mobile"), value: formatPhone(e.phone) }] : []),
+    ...(pf.email && e.email ? [{ Icon: Mail, label: t("labels.email"), value: e.email }] : []),
+    ...(pf.website && website ? [{ Icon: Globe, label: t("labels.web"), value: website }] : []),
   ];
   const company = wrapText((e.company || "").toUpperCase(), 40);
   const contactRows = rows.map((row) => ({ ...row, lines: wrapText(row.value, 48) }));
@@ -118,7 +110,7 @@ function QtmBusinessCard({ employee: e, url, svgRef }: {
   return (
     <svg ref={svgRef} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1050 640" width="1050" height="640"
       data-export-background="#ffffff"
-      role="img" aria-label={`Danh thiếp của ${e.fullName}`}
+      role="img" aria-label={t("qr.businessCardAria", { name: e.fullName })}
       style={{ display: "block", width: "100%", height: "auto", fontFamily: "Arial, Helvetica, sans-serif" }}>
       <defs>
         <clipPath id={`${id}-clip`}><rect width="1050" height="640" rx="8" /></clipPath>

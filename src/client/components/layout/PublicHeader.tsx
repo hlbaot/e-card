@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ArrowRight, LogOut } from "lucide-react";
 import { routes } from "@/shared/constants/routes";
 import { restoreSession, shouldCheckSessionOnVisibility, useAuth } from "@/client/hooks/useAuth";
@@ -12,7 +12,7 @@ import { useAuthStore } from "@/client/store/auth.store";
 import { useToast } from "@/client/components/ui/Toast";
 import { Spinner } from "@/client/components/ui/Spinner";
 import { LoadingOverlay } from "@/client/components/ui/LoadingOverlay";
-
+import { LanguageSwitcher } from "@/client/components/ui/LanguageSwitcher";
 
 export function Brand({ href = routes.home }: { href?: string } = {}) {
   return (
@@ -41,21 +41,28 @@ export function PublicHeader() {
   const { ready, authenticated, logout } = useAuth();
   const router = useRouter();
   const toast = useToast();
+  const tHome = useTranslations("home.header");
+  const tSidebar = useTranslations("admin.sidebar");
+  const tToast = useTranslations("toast");
+  const tErrors = useTranslations("errors");
   const [loggingOut, setLoggingOut] = useState(false);
+
   useEffect(() => {
     if (!useAuthStore.getState().ready || shouldCheckSessionOnVisibility()) {
       void restoreSession().catch(() => {});
     }
   }, []);
+
   const isLoggedIn = ready && authenticated;
 
   return (
     <header className="public-header">
-      <LoadingOverlay show={loggingOut} label="Đang đăng xuất…" />
+      <LoadingOverlay show={loggingOut} label={tSidebar("loggingOut")} />
       <div className="container header-inner">
         <Brand />
 
         <div className="header-nav flex items-center gap-2 sm:gap-3">
+          <LanguageSwitcher />
           {isLoggedIn ? (
             <>
               <Link
@@ -63,7 +70,7 @@ export function PublicHeader() {
                 href={routes.admin}
                 prefetch={false}
               >
-                <span>QUẢN TRỊ</span>
+                <span>{tHome("adminUpper")}</span>
                 <ArrowRight
                   size={14}
                   className="transition-transform duration-200 group-hover:translate-x-1"
@@ -76,19 +83,19 @@ export function PublicHeader() {
                   setLoggingOut(true);
                   try {
                     await logout();
-                    toast("Đã đăng xuất thành công.");
+                    toast(tToast("logoutSuccess"));
                     router.refresh();
                   } catch {
-                    toast("Chưa thể đăng xuất. Vui lòng thử lại.");
+                    toast(tErrors("logoutFailed"), "error");
                   } finally {
                     setLoggingOut(false);
                   }
                 }}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white rounded-lg border border-white/10 hover:border-red-500/40 hover:bg-red-500/10 transition-all cursor-pointer disabled:opacity-50"
-                title="Đăng xuất khỏi hệ thống"
+                title={tSidebar("logoutTitle")}
               >
                 {loggingOut ? <Spinner size={13} /> : <LogOut size={13} />}
-                <span>{loggingOut ? "Đang thoát…" : "ĐĂNG XUẤT"}</span>
+                <span>{loggingOut ? tSidebar("loggingOut") : tHome("logoutUpper")}</span>
               </button>
             </>
           ) : (
@@ -97,7 +104,7 @@ export function PublicHeader() {
               href={routes.login}
               prefetch={false}
             >
-              <span>ĐĂNG NHẬP</span>
+              <span>{tHome("loginUpper")}</span>
               <ArrowRight
                 size={14}
                 className="transition-transform duration-200 group-hover:translate-x-1"

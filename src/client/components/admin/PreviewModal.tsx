@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { X, Smartphone, Monitor, Eye } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { Employee } from "@/shared/types";
 import { ScaledECardViewport } from "./LivePreviewPanel";
 import { cn } from "@/shared/utils/cn";
@@ -23,6 +24,8 @@ export function PreviewModal({
   const [dragY, setDragY] = useState(0);
   const touchStartYRef = useRef<number | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const t = useTranslations("admin.preview");
+  const tCommon = useTranslations("common");
 
   useEffect(() => {
     if (!open) return;
@@ -83,7 +86,7 @@ export function PreviewModal({
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Xem trước danh thiếp"
+      aria-label={t("modalAria")}
       className="fixed inset-0 z-50 flex items-end lg:items-center justify-center bg-slate-950/75 backdrop-blur-md p-0 lg:p-6"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
@@ -127,10 +130,10 @@ export function PreviewModal({
             </span>
             <div>
               <h2 className="text-sm lg:text-base font-bold text-white tracking-tight">
-                Xem trước danh thiếp trực tiếp
+                {t("modalTitle")}
               </h2>
               <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-teal-400">
-                ● Đồng bộ dữ liệu thời gian thực
+                ● {t("realtimeSync")}
               </p>
             </div>
           </div>
@@ -139,7 +142,7 @@ export function PreviewModal({
             {/* Device switcher */}
             <div
               role="group"
-              aria-label="Chế độ khung hình xem trước"
+              aria-label={t("deviceGroupAria")}
               className="hidden sm:inline-flex items-center rounded-full border border-white/15 bg-white/[0.04] p-1"
             >
               <button
@@ -153,7 +156,7 @@ export function PreviewModal({
                 )}
               >
                 <Smartphone size={13} />
-                Điện thoại
+                {t("mobile")}
               </button>
               <button
                 type="button"
@@ -166,7 +169,7 @@ export function PreviewModal({
                 )}
               >
                 <Monitor size={13} />
-                Máy tính
+                {t("desktop")}
               </button>
             </div>
 
@@ -174,11 +177,11 @@ export function PreviewModal({
               ref={closeButtonRef}
               type="button"
               onClick={onClose}
-              aria-label="Đóng xem trước"
+              aria-label={t("closeAria")}
               className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/[0.06] px-3 py-1.5 text-xs font-semibold text-white cursor-pointer transition-all hover:border-cyan-400/60 hover:bg-cyan-400/15 hover:text-cyan-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400"
             >
               <X size={15} />
-              <span className="hidden sm:inline">Đóng</span>
+              <span className="hidden sm:inline">{tCommon("close")}</span>
             </button>
           </div>
         </div>
@@ -195,13 +198,13 @@ export function PreviewModal({
         {/* Footer hint */}
         <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-white/10 text-[11px] text-slate-400 shrink-0">
           <span className="hidden lg:inline font-mono text-[10px] tracking-[0.06em] uppercase">
-            Nhấn phím ESC hoặc bấm ra ngoài để đóng
+            {t("hintDesktop")}
           </span>
           <span className="lg:hidden font-mono text-[10px] tracking-[0.06em] uppercase">
-            Vuốt xuống hoặc bấm nút Đóng để quay lại chỉnh sửa
+            {t("hintMobile")}
           </span>
           <span className="font-mono text-[10px] text-cyan-300/90">
-            Tỉ lệ chuẩn · Tự động co vừa màn hình
+            {t("autoScaleNote")}
           </span>
         </div>
       </div>

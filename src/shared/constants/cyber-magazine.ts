@@ -1,5 +1,8 @@
 import { hexToRgb, toTint } from "@/shared/utils/color";
 
+export const CYBER_MAGAZINE_PATTERN_KEY = "themeCustomizer.patterns.cyberMagazine";
+export const CYBER_MAGAZINE_BRAND_KEY = "common.cyberMagazineName";
+
 export function isCyberMagazineDefaultColor(primaryColor: string) {
   return ["#0F4C75", "#0F2A5C", "#0B3A75", "#0B2A5B", "#0F3A75"].includes(primaryColor.toUpperCase());
 }

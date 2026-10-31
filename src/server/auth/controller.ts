@@ -5,7 +5,7 @@ import { serverAuth } from "./runtime";
 import { AuthError } from "./service";
 import { changePasswordInput, loginInput } from "./dto";
 import {
-  ACCESS_COOKIE, REFRESH_COOKIE, assertSameOrigin, authHandler, authJson,
+  ACCESS_COOKIE, REFRESH_COOKIE, SESSION_COOKIE, assertSameOrigin, authHandler, authJson,
   clearAuthCookies, limitLogin, resetLoginLimit, setAuthCookies,
 } from "./http";
 
@@ -45,7 +45,15 @@ export async function logout(request: NextRequest) {
     assertSameOrigin(request);
     const refreshToken = request.cookies.get(REFRESH_COOKIE)?.value;
     const accessToken = request.cookies.get(ACCESS_COOKIE)?.value;
-    await serverAuth.logout(refreshToken || accessToken || "");
+    const sessionToken = request.cookies.get(SESSION_COOKIE)?.value;
+    const tokens = new Set([refreshToken, accessToken, sessionToken].filter((t): t is string => Boolean(t)));
+    if (tokens.size === 0) {
+      await serverAuth.logout("");
+    } else {
+      for (const token of tokens) {
+        await serverAuth.logout(token);
+      }
+    }
     return clearAuthCookies(authJson({ success: true } satisfies ApiStatusResponse));
   });
 }

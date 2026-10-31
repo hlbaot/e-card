@@ -22,7 +22,7 @@ import { CardListContent } from "../src/client/components/card/CardListItem";
 import { ContactList } from "../src/client/components/card/ContactList";
 import { ProfileInfo } from "../src/client/components/card/ProfileInfo";
 import { DEFAULT_PUBLIC_FIELDS, type Employee } from "../src/shared/types";
-import { formatLocalizedDate, formatLocalizedNumber, localizeEmployee } from "../src/shared/utils/localize";
+import { formatLocalizedDate, formatLocalizedNumber, localizeEmployee, localizeEmployeeName } from "../src/shared/utils/localize";
 
 const sampleEmployee: Employee = {
   id: "emp-1",
@@ -266,4 +266,41 @@ test("error mapper translates server error messages and status codes into Englis
   assert.equal(formatLocalizedNumber(1234567, "vi"), "1.234.567");
   assert.ok(formatLocalizedDate("2026-10-25T00:00:00.000Z", "en").length > 0);
   assert.ok(formatLocalizedDate("2026-10-25T00:00:00.000Z", "vi").length > 0);
+});
+
+test("employee names keep their source spelling in Vietnamese and omit accents in English", () => {
+  for (const [source, english] of [
+    ["NGUYỄN TẤT HỒNG DƯƠNG", "NGUYEN TAT HONG DUONG"],
+    ["ĐẶNG ĐỖ ÁNH HƯỜNG", "DANG DO ANH HUONG"],
+    ["Nguyễn Đặng bảo Toàn", "Nguyen Dang bao Toan"],
+    ["TRAN THE ANH", "TRAN THE ANH"],
+    ["", ""],
+    ["NGUYỄN ĐỨC".normalize("NFD"), "NGUYEN DUC"],
+  ]) {
+    assert.equal(localizeEmployeeName(source, "vi"), source);
+    assert.equal(localizeEmployeeName(source, "en"), english);
+  }
+  const originalName = sampleEmployee.fullName;
+  assert.equal(localizeEmployee(sampleEmployee, "en").fullName, "NGUYEN VAN AN");
+  assert.equal(localizeEmployee(sampleEmployee, "vi").fullName, originalName);
+  assert.equal(localizeEmployee(sampleEmployee).fullName, originalName);
+  assert.equal(sampleEmployee.fullName, originalName);
+});
+
+test("public directory and both exported card styles show names in the selected language", () => {
+  for (const businessCardType of ["qtm", "an-ninh-mang"] as const) {
+    const employee = { ...sampleEmployee, fullName: "NGUYỄN TẤT HỒNG DƯƠNG", theme: { ...sampleEmployee.theme, businessCardType } };
+    for (const locale of ["vi", "en"] as const) {
+      const expected = locale === "vi" ? employee.fullName : "NGUYEN TAT HONG DUONG";
+      const directory = renderWithLocale(locale, createElement(CardListContent, { employee }));
+      const exportedCard = renderWithLocale(locale, createElement(QrBusinessCard, { employee, url: "https://example.com/card/test" }));
+      assert.ok(directory.includes(expected));
+      assert.ok(exportedCard.includes(expected));
+      if (locale === "en") {
+        assert.ok(!directory.includes(employee.fullName));
+        assert.ok(!exportedCard.includes(employee.fullName));
+      }
+    }
+    assert.equal(employee.fullName, "NGUYỄN TẤT HỒNG DƯƠNG");
+  }
 });

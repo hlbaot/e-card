@@ -42,7 +42,8 @@ export function LoginView() {
       if (active) setCheckingSession(false);
     });
     return () => { active = false; };
-  }, [t]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Run session verification once on mount so re-renders do not cancel it.
+  }, []);
 
   useEffect(() => {
     if (sessionVerified && authenticated) window.location.replace("/admin");

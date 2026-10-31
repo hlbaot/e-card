@@ -7,7 +7,7 @@ import type { Employee } from "@/shared/types";
 import { Avatar } from "@/client/components/ui/Avatar";
 import { routes } from "@/shared/constants/routes";
 import { resolveLocale } from "@/i18n/config";
-import { localizeText } from "@/shared/utils/localize";
+import { localizeText, localizeEmployeeName } from "@/shared/utils/localize";
 import { capitalizeFirstLetter } from "@/shared/utils/format-text";
 
 export function CardListContent({
@@ -18,6 +18,7 @@ export function CardListContent({
   showFooter?: boolean;
 }) {
   const locale = resolveLocale(useLocale());
+  const displayName = localizeEmployeeName(e.fullName, locale);
   const tCommon = useTranslations("common");
   const tHome = useTranslations("home.directory");
   const isCyberSecurity = e.theme.businessCardType === "an-ninh-mang";
@@ -35,13 +36,13 @@ export function CardListContent({
         {showFooter && e.isActive && <i className="live-dot" />}
       </div>
       <Avatar
-        name={e.fullName}
+        name={displayName}
         src={e.avatarUrl}
         color={e.theme.primaryColor}
         size={80}
         rounded={e.theme.avatarShape === "rounded"}
       />
-      <h3>{e.fullName.toUpperCase()}</h3>
+      <h3>{displayName.toUpperCase()}</h3>
       <p className="position">{capitalizeFirstLetter(localizeText(e.position, locale))}</p>
       <p className={`company ${showFooter ? "" : "pb-4"}`}>{localizeText(e.companyShort, locale)}</p>
       {showFooter && (

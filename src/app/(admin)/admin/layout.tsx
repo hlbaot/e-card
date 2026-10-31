@@ -7,7 +7,7 @@ import { QueryProvider } from "@/client/providers/QueryProvider";
 import { AuthGuard } from "@/client/components/layout/AuthGuard";
 import { AdminSidebar } from "@/client/components/layout/AdminSidebar";
 import { getRequestLocale } from "@/i18n/request";
-import { ACCESS_COOKIE, REFRESH_COOKIE } from "@/server/auth/http";
+import { ACCESS_COOKIE, REFRESH_COOKIE, SESSION_COOKIE } from "@/server/auth/http";
 import { serverAuth } from "@/server/auth/runtime";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -29,6 +29,7 @@ export default async function AdminLayout({
 }) {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get(ACCESS_COOKIE)?.value;
+  const sessionToken = cookieStore.get(SESSION_COOKIE)?.value;
   const refreshToken = cookieStore.get(REFRESH_COOKIE)?.value;
 
   let initialUser: AuthUser | null = null;
@@ -44,8 +45,12 @@ export default async function AdminLayout({
     }
   }
 
+  if (!initialUser && !canRefresh && sessionToken) {
+    canRefresh = await serverAuth.hasActiveRefreshSession(sessionToken);
+  }
+
   if (!initialUser && !canRefresh) {
-    redirect("/login");
+    redirect("/");
   }
 
   return (

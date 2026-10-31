@@ -38,6 +38,28 @@ export function CyberMagazineArtwork({ className, primaryColor = "#0F4C75", thum
         <linearGradient id={`${id}-teal`} x1="0" y1="0" x2="1" y2="1">
           <stop stopColor={native ? "#009BB2" : surface} /><stop offset=".45" stopColor={native ? "#00627E" : blue} /><stop offset="1" stopColor={native ? "#003651" : navy} />
         </linearGradient>
+        <linearGradient id={`${id}-left-ribbon`} gradientUnits="userSpaceOnUse" x1="0" y1="330" x2="445" y2="513">
+          <stop stopColor={native ? "#00415D" : navy} /><stop offset=".42" stopColor={native ? "#008CA7" : surface} />
+          <stop offset=".72" stopColor={native ? "#13ACC0" : cyan} /><stop offset="1" stopColor={light} stopOpacity=".25" />
+        </linearGradient>
+        <radialGradient id={`${id}-left-gloss`}>
+          <stop stopColor="#E9FCFF" stopOpacity=".38" /><stop offset=".35" stopColor={light} stopOpacity=".19" />
+          <stop offset="1" stopColor={cyan} stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id={`${id}-left-gold`} gradientUnits="userSpaceOnUse" x1="0" y1="375" x2="445" y2="513">
+          <stop stopColor="#C9A227" /><stop offset=".18" stopColor="#E6C766" /><stop offset=".36" stopColor="#FFF4C3" />
+          <stop offset=".55" stopColor="#E6C766" /><stop offset=".82" stopColor="#C9A227" /><stop offset="1" stopColor="#FFF3B0" />
+        </linearGradient>
+        <clipPath id={`${id}-left-surface`}>
+          <path d="M0 295C145 322 211 401 321 461C365 483 404 500 445 513C291 459 163 373 0 465Z" />
+        </clipPath>
+        <linearGradient id={`${id}-left-fade`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="450" y2="0">
+          <stop offset="0" stopColor="white" /><stop offset=".7" stopColor="white" />
+          <stop offset=".92" stopColor="#a0a0a0" /><stop offset="1" stopColor="black" />
+        </linearGradient>
+        <mask id={`${id}-left-soft`} maskUnits="userSpaceOnUse" x="0" y="280" width="470" height="280">
+          <rect y="280" width="470" height="280" fill={paint("left-fade")} />
+        </mask>
         <linearGradient id={`${id}-gold`} x1="0" y1="0" x2="1" y2=".3">
           <stop stopColor="#C9A227" /><stop offset=".25" stopColor="#E6C766" /><stop offset=".48" stopColor="#FFF3B0" /><stop offset=".7" stopColor="#C9A227" /><stop offset="1" stopColor="#E6C766" />
         </linearGradient>
@@ -95,14 +117,17 @@ export function CyberMagazineArtwork({ className, primaryColor = "#0F4C75", thum
       {/* Separate anchors keep the left cluster at the left edge on wide cards. */}
       <svg data-cyber-corner="top-left" x="0" y="0" width="100%" height="48%"
         viewBox="0 0 1080 600" preserveAspectRatio="xMinYMin meet">
-      {/* The reference's second wave enters from the left beside the portrait. */}
-      <g transform="translate(0 0)">
-      <path d="M0 295C137 322 203 377 283 437C332 473 364 488 401 501C225 429 112 394 0 462Z" fill={paint("teal")} />
-      <path d="M0 295C149 327 208 391 303 452C193 399 103 365 0 399Z" fill={navy} />
-      <path d="M0 376C140 345 246 433 363 488C205 421 112 375 0 405Z" fill={paint("gold")} />
-      <path d="M0 332C145 340 227 423 369 489" stroke={cyan} strokeWidth="1.3" opacity=".85" />
-      <path d="M0 454C105 407 220 437 323 479L126 552H0Z" fill={paint("dots")} opacity=".2" />
-
+      {/* Rounded shoulders and a feathered tail echo the reference's fluid ribbon. */}
+      <g data-cyber-wave="left" mask={paint("left-soft")}>
+        <path d="M0 295C145 322 211 401 321 461C365 483 404 500 445 513C291 459 163 373 0 465Z" fill={paint("left-ribbon")} />
+        <path d="M0 295C145 322 211 401 321 461C217 409 107 354 0 397Z" fill={paint("navy")} />
+        <g clipPath={paint("left-surface")}>
+          <ellipse cx="110" cy="415" rx="155" ry="40" transform="rotate(12 110 415)" fill={paint("left-gloss")} />
+        </g>
+        <path d="M0 375C100 349 194 397 283 443C342 474 389 496 445 513C357 482 305 452 246 427C157 389 82 372 0 403Z" fill={paint("left-gold")} />
+        <path d="M0 375C100 349 194 397 283 443C342 474 389 496 445 513" stroke="#FFF5CE" strokeWidth=".8" opacity=".45" />
+        <path d="M0 332C146 343 230 425 424 506" stroke={cyan} strokeWidth="1.1" opacity=".45" />
+        <path d="M0 465C132 402 260 446 426 508L130 553H0Z" fill={paint("dots")} opacity=".12" />
       </g>
 
         <g stroke={blue} strokeWidth="1.4" opacity=".4">

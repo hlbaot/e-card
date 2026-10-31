@@ -196,7 +196,12 @@ export function createAuthService(
         ({ payload } = await jwtVerify(token, key, { algorithms: ["HS256"], issuer, audience, requiredClaims: ["sub", "exp", "iat"] }));
       } catch { throw new AuthError(); }
       if (payload.type !== "access" || typeof payload.sub !== "string" || typeof payload.session !== "string") throw new AuthError();
-      const admin = await findAdminByIdCached(payload.sub);
+      const wasCached = userCache.get(payload.sub) !== null;
+      let admin = await findAdminByIdCached(payload.sub);
+      if (wasCached && (!admin || admin.refreshTokenHash !== payload.session || !admin.refreshExpiresAt || admin.refreshExpiresAt.getTime() <= Date.now())) {
+        userCache.delete(payload.sub);
+        admin = await findAdminByIdCached(payload.sub);
+      }
       if (!admin || admin.refreshTokenHash !== payload.session || !admin.refreshExpiresAt || admin.refreshExpiresAt.getTime() <= Date.now()) {
         userCache.delete(payload.sub);
         throw new AuthError();
@@ -213,9 +218,14 @@ export function createAuthService(
           requiredClaims: ["sub", "exp", "iat"],
           currentDate: new Date(0),
         });
-        if (payload.type !== "access" || typeof payload.sub !== "string") return false;
-        const admin = await findAdminByIdCached(payload.sub);
-        return Boolean(admin && admin.refreshTokenHash && admin.refreshExpiresAt && admin.refreshExpiresAt.getTime() > Date.now());
+        if (payload.type !== "access" || typeof payload.sub !== "string" || typeof payload.session !== "string") return false;
+        const wasCached = userCache.get(payload.sub) !== null;
+        let admin = await findAdminByIdCached(payload.sub);
+        if (wasCached && (!admin || admin.refreshTokenHash !== payload.session || !admin.refreshExpiresAt || admin.refreshExpiresAt.getTime() <= Date.now())) {
+          userCache.delete(payload.sub);
+          admin = await findAdminByIdCached(payload.sub);
+        }
+        return Boolean(admin && admin.refreshTokenHash === payload.session && admin.refreshExpiresAt && admin.refreshExpiresAt.getTime() > Date.now());
       } catch {
         return false;
       }

@@ -9,6 +9,8 @@ import { cardUrl, downloadBusinessCard } from "@/shared/utils/qr";
 import { useToast } from "@/client/components/ui/Toast";
 import { LanguageSwitcher } from "@/client/components/ui/LanguageSwitcher";
 import { useAos } from "@/client/hooks/useAos";
+import { restoreSession, shouldCheckSessionOnVisibility } from "@/client/hooks/useAuth";
+import { useAuthStore } from "@/client/store/auth.store";
 import { resolveLocale } from "@/i18n/config";
 import { localizeEmployee } from "@/shared/utils/localize";
 import { ECard } from "./ECard";
@@ -22,6 +24,12 @@ export function ProfileView({ employee }: { employee: Employee }) {
   const tToast = useTranslations("toast");
   const tErrors = useTranslations("errors");
   const e = localizeEmployee(employee, locale);
+
+  useEffect(() => {
+    if (!useAuthStore.getState().ready || shouldCheckSessionOnVisibility()) {
+      void restoreSession().catch(() => {});
+    }
+  }, []);
 
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [addressModalOpen, setAddressModalOpen] = useState(false);

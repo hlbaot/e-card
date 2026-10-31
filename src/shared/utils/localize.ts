@@ -299,6 +299,15 @@ const BILINGUAL_DICTIONARY: readonly BilingualEntry[] = [
     ],
   },
   {
+    en: "11 Cua Bac, Ba Dinh, Ha Noi",
+    vi: "11 Cửa Bắc, Ba Đình, Hà Nội",
+    aliases: [
+      "11 Cua Bac, Ba Dinh, Hanoi",
+      "No. 11 Cua Bac, Ba Dinh, Ha Noi",
+      "Số 11 Cửa Bắc, Ba Đình, Hà Nội",
+    ],
+  },
+  {
     en: "123 Dien Bien Phu",
     vi: "123 Điện Biên Phủ",
   },
@@ -337,6 +346,12 @@ export function localizeText(value: string, locale: Locale = defaultLocale): str
   return resolved === "vi" ? matched.vi : matched.en;
 }
 
+/** Display-only transliteration. The stored Vietnamese name remains untouched. */
+export function localizeEmployeeName(name: string, locale: Locale = defaultLocale): string {
+  if (resolveLocale(locale) !== "en") return name;
+  return name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D");
+}
+
 export function localizeEmployee(e: Employee, locale?: Locale): Employee {
   const normalized: Employee = {
     ...e,
@@ -360,6 +375,7 @@ export function localizeEmployee(e: Employee, locale?: Locale): Employee {
 
   return {
     ...normalized,
+    fullName: localizeEmployeeName(normalized.fullName, locale),
     position: localizeText(normalized.position, locale),
     company: localizeText(normalized.company, locale),
     companyShort: localizeText(normalized.companyShort, locale),

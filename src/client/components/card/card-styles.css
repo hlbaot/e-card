@@ -319,18 +319,52 @@
 .qtm-art-botanical { --style-mini-rule-width: 42px; --style-mini-rule-height: 3px; }
 .qtm-art-creative .art-rule { width: 48px; height: 3px; border-radius: 0; background: linear-gradient(90deg,var(--thumb-color) 65%,transparent 65%,transparent 73%,var(--thumb-color) 73%); }
 
+.qtm-professional-card .card-actions .action-btn-divider {
+  display: none;
+}
+
 /* Selecting the magazine motif brings its navy and gold control treatment,
    independently of the decoration opacity and structural template. */
 .qtm-professional-card.qtm-cyber-controls {
   --cyber-gold: #e6c766;
-  --cyber-control-fill: linear-gradient(110deg, var(--cyber-deep, #0a1f44), var(--cyber-navy, #0b2a5b) 66%, var(--cyber-blue, #0f3a75));
+  --cyber-gold-border: #d8b243;
+  --cyber-control-fill: linear-gradient(100deg, var(--cyber-deep, #071936) 0%, var(--cyber-navy, #0b2b59) 52%, var(--cyber-blue, #0e4c7a) 100%);
 }
-.qtm-professional-card.qtm-cyber-controls .card-actions :is(a, button),
+.qtm-professional-card.qtm-cyber-controls .card-actions :is(a, button) {
+  background: var(--cyber-control-fill) !important;
+  color: #ffffff !important;
+  border: 1.5px solid var(--cyber-gold-border) !important;
+  border-radius: 999px !important;
+  box-shadow: inset 0 0 0 0.5px rgba(255, 243, 176, 0.38), 0 4px 10px rgba(7, 25, 54, 0.25) !important;
+  transform: none !important;
+}
 .qtm-professional-card.qtm-cyber-controls .qtm-profile-tools :is(a, button) {
   background: var(--cyber-control-fill) !important;
   color: var(--cyber-gold) !important;
-  border: 1px solid #c9a227 !important;
+  border: 1.5px solid var(--cyber-gold-border) !important;
   box-shadow: 0 2px 6px #0f2a5c26 !important;
+}
+.qtm-professional-card.qtm-cyber-controls .card-actions .action-btn-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--qtm-unit, 1cqw) * 1.8);
+}
+.qtm-professional-card.qtm-cyber-controls .card-actions .action-btn-divider {
+  display: inline-block;
+  width: 1px;
+  height: 1.15em;
+  background: linear-gradient(
+    180deg,
+    rgba(230, 199, 102, 0.35),
+    rgba(230, 199, 102, 0.92),
+    rgba(230, 199, 102, 0.35)
+  );
+  flex-shrink: 0;
+}
+.qtm-professional-card.qtm-cyber-controls .card-actions .action-btn-label {
+  color: #ffffff !important;
+  font-weight: 500;
 }
 .qtm-professional-card.qtm-cyber-controls .card-actions :is(a, button):hover,
 .qtm-professional-card.qtm-cyber-controls .qtm-profile-tools :is(a, button):hover {
@@ -343,19 +377,46 @@
 }
 .qtm-professional-card.qtm-cyber-controls .qtm-contact-icon {
   background: var(--cyber-control-fill);
-  border: 1px solid #c9a227;
+  border: 1.5px solid var(--cyber-gold-border);
+  border-radius: 50% !important;
+  box-shadow: inset 0 0 0 0.5px rgba(255, 243, 176, 0.32), 0 2px 6px rgba(7, 25, 54, 0.22);
+}
+.qtm-professional-card.qtm-cyber-controls .qtm-contact:not(:last-child) {
+  position: relative;
+  border-bottom: 1px solid rgba(15, 58, 117, 0.16);
+}
+.qtm-professional-card.qtm-cyber-controls .qtm-contact:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -2.5px;
+  width: 4px;
+  height: 4px;
+  background: var(--cyber-gold-border);
+  transform: rotate(45deg);
 }
 .qtm-professional-card.qtm-cyber-controls .qtm-identity-rule {
-  background: linear-gradient(90deg, #c9a227, #e6c766, #c9a227);
+  width: calc(var(--qtm-unit, 1cqw) * 10.5) !important;
+  height: calc(var(--qtm-unit, 1cqw) * 0.65) !important;
+  border-radius: 999px !important;
+  background: linear-gradient(90deg, #b88917, #f5df88 50%, #b88917) !important;
+}
+.qtm-desktop-stage .qtm-professional-card.qtm-cyber-controls .card-actions .action-btn-content {
+  gap: 8px;
+}
+@media (min-width: 960px) {
+  .qtm-public-profile .qtm-professional-card.qtm-cyber-controls .card-actions .action-btn-content {
+    gap: 8px;
+  }
 }
 
 /* Magazine portrait: fine gold edge, white separation and a restrained halo. */
 .qtm-professional-card.qtm-cyber-controls .qtm-portrait .avatar {
-  border: 2px solid #d4ac32;
+  border: 2.5px solid #d4ac32 !important;
   outline: 1px solid #f5e4a1;
   outline-offset: 4px;
   box-shadow: 0 0 0 3px #fff, 0 0 0 10px #ffffff50,
-    0 0 15px 5px #e6c76655, 0 0 28px 9px #8fc7f038;
+    0 0 15px 5px #e6c76655, 0 0 28px 9px #8fc7f038 !important;
 }
 .qtm-professional-card.qtm-cyber-controls .qtm-profile-brand img {
   filter: drop-shadow(0 0 1px #e6c76680) drop-shadow(0 0 4px #e6c76630);

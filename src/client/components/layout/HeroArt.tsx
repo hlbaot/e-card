@@ -1,6 +1,10 @@
+"use client";
 import { QrCode, CheckCircle2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Avatar } from "@/client/components/ui/Avatar";
+
 export function HeroArt() {
+  const t = useTranslations("home.hero");
   return (
     <div className="hero-art" aria-hidden="true">
       <div className="orbit" />
@@ -18,17 +22,17 @@ export function HeroArt() {
       <div className="floating-badge badge-connect">
         <CheckCircle2 size={23} />
         <span>
-          Kết nối dễ dàng
+          {t("artBadge1Line1")}
           <br />
-          <strong>Ấn tượng dài lâu</strong>
+          <strong>{t("artBadge1Line2")}</strong>
         </span>
       </div>
       <div className="floating-badge badge-qr">
         <QrCode size={38} />
         <span>
-          Một lần quét.
+          {t("artBadge2Line1")}
           <br />
-          <strong>Mọi kết nối.</strong>
+          <strong>{t("artBadge2Line2")}</strong>
         </span>
       </div>
     </div>

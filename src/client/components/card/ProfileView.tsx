@@ -1,19 +1,27 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { Copy, Download, ExternalLink, MapPin, X } from "lucide-react";
 import { getPublicFields } from "@/shared/types";
 import type { Employee } from "@/shared/types";
 import { cardUrl, downloadBusinessCard } from "@/shared/utils/qr";
 import { useToast } from "@/client/components/ui/Toast";
+import { LanguageSwitcher } from "@/client/components/ui/LanguageSwitcher";
 import { useAos } from "@/client/hooks/useAos";
-import { migrateCardTheme } from "@/shared/utils/migrate-theme";
+import { resolveLocale } from "@/i18n/config";
+import { localizeEmployee } from "@/shared/utils/localize";
 import { ECard } from "./ECard";
 import { QrBusinessCard } from "./QrBusinessCard";
 
 export function ProfileView({ employee }: { employee: Employee }) {
   useAos(true, employee.slug);
-  const e = { ...employee, theme: migrateCardTheme(employee.theme) };
+  const locale = resolveLocale(useLocale());
+  const tCommon = useTranslations("common");
+  const tCard = useTranslations("card");
+  const tToast = useTranslations("toast");
+  const tErrors = useTranslations("errors");
+  const e = localizeEmployee(employee, locale);
 
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [addressModalOpen, setAddressModalOpen] = useState(false);
@@ -55,18 +63,18 @@ export function ProfileView({ employee }: { employee: Employee }) {
     }
     try {
       await navigator.clipboard.writeText(url);
-      toast("Đã sao chép liên kết hồ sơ");
+      toast(tToast("linkCopied"));
     } catch {
-      toast("Không thể sao chép liên kết");
+      toast(tToast("copyFailed"), "error");
     }
   };
 
   const handleCopyUrl = async () => {
     try {
       await navigator.clipboard.writeText(url);
-      toast("Đã sao chép liên kết");
+      toast(tToast("linkCopied"));
     } catch {
-      toast("Không thể sao chép liên kết");
+      toast(tToast("copyFailed"), "error");
     }
   };
 
@@ -75,28 +83,30 @@ export function ProfileView({ employee }: { employee: Employee }) {
     setDownloading(true);
     try {
       await downloadBusinessCard(cardSvgRef.current, e.slug);
-      toast("Đã tải danh thiếp PNG");
+      toast(tToast("cardPngDownloaded"));
     } catch {
-      toast("Không thể tải danh thiếp. Vui lòng thử lại.");
+      toast(tErrors("exportPngFailed"), "error");
     } finally {
       setDownloading(false);
     }
   };
 
   return (
-    <main className="qtm-public-profile">
+    <main className="qtm-public-profile relative">
       <noscript>
         <style>{`.qtm-public-profile [data-aos] { opacity: 1 !important; transform: none !important; }`}</style>
       </noscript>
+      <div className="fixed top-3 right-3 sm:top-4 sm:right-4 z-30">
+        <LanguageSwitcher variant="light" />
+      </div>
       <ECard employee={e} variant="profile" onOpenQr={() => setQrModalOpen(true)} onShare={handleShare} onOpenAddresses={offices.length ? () => setAddressModalOpen(true) : undefined} />
-      {/* MODAL 1: QR CODE (Dark QTM Glass Modal) */}
       {qrModalOpen && (
         <div
           className="sheet-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-[#050B1A]/75 backdrop-blur-sm p-0 sm:p-4"
           onClick={() => setQrModalOpen(false)}
           role="dialog"
           aria-modal="true"
-          aria-label="Danh thiếp QR cá nhân"
+          aria-label={tCard("qr.personalCardAria")}
         >
           <div
             className="sheet-panel w-full min-w-0 sm:max-w-3xl max-h-[92dvh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-[#0B1430]/95 backdrop-blur-xl text-white border border-[rgba(120,200,255,0.22)] p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-[0_0_40px_rgba(34,211,238,0.18)]"
@@ -105,12 +115,12 @@ export function ProfileView({ employee }: { employee: Employee }) {
             <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-3 sm:hidden" />
             <div className="flex items-center justify-between gap-2 mb-4">
               <h3 className="min-w-0 break-words text-base font-bold text-white">
-                Danh thiếp QR · {e.fullName}
+                {tCard("qr.modalTitle", { name: e.fullName })}
               </h3>
               <button
                 type="button"
                 onClick={() => setQrModalOpen(false)}
-                aria-label="Đóng"
+                aria-label={tCommon("close")}
                 className="h-9 w-9 shrink-0 rounded-full inline-flex items-center justify-center bg-white/10 text-[#B6C2D9] hover:bg-cyan-400/20 hover:text-cyan-300 border border-white/15 cursor-pointer"
               >
                 <X size={18} />
@@ -121,7 +131,7 @@ export function ProfileView({ employee }: { employee: Employee }) {
                 <QrBusinessCard employee={e} url={url} svgRef={cardSvgRef} />
               </div>
               <p className="text-xs text-[#B6C2D9] text-center mb-3">
-                Quét QR để mở hồ sơ · Tải trọn danh thiếp dưới dạng PNG
+                {tCard("qr.modalHint")}
               </p>
               <p className="text-xs text-[#B6C2D9] text-center mb-3 font-mono break-all [overflow-wrap:anywhere] bg-white/[0.04] border border-white/10 px-3 py-2 rounded-lg w-full">
                 {url}
@@ -133,7 +143,7 @@ export function ProfileView({ employee }: { employee: Employee }) {
                   className="btn btn-secondary min-h-[42px] min-w-0 whitespace-normal text-center leading-tight text-xs cursor-pointer"
                 >
                   <Copy size={15} />
-                  Sao chép link
+                  {tCommon("copyLink")}
                 </button>
                 <button
                   type="button"
@@ -142,7 +152,7 @@ export function ProfileView({ employee }: { employee: Employee }) {
                   className="btn btn-primary min-h-[42px] min-w-0 whitespace-normal text-center leading-tight text-xs cursor-pointer disabled:opacity-60 disabled:cursor-wait"
                 >
                   <Download size={15} />
-                  {downloading ? "Đang xuất…" : "Tải danh thiếp PNG"}
+                  {downloading ? tCard("qr.exporting") : tCard("qr.downloadCardPng")}
                 </button>
               </div>
             </div>
@@ -150,14 +160,13 @@ export function ProfileView({ employee }: { employee: Employee }) {
         </div>
       )}
 
-      {/* MODAL 2: FULL OFFICE ADDRESSES (Dark QTM Glass Modal) */}
       {pf.offices && offices.length > 0 && addressModalOpen && (
         <div
           className="sheet-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-[#050B1A]/75 backdrop-blur-sm p-0 sm:p-4"
           onClick={() => setAddressModalOpen(false)}
           role="dialog"
           aria-modal="true"
-          aria-label="Địa chỉ văn phòng"
+          aria-label={tCard("officesModal.title")}
         >
           <div
             className="sheet-panel w-full min-w-0 sm:max-w-lg rounded-t-3xl sm:rounded-3xl bg-[#0B1430]/95 backdrop-blur-xl text-white border border-[rgba(120,200,255,0.22)] p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-[0_0_40px_rgba(34,211,238,0.18)] max-h-[85dvh] overflow-y-auto"
@@ -166,12 +175,12 @@ export function ProfileView({ employee }: { employee: Employee }) {
             <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-3 sm:hidden" />
             <div className="flex items-center justify-between gap-2 mb-4">
               <h3 className="min-w-0 break-words text-base font-bold text-white">
-                Địa chỉ văn phòng
+                {tCard("officesModal.title")}
               </h3>
               <button
                 type="button"
                 onClick={() => setAddressModalOpen(false)}
-                aria-label="Đóng"
+                aria-label={tCommon("close")}
                 className="h-9 w-9 shrink-0 rounded-full inline-flex items-center justify-center bg-white/10 text-[#B6C2D9] hover:bg-cyan-400/20 hover:text-cyan-300 border border-white/15 cursor-pointer"
               >
                 <X size={18} />
@@ -189,7 +198,7 @@ export function ProfileView({ employee }: { employee: Employee }) {
                   >
                     <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#22D3EE] mb-1">
                       <MapPin size={15} />
-                      <span>{o.label || "Office"}</span>
+                      <span>{o.label || tCard("labels.office")}</span>
                     </div>
                     <p className="text-sm text-[#B6C2D9] leading-relaxed break-words">
                       {o.address}
@@ -202,7 +211,7 @@ export function ProfileView({ employee }: { employee: Employee }) {
                         className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-[#22D3EE] hover:underline"
                       >
                         <ExternalLink size={13} />
-                        Mở trên Google Maps
+                        {tCard("officesModal.openInGoogleMaps")}
                       </a>
                     )}
                   </div>

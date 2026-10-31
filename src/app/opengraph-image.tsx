@@ -1,5 +1,7 @@
 import { ImageResponse } from "next/og";
+import { getTranslations } from "next-intl/server";
 import { siteConfig } from "@/config/site";
+import { getRequestLocale } from "@/i18n/request";
 
 export const alt = siteConfig.title;
 export const size = {
@@ -8,7 +10,10 @@ export const size = {
 };
 export const contentType = "image/png";
 
-export default function OpenGraphImage() {
+export default async function OpenGraphImage() {
+  const locale = await getRequestLocale();
+  const t = await getTranslations({ locale, namespace: "meta" });
+
   return new ImageResponse(
     (
       <div
@@ -92,7 +97,7 @@ export default function OpenGraphImage() {
               color: "#67E8F9",
             }}
           >
-            Kết nối con người. Lan tỏa giá trị.
+            {t("ogTagline")}
           </div>
           <div
             style={{
@@ -102,8 +107,7 @@ export default function OpenGraphImage() {
               maxWidth: "820px",
             }}
           >
-            Nền tảng danh thiếp điện tử thông minh dành cho đội ngũ CÔNG TY CỔ
-            PHẦN CÔNG NGHỆ TRUYỀN THÔNG QTM.
+            {t("ogDescription")}
           </div>
         </div>
 
@@ -118,7 +122,7 @@ export default function OpenGraphImage() {
             color: "#B6C2D9",
           }}
         >
-          <span>CÔNG TY CỔ PHẦN CÔNG NGHỆ TRUYỀN THÔNG QTM</span>
+          <span>{t("ogCompany")}</span>
           <span style={{ color: "#22D3EE", fontWeight: 700 }}>qtmmedia.vn</span>
         </div>
       </div>

@@ -20,7 +20,7 @@ const html = (element: ReactElement) => renderToStaticMarkup(element);
 
 test("selector preserves eight choices and replaces the fourth choice", () => {
   assert.equal(decorOptions.length, 8);
-  assert.deepEqual(decorOptions[3], { id: "cyber-magazine", name: "Tạp chí an ninh mạng" });
+  assert.deepEqual(decorOptions[3], { id: "cyber-magazine", name: "themeCustomizer.patterns.cyberMagazine" });
 });
 
 test("legacy decor and pattern fields migrate idempotently; API accepts old and new keys", () => {

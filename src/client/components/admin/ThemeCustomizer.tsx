@@ -1,6 +1,7 @@
 "use client";
 import "@/client/components/card/card-styles.css";
 import { memo, useCallback, useState } from "react";
+import { useTranslations } from "next-intl";
 import { migrateCardTheme } from "@/shared/utils/migrate-theme";
 import { Palette, Check, Sparkles } from "lucide-react";
 import {
@@ -55,6 +56,8 @@ const TemplateThumbnailTile = memo(function TemplateThumbnailTile({
   selected: boolean;
   onSelect: (template: TemplateItem) => void;
 }) {
+  const tRoot = useTranslations();
+  const tTheme = useTranslations("themeCustomizer");
   const thumbTheme = THUMB_THEMES[t.id];
   return (
     <button
@@ -71,9 +74,9 @@ const TemplateThumbnailTile = memo(function TemplateThumbnailTile({
         <CardDecorations theme={thumbTheme} variant="thumb" />
         <span className="art-brand">QTM</span>
         <i className="art-avatar" />
-        <span className="art-name">NGUYỄN MINH AN</span>
+        <span className="art-name">{tTheme("sampleName")}</span>
         <i className="art-rule" />
-        <span className="art-role">Chuyên viên phát triển</span>
+        <span className="art-role">{tTheme("sampleRole")}</span>
         <span className="art-buttons">
           <i />
           <i />
@@ -81,8 +84,8 @@ const TemplateThumbnailTile = memo(function TemplateThumbnailTile({
         </span>
       </span>
       <span className="template-tile-caption">
-        <strong>{t.name}</strong>
-        <small>{t.description}</small>
+        <strong>{tRoot(t.name)}</strong>
+        <small>{tRoot(t.description)}</small>
       </span>
       {selected && (
         <span className="template-selected">
@@ -100,6 +103,8 @@ export const ThemeCustomizer = memo(function ThemeCustomizer({
   theme: CardTheme;
   onChange: (theme: CardTheme) => void;
 }) {
+  const tRoot = useTranslations();
+  const t = useTranslations("themeCustomizer");
   const theme = migrateCardTheme(rawTheme);
   const [hexDraft, setHexDraft] = useState(theme.primaryColor);
   const [hexError, setHexError] = useState("");
@@ -116,17 +121,17 @@ export const ThemeCustomizer = memo(function ThemeCustomizer({
   );
 
   const handleSelectTemplate = useCallback(
-    (t: TemplateItem) => {
+    (tpl: TemplateItem) => {
       const current = migrateCardTheme(rawTheme);
       set({
-        templateId: t.id,
-        styleId: t.id,
-        backgroundId: t.defaultBackgroundId || current.backgroundId,
-        decor: [...t.defaultDecor],
+        templateId: tpl.id,
+        styleId: tpl.id,
+        backgroundId: tpl.defaultBackgroundId || current.backgroundId,
+        decor: [...tpl.defaultDecor],
         showDecor: true,
-        decorOpacity: t.defaultDecorOpacity,
+        decorOpacity: tpl.defaultDecorOpacity,
         shapes: Object.fromEntries(
-          t.shapes.map((s) => [s.id, s.id === "editorial-frame"]),
+          tpl.shapes.map((s) => [s.id, s.id === "editorial-frame"]),
         ),
       });
     },
@@ -153,42 +158,40 @@ export const ThemeCustomizer = memo(function ThemeCustomizer({
     <section className="panel form-section theme-customizer">
       <h2>
         <Palette size={18} />
-        <span>03</span>Thiết kế danh thiếp & hồ sơ
+        <span>03</span>{t("title")}
       </h2>
       <p className="theme-intro">
-        Chọn phong cách của bạn. Thiết kế này cũng là giao diện trang hồ sơ khi
-        khách quét mã QR.
+        {t("intro")}
       </p>
 
       <div className="theme-group-heading">
-        <h3>Phong cách thiết kế</h3>
-        <span>{templates.length} mẫu</span>
+        <h3>{t("sections.templates")}</h3>
+        <span>{t("counts.templates", { count: templates.length })}</span>
       </div>
       <p className="theme-help mb-3">
-        Phong cách quyết định cấu trúc, hình dạng nút, kiểu chữ, khung ảnh và đường kẻ (nền trắng &amp; màu trung tính).
+        {t("help.templates")}
       </p>
       <div className="template-gallery">
-        {templates.map((t) => (
+        {templates.map((tpl) => (
           <TemplateThumbnailTile
-            key={t.id}
-            template={t}
-            selected={theme.templateId === t.id}
+            key={tpl.id}
+            template={tpl}
+            selected={theme.templateId === tpl.id}
             onSelect={handleSelectTemplate}
           />
         ))}
       </div>
 
-      {/* BƯỚC: BỘ PHỐI MÀU (PALETTE) */}
       <div className="customizer-section">
         <div className="theme-group-heading">
           <h3 className="inline-flex items-center gap-1.5">
             <Palette size={14} />
-            Bộ phối màu (Palette)
+            {t("sections.palettes")}
           </h3>
-          <span>{palettes.length} phối màu</span>
+          <span>{t("counts.palettes", { count: palettes.length })}</span>
         </div>
         <p className="theme-help mb-3">
-          Chọn bộ màu để đồng bộ toàn bộ: nền, nút, viền, chữ nhấn và họa tiết. Đổi màu không làm đổi hình dạng phong cách.
+          {t("help.palettes")}
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
           {palettes.map((p) => {
@@ -226,7 +229,7 @@ export const ThemeCustomizer = memo(function ThemeCustomizer({
                   </span>
                 </div>
                 <strong className="text-xs font-semibold text-white truncate">
-                  {p.name}
+                  {tRoot(p.name)}
                 </strong>
                 <span className="text-[10px] text-slate-400 truncate">
                   {p.primaryColor}
@@ -242,21 +245,18 @@ export const ThemeCustomizer = memo(function ThemeCustomizer({
         </div>
       </div>
 
-
-
-      {/* BƯỚC: HỌA TIẾT NỀN */}
       <div className="customizer-section">
         <div className="theme-group-heading">
           <h3 className="inline-flex items-center gap-1.5">
             <Sparkles size={13} />
-            Họa tiết nền
+            {t("sections.patterns")}
           </h3>
-          <span>{decorOptions.length} lựa chọn</span>
+          <span>{t("counts.patterns", { count: decorOptions.length })}</span>
         </div>
         <p className="theme-help mb-3">
-          Chọn đúng 1 họa tiết nhẹ nhàng viền quanh rìa thẻ. Thành phố luôn là chân trang cố định.
+          {t("help.patterns")}
         </p>
-        <div className="decor-options" role="radiogroup" aria-label="Họa tiết nền (chọn 1)">
+        <div className="decor-options" role="radiogroup" aria-label={t("sections.patternsAria")}>
           {decorOptions.map((option) => {
             const isSelected =
               option.id === "none"
@@ -284,7 +284,7 @@ export const ThemeCustomizer = memo(function ThemeCustomizer({
                     <DecorSwatch decor={option.id} primaryColor={theme.primaryColor} />
                   )}
                 </span>
-                <span className="pointer-events-none">{option.name}</span>
+                <span className="pointer-events-none">{tRoot(option.name)}</span>
                 {isSelected && <Check className="decor-tick" size={14} />}
               </label>
             );
@@ -294,7 +294,7 @@ export const ThemeCustomizer = memo(function ThemeCustomizer({
         <div className="mt-4">
           <div className="flex items-center justify-between mb-1.5">
             <label htmlFor="decor-opacity-range" className="control-label">
-              Độ đậm họa tiết
+              {t("sections.decorOpacity")}
             </label>
             <span className="text-[11px] font-bold text-[#22D3EE]">
               {Math.min(60, decorOpacity)}%
@@ -311,55 +311,57 @@ export const ThemeCustomizer = memo(function ThemeCustomizer({
             className="w-full accent-[#22D3EE] cursor-pointer h-2 rounded-lg bg-white/10"
           />
           <div className="flex justify-between text-[9px] text-[#7A8AA8] mt-1">
-            <span>0% (Ẩn)</span>
-            <span>35% (Mặc định)</span>
-            <span>60% (Tối đa)</span>
+            <span>{t("slider.min")}</span>
+            <span>{t("slider.default")}</span>
+            <span>{t("slider.max")}</span>
           </div>
         </div>
       </div>
 
-      {/* BƯỚC: MÀU CHỦ ĐẠO */}
       <div className="customizer-section">
         <div className="theme-group-heading">
-          <h3>Màu chủ đạo</h3>
-          <span>{colorPresets.length} màu</span>
+          <h3>{t("sections.primaryColor")}</h3>
+          <span>{t("counts.colors", { count: colorPresets.length })}</span>
         </div>
         <div className="color-gallery">
-          {colorPresets.map((color) => (
-            <button
-              type="button"
-              key={color.hex}
-              title={`${color.name} · ${color.hex}`}
-              aria-label={`${color.name} ${color.hex}`}
-              aria-pressed={
-                theme.primaryColor.toLowerCase() === color.hex.toLowerCase()
-              }
-              className={cn(
-                "color-chip",
-                theme.primaryColor.toLowerCase() === color.hex.toLowerCase() &&
-                  "selected",
-              )}
-              style={{ background: color.hex, color: contrastText(color.hex) }}
-              onClick={() => set({ primaryColor: color.hex })}
-            >
-              {theme.primaryColor.toLowerCase() === color.hex.toLowerCase() && (
-                <Check size={15} />
-              )}
-            </button>
-          ))}
+          {colorPresets.map((color) => {
+            const label = tRoot(color.name);
+            return (
+              <button
+                type="button"
+                key={color.hex}
+                title={`${label} · ${color.hex}`}
+                aria-label={`${label} ${color.hex}`}
+                aria-pressed={
+                  theme.primaryColor.toLowerCase() === color.hex.toLowerCase()
+                }
+                className={cn(
+                  "color-chip",
+                  theme.primaryColor.toLowerCase() === color.hex.toLowerCase() &&
+                    "selected",
+                )}
+                style={{ background: color.hex, color: contrastText(color.hex) }}
+                onClick={() => set({ primaryColor: color.hex })}
+              >
+                {theme.primaryColor.toLowerCase() === color.hex.toLowerCase() && (
+                  <Check size={15} />
+                )}
+              </button>
+            );
+          })}
         </div>
         <div className="hex-editor">
           <label className="color-picker-label">
-            Màu tùy chọn
+            {t("sections.customColor")}
             <input
               type="color"
-              aria-label="Chọn màu chủ đạo"
+              aria-label={t("sections.customColorAria")}
               value={theme.primaryColor}
               onChange={(e) => set({ primaryColor: e.target.value })}
             />
           </label>
           <div className="field">
-            <label htmlFor="theme-hex">Mã màu HEX</label>
+            <label htmlFor="theme-hex">{t("sections.hexCode")}</label>
             <input
               id="theme-hex"
               value={hexDraft}
@@ -374,7 +376,7 @@ export const ThemeCustomizer = memo(function ThemeCustomizer({
               }}
               onBlur={() => {
                 if (!/^#[0-9a-f]{6}$/i.test(hexDraft))
-                  setHexError("Nhập mã # và 6 ký tự, ví dụ #0F4C75.");
+                  setHexError(t("hexError"));
               }}
             />
             {hexError && (
@@ -385,10 +387,9 @@ export const ThemeCustomizer = memo(function ThemeCustomizer({
           </div>
         </div>
         <p className="theme-help">
-          Màu chữ tự cân bằng độ tương phản trên nền sáng và nền tối.
+          {t("help.contrast")}
         </p>
       </div>
-
     </section>
   );
 });

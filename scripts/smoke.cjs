@@ -6,6 +6,35 @@ const path = require("node:path");
 const Module = require("node:module");
 const ts = require("typescript");
 const root = path.resolve(__dirname, "..");
+const enMessages = JSON.parse(
+  fs.readFileSync(path.join(root, "src/messages/en.json"), "utf8"),
+);
+function lookupMessage(messages, keyPath, values) {
+  const raw = keyPath
+    .split(".")
+    .reduce((acc, part) => (acc && typeof acc === "object" ? acc[part] : undefined), messages);
+  if (typeof raw !== "string") return keyPath;
+  if (!values) return raw;
+  return raw.replace(/\{(\w+)\}/g, (_, k) => (values[k] !== undefined ? String(values[k]) : `{${k}}`));
+}
+const origLoad = Module._load;
+Module._load = function (request, parent, isMain) {
+  if (request === "next-intl") {
+    return {
+      useTranslations(namespace) {
+        return (key, values) =>
+          lookupMessage(enMessages, namespace ? `${namespace}.${key}` : key, values);
+      },
+      useLocale: () => "en",
+      useFormatter: () => ({
+        dateTime: (d) => new Date(d).toISOString(),
+        number: (n) => String(n),
+      }),
+      NextIntlClientProvider: ({ children }) => children,
+    };
+  }
+  return origLoad.call(this, request, parent, isMain);
+};
 const resolve = Module._resolveFilename;
 Module._resolveFilename = function (request, ...args) {
   return resolve.call(
@@ -168,8 +197,8 @@ async function main() {
     const html = renderToStaticMarkup(createElement(ProfilePage, { employee }));
     assert.ok(html.includes("<h1"));
     assert.ok(html.includes("Test Employee 4"));
-    assert.ok(html.includes("Gọi điện"));
-    assert.ok(html.includes("Lưu danh bạ"));
+    assert.ok(html.includes("Call"));
+    assert.ok(html.includes("Save Contact"));
     assert.ok(!html.includes('class="qr-panel"'));
     assert.ok(!html.includes('class="public-header"'));
     assert.ok(!html.includes("/login"));

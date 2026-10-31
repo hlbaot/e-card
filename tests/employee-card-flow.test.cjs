@@ -5,6 +5,14 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const ts = require('typescript');
 
+const enMessages = JSON.parse(fs.readFileSync('src/messages/en.json', 'utf8'));
+function lookupMessage(keyPath, values) {
+  const raw = keyPath.split('.').reduce((acc, part) => (acc && typeof acc === 'object' ? acc[part] : undefined), enMessages);
+  if (typeof raw !== 'string') return keyPath;
+  if (!values) return raw;
+  return raw.replace(/\{(\w+)\}/g, (_, k) => (values[k] !== undefined ? String(values[k]) : `{${k}}`));
+}
+
 function harness(existing = false) {
   const states = [], writes = [], navigations = [];
   let cursor = 0;
@@ -26,7 +34,7 @@ function harness(existing = false) {
     compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, target: ts.ScriptTarget.ES2022 },
   }).outputText;
   vm.runInNewContext(code, {
-    exports, structuredClone, document: { getElementById: () => null },
+    exports, structuredClone, requestAnimationFrame: fn => fn(), document: { getElementById: () => null },
     require(name) {
       if (name === 'react') return {
         useState(initial) { const i = cursor++; if (!(i in states)) states[i] = typeof initial === 'function' ? initial() : initial;
@@ -34,6 +42,13 @@ function harness(existing = false) {
         useMemo: fn => fn(), useCallback: fn => fn, useRef: () => ({ current: null }), useDeferredValue: value => value,
       };
       if (name === 'react/jsx-runtime') return { jsx: (type, props) => ({ type, props }), jsxs: (type, props) => ({ type, props }), Fragment: 'fragment' };
+      if (name === 'next-intl') return {
+        useTranslations: (ns) => (key, values) => lookupMessage(ns ? `${ns}.${key}` : key, values),
+        useLocale: () => 'en',
+      };
+      if (name.endsWith('/error-map')) return {
+        translateErrorMessage: (err, _t, fallback) => (err && err.message) || fallback || 'error',
+      };
       if (name === 'next/dynamic') return { default: () => component('dynamic') };
       if (name === 'next/navigation') return { useRouter: () => ({ push: path => navigations.push(path), refresh() {} }) };
       if (name.endsWith('/useEmployeeMutations')) return { useEmployeeMutations: () => mutations };
@@ -64,6 +79,7 @@ function harness(existing = false) {
     return null;
   }
   return { render, writes, navigations, find,
+    input(id) { return findNode(render(), node => node.type === "input" && node.props.id === id); },
     patch(values) { states[0] = { ...states[0], ...values }; },
     saveButton() { return findNode(render(), node => node.type === 'button' && node.props.type === 'submit'); },
     chooseCard(label) { findNode(render(), node => node.type === 'button' && node.props.children === label).props.onClick(); },
@@ -131,7 +147,7 @@ test('saving changes resets the dirty baseline and tracks nested office changes'
 
 test('an existing employee can switch QTM to An ninh mang and back, preserving identity', async () => {
   const h = harness(true);
-  h.chooseCard('An ninh mạng');
+  h.chooseCard('Cyber Security');
   assert.equal(h.saveButton().props.disabled, false);
   await h.submit();
   assert.equal(h.writes[0].name, 'update');
@@ -144,4 +160,24 @@ test('an existing employee can switch QTM to An ninh mang and back, preserving i
   assert.equal(h.writes[1].args[1].theme.businessCardType, 'qtm');
   assert.equal(h.writes[1].args[1].slug, 'saved-slug');
   assert.equal(h.saveButton().props.disabled, true);
+});
+
+test('full name input uppercases Vietnamese text and persists the uppercase value', async () => {
+  const h = harness(true);
+  const element = { value: 'Nguyễn Đặng bảo Toàn', selectionStart: null, selectionEnd: null };
+  h.input('fullName').props.onChange({ target: element, currentTarget: element, nativeEvent: {} });
+  assert.equal(h.input('fullName').props.value, 'NGUYỄN ĐẶNG BẢO TOÀN');
+  await h.submit();
+  assert.equal(h.writes[0].args[1].fullName, 'NGUYỄN ĐẶNG BẢO TOÀN');
+});
+
+test('full name allows Vietnamese IME composition before uppercasing the committed name', () => {
+  const h = harness(true);
+  const input = h.input('fullName');
+  input.props.onCompositionStart();
+  const element = { value: 'Nguyễn đức', selectionStart: null, selectionEnd: null };
+  input.props.onChange({ target: element, currentTarget: element, nativeEvent: { isComposing: true } });
+  assert.equal(h.input('fullName').props.value, 'Nguyễn đức');
+  input.props.onCompositionEnd({ currentTarget: element });
+  assert.equal(h.input('fullName').props.value, 'NGUYỄN ĐỨC');
 });

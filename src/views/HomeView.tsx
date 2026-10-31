@@ -7,6 +7,7 @@ import {
   Users,
   ArrowRight,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { PublicHeader } from "@/client/components/layout/PublicHeader";
 import { PublicFooter } from "@/client/components/layout/PublicFooter";
 import type { Employee } from "@/shared/types";
@@ -26,6 +27,9 @@ export function HomeView({ employees }: { employees: Employee[] }) {
   const [search, setSearch] = useState("");
   const deferredSearch = useDeferredValue(search);
   const [activeFilter, setActiveFilter] = useState("all");
+  const tHero = useTranslations("home.hero");
+  const tDir = useTranslations("home.directory");
+  const tCommon = useTranslations("common");
   useAos(ready, `${deferredSearch}:${activeFilter}`);
 
   const active = employees.filter((e) => e.isActive);
@@ -51,27 +55,26 @@ export function HomeView({ employees }: { employees: Employee[] }) {
           <div className="container hero-inner">
             <div data-aos="fade-up" data-aos-delay="50">
               <Badge>
-                QTM COMMUNICATION TECHNOLOGY · TINH GỌN · LINH HOẠT · HIỆU QUẢ
+                {tHero("badge")}
               </Badge>
               <h1>
-                MediaTech Partner
+                {tHero("title")}
                 <br />
                 <span className="qtm-gradient-text hero-tagline">
-                  <span>Kết nối con người.</span>{" "}
-                  <span>Lan tỏa giá trị.</span>
+                  <span>{tHero("taglinePart1")}</span>{" "}
+                  <span>{tHero("taglinePart2")}</span>
                 </span>
               </h1>
               <div className="qtm-hero-box">
                 <span className="qtm-hero-box-tag">
-                  ● ĐỒNG HÀNH CÙNG TRUYỀN THÔNG SỐ &amp; AI
+                  ● {tHero("boxTag")}
                 </span>
                 <p className="hero-description">
-                  Đồng hành cùng doanh nghiệp chuyển hóa{" "}
+                  {tHero("descriptionPrefix")}{" "}
                   <strong className="text-[#22D3EE]">
-                    CHIẾN LƯỢC – CÔNG NGHỆ – SÁNG TẠO – DỮ LIỆU
+                    {tHero("descriptionHighlight")}
                   </strong>{" "}
-                  thành những điểm chạm kết nối chuyên nghiệp qua danh thiếp
-                  điện tử E-card.
+                  {tHero("descriptionSuffix")}
                 </p>
               </div>
               <div className="qtm-motto-pill">
@@ -83,7 +86,7 @@ export function HomeView({ employees }: { employees: Employee[] }) {
                   prefetch={true}
                   className="btn btn-primary group"
                 >
-                  ĐĂNG NHẬP
+                  {tHero("loginCta")}
                   <ArrowRight
                     size={15}
                     className="transition-transform duration-200 group-hover:translate-x-1"
@@ -106,15 +109,14 @@ export function HomeView({ employees }: { employees: Employee[] }) {
               data-aos-delay="100"
             >
               <div className="eyebrow justify-center">
-                QTM MEDIATECH PLATFORM
+                {tDir("eyebrow")}
               </div>
               <h2 className="qtm-directory-title">
-                HỒ SƠ &amp;{" "}
-                <span className="qtm-gradient-text">DANH THIẾP SỐ QTM</span>
+                {tDir("titlePrefix")}{" "}
+                <span className="qtm-gradient-text">{tDir("titleHighlight")}</span>
               </h2>
               <p className="qtm-directory-subtitle">
-                Khám phá hồ sơ nhân sự QTM MediaTech, quét mã QR hoặc lưu danh
-                bạ vCard trực tiếp chỉ với một chạm.
+                {tDir("subtitle")}
               </p>
 
               <label className="search-box qtm-search-centered">
@@ -122,8 +124,8 @@ export function HomeView({ employees }: { employees: Employee[] }) {
                 <input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Tìm kiếm thành viên theo họ tên hoặc chức vụ…"
-                  aria-label="Tìm kiếm tên hoặc chức vụ"
+                  placeholder={tDir("searchPlaceholder")}
+                  aria-label={tDir("searchAria")}
                 />
               </label>
 
@@ -136,7 +138,7 @@ export function HomeView({ employees }: { employees: Employee[] }) {
                     activeFilter === "all" && "active",
                   )}
                 >
-                  <span>Tất cả</span>
+                  <span>{tCommon("all")}</span>
                   <span className="qtm-pill-count">{active.length}</span>
                 </button>
                 {departments.map((pos) => {
@@ -175,8 +177,8 @@ export function HomeView({ employees }: { employees: Employee[] }) {
                 {filtered.length === 0 && (
                   <div className="empty">
                     <Users size={28} className="mx-auto text-[#22D3EE]" />
-                    <h3>Chưa tìm thấy thành viên</h3>
-                    <p>Thử tìm kiếm với tên hoặc chức vụ khác.</p>
+                    <h3>{tDir("emptyTitle")}</h3>
+                    <p>{tDir("emptySubtitle")}</p>
                   </div>
                 )}
               </div>

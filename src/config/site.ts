@@ -6,13 +6,13 @@ const normalizedSiteUrl = rawSiteUrl.replace(/\/+$/, "");
 
 export const siteConfig = {
   name: "E-card",
-  title: "E-card — Danh thiếp số MediaTech",
-  companyName: "CÔNG TY CỔ PHẦN CÔNG NGHỆ TRUYỀN THÔNG QTM",
+  title: "E-card — MediaTech Digital Business Card",
+  companyName: "QTM MEDIA TECHNOLOGY JOINT STOCK COMPANY",
   companyLegalName: "QTM Media Technology JSC",
   description:
-    "Kết nối con người. Lan tỏa giá trị. Nền tảng danh thiếp số E-card dành cho đội ngũ QTM MediaTech.",
+    "Connect People. Spread Value. Smart digital business card platform for the QTM MediaTech team.",
   url: normalizedSiteUrl,
-  locale: "vi_VN",
+  locale: "en_US",
   ogImage: "/opengraph-image",
   /**
    * Cờ cho phép Google lập chỉ mục trang chủ `/`.

@@ -7,6 +7,7 @@ import {
   Globe,
   MapPin,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { getPublicFields } from "@/shared/types";
 import type { Employee } from "@/shared/types";
 import { saveContact, websiteUrl } from "@/shared/utils/vcard";
@@ -20,13 +21,16 @@ export function CardActions({
   animate?: boolean;
 }) {
   const toast = useToast();
+  const t = useTranslations("card.actions");
+  const tToast = useTranslations("toast");
   const pf = getPublicFields(e);
   const firstOffice = e.offices.find(office => office.address.trim());
   const actions = [
     ...(pf.phone && e.phone.trim()
       ? [
           {
-            label: "Call",
+            id: "call",
+            label: t("call"),
             icon: Phone,
             href: e.phone ? `tel:${e.phone.replace(/\s/g, "")}` : "",
             external: false,
@@ -36,7 +40,8 @@ export function CardActions({
     ...(pf.email && e.email.trim()
       ? [
           {
-            label: "Email",
+            id: "email",
+            label: t("email"),
             icon: Mail,
             href: e.email ? `mailto:${e.email}` : "",
             external: false,
@@ -46,7 +51,8 @@ export function CardActions({
     ...(pf.zalo && e.zalo.replace(/[^0-9]/g, "")
       ? [
           {
-            label: "Zalo",
+            id: "zalo",
+            label: t("zalo"),
             icon: MessageCircle,
             href: e.zalo
               ? `https://zalo.me/${e.zalo.replace(/[^0-9]/g, "")}`
@@ -55,11 +61,12 @@ export function CardActions({
           },
         ]
       : []),
-    { label: "Save contact", icon: ContactRound, href: "", external: false },
+    { id: "save", label: t("saveContact"), icon: ContactRound, href: "", external: false },
     ...(pf.website && websiteUrl(e.website)
       ? [
           {
-            label: "Website",
+            id: "website",
+            label: t("website"),
             icon: Globe,
             href: websiteUrl(e.website),
             external: true,
@@ -69,7 +76,8 @@ export function CardActions({
     ...(pf.offices && firstOffice
       ? [
           {
-            label: "Directions",
+            id: "directions",
+            label: t("directions"),
             icon: MapPin,
             href: firstOffice?.address
               ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(firstOffice.address.trim())}`
@@ -82,7 +90,7 @@ export function CardActions({
 
   return (
     <div className="card-actions actions-outline">
-      {actions.map(({ label, icon: Icon, href, external }, index) => {
+      {actions.map(({ id, label, icon: Icon, href, external }, index) => {
         const aosProps = animate
           ? {
               "data-aos": "zoom-in-up",
@@ -92,7 +100,7 @@ export function CardActions({
           : {};
         return href ? (
           <a
-            key={label}
+            key={id}
             href={href}
             target={external ? "_blank" : undefined}
             rel={external ? "noopener noreferrer" : undefined}
@@ -105,11 +113,11 @@ export function CardActions({
           </a>
         ) : (
           <button
-            key={label}
+            key={id}
             type="button"
             onClick={() => {
               saveContact(e);
-              toast("Contact downloaded");
+              toast(tToast("contactSaved"));
             }}
             {...aosProps}
           >

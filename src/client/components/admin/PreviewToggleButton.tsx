@@ -2,6 +2,7 @@
 
 import { forwardRef } from "react";
 import { Eye, Maximize2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/shared/utils/cn";
 
 export interface PreviewToggleButtonProps
@@ -17,12 +18,13 @@ export const PreviewToggleButton = forwardRef<
   { variant = "header", label, className, ...props },
   ref,
 ) {
+  const t = useTranslations("admin.preview");
   if (variant === "fab") {
     return (
       <button
         ref={ref}
         type="button"
-        aria-label="Xem trước toàn màn hình"
+        aria-label={t("fullscreenAria")}
         className={cn(
           "preview-fab lg:hidden fixed right-4 bottom-[calc(82px+env(safe-area-inset-bottom,0px))] z-30",
           "inline-flex items-center gap-2 rounded-full px-4 py-2.5",
@@ -37,7 +39,7 @@ export const PreviewToggleButton = forwardRef<
         {...props}
       >
         <Eye size={16} className="text-cyan-400 shrink-0" />
-        <span>{label ?? "Xem trước"}</span>
+        <span>{label ?? t("fabLabel")}</span>
       </button>
     );
   }
@@ -46,7 +48,7 @@ export const PreviewToggleButton = forwardRef<
     <button
       ref={ref}
       type="button"
-      aria-label="Xem trước toàn màn hình"
+      aria-label={t("fullscreenAria")}
       className={cn(
         "preview-toggle-btn group relative z-10 inline-flex items-center gap-2",
         "rounded-full px-3.5 py-1.5",
@@ -63,7 +65,7 @@ export const PreviewToggleButton = forwardRef<
         size={15}
         className="text-cyan-400 transition-transform duration-200 group-hover:scale-110 shrink-0"
       />
-      <span>{label ?? "XEM TRƯỚC TRỰC TIẾP"}</span>
+      <span>{label ?? t("headerLabel")}</span>
       <Maximize2
         size={12}
         className="text-slate-400 opacity-75 transition-all duration-200 group-hover:text-cyan-300 group-hover:opacity-100 shrink-0"

@@ -3,6 +3,7 @@ import { memo, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Eye, QrCode, Download, Pencil } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { Employee } from "@/shared/types";
 import { CardListContent } from "@/client/components/card/CardListItem";
 import { CopyButton } from "@/client/components/ui/CopyButton";
@@ -23,6 +24,9 @@ export const AdminCardItem = memo(function AdminCardItem({
 }) {
   const [open, setOpen] = useState(false);
   const toast = useToast();
+  const t = useTranslations("admin.cards");
+  const tCommon = useTranslations("common");
+  const tToast = useTranslations("toast");
   const url = cardUrl(e.slug);
 
   return (
@@ -31,11 +35,11 @@ export const AdminCardItem = memo(function AdminCardItem({
       <Link
         href={routes.employee(e.id)}
         className="admin-card-edit-btn"
-        title={`Cập nhật danh thiếp của ${e.fullName}`}
-        aria-label={`Cập nhật danh thiếp của ${e.fullName}`}
+        title={t("editCardAria", { name: e.fullName })}
+        aria-label={t("editCardAria", { name: e.fullName })}
       >
         <Pencil size={12} />
-        <span>Cập nhật</span>
+        <span>{t("editCard")}</span>
       </Link>
 
       <Link
@@ -51,14 +55,12 @@ export const AdminCardItem = memo(function AdminCardItem({
       <div className="admin-card-controls">
         <div className="flex items-center justify-between gap-2">
           <span className={`status ${e.isActive ? "" : "off"}`}>
-            {e.isActive
-              ? "Danh thiếp đang bật"
-              : "Danh thiếp đã tắt · không công khai"}
+            {e.isActive ? t("statusOn") : t("statusOff")}
           </span>
         </div>
         <div className="admin-card-link">{url}</div>
         <div className="button-row">
-          <CopyButton value={url} label="Sao chép" />
+          <CopyButton value={url} label={tCommon("copy")} />
           <Link
             className="btn btn-secondary"
             href={`/card/${e.slug}`}
@@ -67,7 +69,7 @@ export const AdminCardItem = memo(function AdminCardItem({
             prefetch={false}
           >
             <Eye size={13} />
-            Xem hồ sơ
+            {t("viewProfile")}
           </Link>
           <button
             className="btn btn-secondary"
@@ -75,7 +77,7 @@ export const AdminCardItem = memo(function AdminCardItem({
             onClick={() => setOpen(true)}
           >
             <QrCode size={13} />
-            Xem QR
+            {t("viewQr")}
           </button>
         </div>
         <button
@@ -84,18 +86,21 @@ export const AdminCardItem = memo(function AdminCardItem({
           onClick={async () => {
             try {
               await downloadQrBySlug(e.slug, url);
-              toast("Đã tải mã QR PNG");
+              toast(tToast("qrDownloaded"));
             } catch {
-              toast("Không thể tạo mã QR", "error");
+              toast(tToast("qrGenerateError"), "error");
             }
           }}
         >
           <Download size={14} />
-          Tải QR (PNG)
+          {t("downloadQrPng")}
         </button>
       </div>
       {open && (
-        <Modal title={`Mã QR · ${e.fullName}`} onClose={() => setOpen(false)}>
+        <Modal
+          title={t("qrModalTitle", { name: e.fullName })}
+          onClose={() => setOpen(false)}
+        >
           <QRPanel slug={e.slug} />
         </Modal>
       )}

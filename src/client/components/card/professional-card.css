@@ -573,6 +573,7 @@
     /* Keep contacts compact; anchor the footer to the viewport bottom. */
     grid-template-rows: none;
     gap: clamp(8px, 1.2dvh, 16px);
+    padding-top: 44px;
     padding-bottom: max(16px, env(safe-area-inset-bottom));
   }
   .qtm-public-profile .qtm-portrait .avatar,

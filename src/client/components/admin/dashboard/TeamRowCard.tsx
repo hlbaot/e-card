@@ -3,7 +3,10 @@
 import { memo } from "react";
 import Link from "next/link";
 import { Pencil, Trash2, Phone, Mail } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import type { Employee } from "@/shared/types";
+import { resolveLocale } from "@/i18n/config";
+import { localizeText } from "@/shared/utils/localize";
 import { Avatar } from "@/client/components/ui/Avatar";
 import { Switch } from "@/client/components/ui/Switch";
 import { routes } from "@/shared/constants/routes";
@@ -21,6 +24,9 @@ export const TeamRowCard = memo(function TeamRowCard({
   toggling,
   onDeleteRequest,
 }: TeamRowCardProps) {
+  const locale = resolveLocale(useLocale());
+  const t = useTranslations("admin.employees");
+  const tCommon = useTranslations("common");
   return (
     <article className="rounded-xl border border-white/[0.09] bg-white/[0.025] p-4 transition-colors hover:border-cyan-400/30">
       <div className="flex items-start justify-between gap-3">
@@ -32,11 +38,11 @@ export const TeamRowCard = memo(function TeamRowCard({
             color={e.theme.primaryColor}
           />
           <div className="min-w-0">
-            <strong className="block truncate text-sm font-semibold text-[var(--ink)]">
-              {e.fullName}
+            <strong className="block truncate text-sm font-semibold uppercase text-[var(--ink)]">
+              {e.fullName.toLocaleUpperCase("vi-VN")}
             </strong>
             <span className="mt-0.5 block truncate text-xs text-[var(--muted)]">
-              {e.companyShort}
+              {localizeText(e.companyShort, locale)}
             </span>
           </div>
         </div>
@@ -45,16 +51,16 @@ export const TeamRowCard = memo(function TeamRowCard({
         <div className="flex items-center gap-1.5 shrink-0">
           <Link
             href={routes.employee(e.id)}
-            title={`Chỉnh sửa ${e.fullName}`}
-            aria-label={`Sửa ${e.fullName}`}
+            title={t("editAria", { name: e.fullName })}
+            aria-label={t("editAria", { name: e.fullName })}
             className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-[var(--text-body)] transition-all hover:border-cyan-400/40 hover:bg-cyan-400/12 hover:text-white"
           >
             <Pencil size={15} />
           </Link>
           <button
             type="button"
-            title={`Xóa ${e.fullName}`}
-            aria-label={`Xóa ${e.fullName}`}
+            title={t("deleteAria", { name: e.fullName })}
+            aria-label={t("deleteAria", { name: e.fullName })}
             onClick={() => onDeleteRequest(e)}
             className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-rose-400/90 transition-all hover:border-rose-400/40 hover:bg-rose-500/15 hover:text-rose-300 cursor-pointer"
           >
@@ -65,7 +71,7 @@ export const TeamRowCard = memo(function TeamRowCard({
 
       {/* Position */}
       <p className="mt-2.5 text-xs font-medium text-[var(--text-body)]">
-        {e.position}
+        {localizeText(e.position, locale)}
       </p>
 
       {/* Contact rows */}
@@ -84,12 +90,12 @@ export const TeamRowCard = memo(function TeamRowCard({
 
       {/* Status Footer */}
       <div className="mt-3 flex items-center justify-between border-t border-white/[0.07] pt-3">
-        <span className="text-xs text-[var(--muted)]">Trạng thái hiển thị</span>
+        <span className="text-xs text-[var(--muted)]">{t("displayStatus")}</span>
         <div className="flex items-center gap-2.5">
           <Switch
             checked={e.isActive}
             disabled={toggling}
-            label={`Bật danh thiếp của ${e.fullName}`}
+            label={t("toggleAria", { name: e.fullName })}
             onChange={() => onToggleActive(e)}
           />
           <span
@@ -107,7 +113,7 @@ export const TeamRowCard = memo(function TeamRowCard({
                   : "bg-slate-400"
               }`}
             />
-            {e.isActive ? "Đang bật" : "Đã tắt"}
+            {e.isActive ? tCommon("enabled") : tCommon("disabled")}
           </span>
         </div>
       </div>

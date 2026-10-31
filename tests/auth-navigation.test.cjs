@@ -40,6 +40,13 @@ function harness(component, { authenticated = true, initialUser = null } = {}) {
     require(name) {
       if (name === 'react') return react;
       if (name === 'react/jsx-runtime') return { jsx: element, jsxs: element, Fragment: 'fragment' };
+      if (name === 'next-intl') return {
+        useTranslations: () => (key) => key,
+        useLocale: () => 'en',
+      };
+      if (name.endsWith('/error-map')) return {
+        translateErrorMessage: (_err, _t, fallback) => fallback || 'error',
+      };
       if (name.endsWith('/useAuth')) return {
         useAuth: () => ({ ...state, login: async () => {} }),
         restoreSession: () => { restores++; return restoring; },

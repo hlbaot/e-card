@@ -9,6 +9,7 @@ import {
   MapPin,
   ChevronRight,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { getPublicFields } from "@/shared/types";
 import type { Employee } from "@/shared/types";
 import { saveContact, websiteUrl } from "@/shared/utils/vcard";
@@ -17,11 +18,13 @@ import { cn } from "@/shared/utils/cn";
 
 export function ActionGrid({ employee: e }: { employee: Employee }) {
   const toast = useToast();
+  const t = useTranslations("card.actions");
+  const tToast = useTranslations("toast");
   const pf = getPublicFields(e);
   const webHref = websiteUrl(e.website) || "https://qtmmedia.vn";
   const mapAddress =
     e.offices[0]?.address ||
-    "Số 22 Hồ Giám, phường Văn Miếu - Quốc Tử Giám, Hà Nội, Việt Nam";
+    "22 Ho Giam, Van Mieu - Quoc Tu Giam, Hanoi, Vietnam";
   const mapHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapAddress)}`;
 
   const actions = [
@@ -29,7 +32,7 @@ export function ActionGrid({ employee: e }: { employee: Employee }) {
       ? [
           {
             id: "call",
-            label: "Call",
+            label: t("call"),
             icon: Phone,
             href: e.phone ? `tel:${e.phone.replace(/\s/g, "")}` : "",
             external: false,
@@ -41,7 +44,7 @@ export function ActionGrid({ employee: e }: { employee: Employee }) {
       ? [
           {
             id: "email",
-            label: "Email",
+            label: t("email"),
             icon: Mail,
             href: e.email ? `mailto:${e.email}` : "",
             external: false,
@@ -53,7 +56,7 @@ export function ActionGrid({ employee: e }: { employee: Employee }) {
       ? [
           {
             id: "zalo",
-            label: "Zalo",
+            label: t("zalo"),
             icon: MessageCircle,
             href: e.zalo
               ? `https://zalo.me/${e.zalo.replace(/[^0-9]/g, "")}`
@@ -65,20 +68,20 @@ export function ActionGrid({ employee: e }: { employee: Employee }) {
       : []),
     {
       id: "save",
-      label: "Save contact",
+      label: t("saveContact"),
       icon: UserPlus,
       href: "",
       external: false,
       onClick: () => {
         saveContact(e);
-        toast("Contact downloaded (.vcf)");
+        toast(tToast("contactSaved"));
       },
     },
     ...(pf.website
       ? [
           {
             id: "website",
-            label: "Website",
+            label: t("website"),
             icon: Globe,
             href: webHref,
             external: true,
@@ -90,7 +93,7 @@ export function ActionGrid({ employee: e }: { employee: Employee }) {
       ? [
           {
             id: "direction",
-            label: "Directions",
+            label: t("directions"),
             icon: MapPin,
             href: mapHref,
             external: true,

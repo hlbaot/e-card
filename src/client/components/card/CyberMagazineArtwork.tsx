@@ -38,7 +38,7 @@ export function CyberMagazineArtwork({ className, primaryColor = "#0F4C75", thum
         <linearGradient id={`${id}-teal`} x1="0" y1="0" x2="1" y2="1">
           <stop stopColor={native ? "#009BB2" : surface} /><stop offset=".45" stopColor={native ? "#00627E" : blue} /><stop offset="1" stopColor={native ? "#003651" : navy} />
         </linearGradient>
-        <linearGradient id={`${id}-left-ribbon`} gradientUnits="userSpaceOnUse" x1="0" y1="330" x2="445" y2="513">
+        <linearGradient id={`${id}-left-ribbon`} gradientUnits="userSpaceOnUse" x1="0" y1="330" x2="480" y2="790">
           <stop stopColor={native ? "#00415D" : navy} /><stop offset=".42" stopColor={native ? "#008CA7" : surface} />
           <stop offset=".72" stopColor={native ? "#13ACC0" : cyan} /><stop offset="1" stopColor={light} stopOpacity=".25" />
         </linearGradient>
@@ -46,19 +46,19 @@ export function CyberMagazineArtwork({ className, primaryColor = "#0F4C75", thum
           <stop stopColor="#E9FCFF" stopOpacity=".38" /><stop offset=".35" stopColor={light} stopOpacity=".19" />
           <stop offset="1" stopColor={cyan} stopOpacity="0" />
         </radialGradient>
-        <linearGradient id={`${id}-left-gold`} gradientUnits="userSpaceOnUse" x1="0" y1="375" x2="445" y2="513">
+        <linearGradient id={`${id}-left-gold`} gradientUnits="userSpaceOnUse" x1="0" y1="375" x2="480" y2="790">
           <stop stopColor="#C9A227" /><stop offset=".18" stopColor="#E6C766" /><stop offset=".36" stopColor="#FFF4C3" />
           <stop offset=".55" stopColor="#E6C766" /><stop offset=".82" stopColor="#C9A227" /><stop offset="1" stopColor="#FFF3B0" />
         </linearGradient>
         <clipPath id={`${id}-left-surface`}>
-          <path d="M0 295C145 322 211 401 321 461C365 483 404 500 445 513C291 459 163 373 0 465Z" />
+          <path d="M0 295C173 320 252 531 480 790C310 621 163 397 0 465Z" />
         </clipPath>
-        <linearGradient id={`${id}-left-fade`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="450" y2="0">
+        <linearGradient id={`${id}-left-fade`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="510" y2="0">
           <stop offset="0" stopColor="white" /><stop offset=".7" stopColor="white" />
           <stop offset=".92" stopColor="#a0a0a0" /><stop offset="1" stopColor="black" />
         </linearGradient>
-        <mask id={`${id}-left-soft`} maskUnits="userSpaceOnUse" x="0" y="280" width="470" height="280">
-          <rect y="280" width="470" height="280" fill={paint("left-fade")} />
+        <mask id={`${id}-left-soft`} maskUnits="userSpaceOnUse" x="0" y="280" width="520" height="560">
+          <rect y="280" width="520" height="560" fill={paint("left-fade")} />
         </mask>
         <linearGradient id={`${id}-gold`} x1="0" y1="0" x2="1" y2=".3">
           <stop stopColor="#C9A227" /><stop offset=".25" stopColor="#E6C766" /><stop offset=".48" stopColor="#FFF3B0" /><stop offset=".7" stopColor="#C9A227" /><stop offset="1" stopColor="#E6C766" />
@@ -114,21 +114,25 @@ export function CyberMagazineArtwork({ className, primaryColor = "#0F4C75", thum
           <circle cx="934" cy="490" r="4" strokeWidth="2" />
         </g>
       </svg>
-      {/* Separate anchors keep the left cluster at the left edge on wide cards. */}
-      <svg data-cyber-corner="top-left" x="0" y="0" width="100%" height="48%"
-        viewBox="0 0 1080 600" preserveAspectRatio="xMinYMin meet">
+      {/* The tail curls down outside the portrait instead of pointing at its face. */}
+      <svg data-cyber-wave-layer="left" x="0" y="0" width="100%" height="100%"
+        viewBox="0 0 1080 1440" preserveAspectRatio="xMinYMin meet">
       {/* Rounded shoulders and a feathered tail echo the reference's fluid ribbon. */}
       <g data-cyber-wave="left" mask={paint("left-soft")}>
-        <path d="M0 295C145 322 211 401 321 461C365 483 404 500 445 513C291 459 163 373 0 465Z" fill={paint("left-ribbon")} />
-        <path d="M0 295C145 322 211 401 321 461C217 409 107 354 0 397Z" fill={paint("navy")} />
+        <path d="M0 295C173 320 252 531 480 790C310 621 163 397 0 465Z" fill={paint("left-ribbon")} />
+        <path d="M0 295C121.1 312.5 196.1 421.1 308.5 573.6C210 450 110 355 0 397Z" fill={paint("navy")} />
         <g clipPath={paint("left-surface")}>
           <ellipse cx="110" cy="415" rx="155" ry="40" transform="rotate(12 110 415)" fill={paint("left-gloss")} />
         </g>
-        <path d="M0 375C100 349 194 397 283 443C342 474 389 496 445 513C357 482 305 452 246 427C157 389 82 372 0 403Z" fill={paint("left-gold")} />
-        <path d="M0 375C100 349 194 397 283 443C342 474 389 496 445 513" stroke="#FFF5CE" strokeWidth=".8" opacity=".45" />
-        <path d="M0 332C146 343 230 425 424 506" stroke={cyan} strokeWidth="1.1" opacity=".45" />
-        <path d="M0 465C132 402 260 446 426 508L130 553H0Z" fill={paint("dots")} opacity=".12" />
+        <path d="M0 375C124 344 208 452 315 598C364 663 414 727 480 790C398 712 355 661 300 594C208 469 96 372 0 403Z" fill={paint("left-gold")} />
+        <path d="M0 375C124 344 208 452 315 598C364 663 414 727 480 790" stroke="#FFF5CE" strokeWidth=".8" opacity=".45" />
+        <path d="M0 332C180 354 249 533 462 773" stroke={cyan} strokeWidth="1.1" opacity=".45" />
+        <path d="M0 465C123 415 235 538 355 665L130 585H0Z" fill={paint("dots")} opacity=".12" />
       </g>
+      </svg>
+      {/* Separate anchors keep the left cluster at the left edge on wide cards. */}
+      <svg data-cyber-corner="top-left" x="0" y="0" width="100%" height="48%"
+        viewBox="0 0 1080 600" preserveAspectRatio="xMinYMin meet">
 
         <g stroke={blue} strokeWidth="1.4" opacity=".4">
           <path d="M0 48H54L104 0M0 28H40L68 0M0 171H38L73 205H156M0 203H27L62 237H145M0 244H16L51 280H91" />

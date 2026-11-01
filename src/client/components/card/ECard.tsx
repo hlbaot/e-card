@@ -8,7 +8,7 @@ import { MapPin, Phone, Mail, Globe, QrCode, Share2 } from "lucide-react";
 import { getPublicFields } from "@/shared/types";
 import type { Employee } from "@/shared/types";
 import { getTemplate, getThemeBackgroundCss } from "@/config/card-themes";
-import { getCyberMagazineColors } from "@/shared/constants/cyber-magazine";
+import { getCyberMagazineColors, isCyberMagazineDefaultColor } from "@/shared/constants/cyber-magazine";
 import { readableAccent } from "@/shared/utils/color";
 import { capitalizeFirstLetter } from "@/shared/utils/format-text";
 import { resolveLocale } from "@/i18n/config";
@@ -41,6 +41,7 @@ export function ECard({ employee: rawEmployee, variant = "preview", onOpenQr, on
       ? { ...rawTheme, decor: ["cyber-magazine" as const] }
       : rawTheme;
   const isCyberStyle = isCyberSecurity || theme.decor[0] === "cyber-magazine";
+  const hasReferenceFooter = theme.decor[0] === "cyber-magazine" && theme.showDecor !== false && (theme.decorOpacity ?? 35) >= 20 && isCyberMagazineDefaultColor(theme.primaryColor);
   const template = getTemplate(theme.templateId);
   const pf = getPublicFields(e);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -189,8 +190,8 @@ export function ECard({ employee: rawEmployee, variant = "preview", onOpenQr, on
       "--card-font": template.fontFamily || (template.fontStyle === "serif" ? "Georgia, serif" : template.fontStyle === "mono" ? "\"Courier New\", monospace" : "var(--font-body), Arial, sans-serif"),
       "--motif-opacity": (theme.showDecor === false ? 0 : (theme.decorOpacity ?? 35)) / 100,
     } as CSSProperties}>
-      <article className={`qtm-professional-card qtm-template-${theme.templateId}${isCyberStyle ? " qtm-cyber-controls" : ""}${isCyberStyle && theme.showDecor !== false && (theme.decorOpacity ?? 35) >= 20 ? " qtm-cyber-magazine" : ""}${variant === "preview" ? " qtm-fit-preview" : ""}`} aria-label={t("profileAria", { name: e.fullName || t("placeholders.employee") })}>
-        <ProfileDecorations theme={theme} />
+      <article className={`qtm-professional-card qtm-template-${theme.templateId}${isCyberStyle ? " qtm-cyber-controls" : ""}${isCyberStyle && theme.showDecor !== false && (theme.decorOpacity ?? 35) >= 20 ? " qtm-cyber-magazine" : ""}${variant === "preview" ? " qtm-fit-preview" : ""}`} data-reference-footer={hasReferenceFooter || undefined} aria-label={t("profileAria", { name: e.fullName || t("placeholders.employee") })}>
+        <ProfileDecorations theme={theme} locale={locale} />
         <div className="qtm-card-scroll" ref={scrollRef}>
           <div className="qtm-card-layout">
             <header className="qtm-profile-brand" {...aos("fade-down", 50)}>
@@ -230,7 +231,19 @@ export function ECard({ employee: rawEmployee, variant = "preview", onOpenQr, on
             <ProfileConnectionArtwork theme={theme} />
             <footer className="qtm-profile-footer qtm-brand-footer" {...aos("fade-up", 420)}>
               {isCyberSecurity ? (
-                <p className="qtm-profile-motto anm-profile-motto">{t("placeholders.cyberMotto")}</p>
+                <p className="qtm-profile-motto anm-profile-motto">
+                  {(() => {
+                    const rawSlogan = rawEmployee.slogan?.trim() || "";
+                    const isDefault = !rawSlogan || [
+                      "your journey partner",
+                      "người bạn đồng hành trên mọi hành trình",
+                      "tin cậy - tiên phong - khát vọng",
+                      "trust - pioneer - aspiration",
+                      "quality - technology - mindset",
+                    ].includes(rawSlogan.toLowerCase());
+                    return isDefault ? t("placeholders.cyberMotto") : e.slogan.trim();
+                  })()}
+                </p>
               ) : (
                 <p className="qtm-profile-motto qtm-platform-motto">QUALITY - TECHNOLOGY - MINDSET</p>
               )}

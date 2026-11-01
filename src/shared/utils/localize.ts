@@ -249,6 +249,7 @@ const BILINGUAL_DICTIONARY: readonly BilingualEntry[] = [
   {
     en: "Hanoi Office",
     vi: "Văn phòng Hà Nội",
+    aliases: ["VPHN"],
   },
   {
     en: "Ho Chi Minh Office",
@@ -286,6 +287,12 @@ const BILINGUAL_DICTIONARY: readonly BilingualEntry[] = [
       "No. 01 Le Duc Tho, Tu Liem Ward, Hanoi, Vietnam",
       "No.01 Le Duc Tho, Tu Liem Ward, Hanoi, Vietnam",
       "01 Le Duc Tho, Tu Liem Ward, Ha Noi, Viet Nam",
+      "01 Le Duc Tho Street, Tu Liem Ward, Hanoi, Viet Nam",
+      "01 Le Duc Tho Street, Tu Liem Ward, Hanoi, Vietnam",
+      "01 Le Duc Tho Street, Tu Liem Ward, Ha Noi, Viet Nam",
+      "No. 01 Le Duc Tho Street, Tu Liem Ward, Hanoi, Viet Nam",
+      "No. 01 Le Duc Tho Street, Tu Liem Ward, Hanoi, Vietnam",
+      "No. 01 Le Duc Tho Street, Tu Liem Ward, Ha Noi, Viet Nam",
     ],
   },
   {

@@ -78,7 +78,7 @@ export const TeamRowCard = memo(function TeamRowCard({
       <div className="mt-3 space-y-1.5 border-t border-white/[0.07] pt-3 text-xs">
         <div className="flex items-center gap-2 text-[var(--ink)] tabular-nums">
           <Phone size={13} className="text-cyan-400 shrink-0" />
-          <span>{e.phone}</span>
+          <span className="whitespace-pre-wrap">{e.phone}</span>
         </div>
         <div className="flex items-center gap-2 text-[var(--muted)] min-w-0">
           <Mail size={13} className="text-cyan-400 shrink-0" />

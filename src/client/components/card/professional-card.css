@@ -724,3 +724,18 @@
 .qtm-cyber-magazine .qtm-profile-motto { color: #e5f5ff; text-shadow: 0 1px 2px #0f2a5c; }
 
 .qtm-cyber-magazine .qtm-creative { background: #ffffffde; border-radius: 4px; }
+
+/* Keep saved profile information complete on one line at every viewport width.
+   ECard measures these boxes and reduces the font only when the text overflows. */
+.qtm-profile-surface .qtm-profile-identity > :is(h1, h2, h3, .qtm-position, .qtm-company-short),
+.qtm-profile-surface .qtm-contact > :is(strong, a, span:last-child, .qtm-contact-value) {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  white-space: pre;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+.qtm-profile-surface .qtm-profile-identity > :is(h1, h2, h3, .qtm-position, .qtm-company-short) {
+  width: 100%;
+}

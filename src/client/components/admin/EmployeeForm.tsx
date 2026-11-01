@@ -34,7 +34,6 @@ import { LoadingOverlay } from "@/client/components/ui/LoadingOverlay";
 import { BusinessCardPicker } from "./BusinessCardPicker";
 import { EmployeeFormLayout } from "./EmployeeFormLayout";
 import { PreviewToggleButton } from "./PreviewToggleButton";
-import { formatPhone, normalizePhone } from "@/shared/utils/phone";
 import { websiteUrl } from "@/shared/utils/vcard";
 import { translateErrorMessage } from "@/i18n/error-map";
 
@@ -90,9 +89,8 @@ const requiredFields: readonly TextField[] = ["fullName", "phone", "email"];
 
 
 function formFingerprint(input: EmployeeInput) {
-  // Compare editable fields only; ignore response metadata and phone display spacing.
+  // Compare editable fields, including user-defined phone spacing.
   const editable = Object.fromEntries(Object.keys(blank).map((key) => [key, input[key as keyof EmployeeInput]]));
-  editable.phone = normalizePhone(input.phone);
   editable.publicFields = getPublicFields(input);
   editable.theme = { ...migrateCardTheme(input.theme), businessCardType: input.theme.businessCardType ?? "qtm" };
   return JSON.stringify(editable, (_key, value) => {
@@ -224,7 +222,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
           uppercaseFullName(e.currentTarget);
         } : undefined}
         required={requiredFields.includes(key)}
-        value={key === "phone" ? formatPhone(form.phone) : form[key]}
+        value={form[key]}
         placeholder={placeholder}
         onChange={(e) => {
           if (key === "fullName") {
@@ -235,30 +233,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
             }
             return;
           }
-          if (key !== "phone") { set(key, e.target.value); return; }
-          const element = e.currentTarget;
-          const cursor = element.selectionStart ?? element.value.length;
-          let offset = normalizePhone(element.value.slice(0, cursor)).length;
-          let value = normalizePhone(element.value);
-          const inputType = (e.nativeEvent as InputEvent).inputType;
-          // Backspace/delete on a generated separator should remove a digit as usual.
-          if (value === normalizePhone(form.phone) && inputType?.startsWith("delete")) {
-            const index = inputType === "deleteContentBackward" ? offset - 1 : offset;
-            if (index >= 0) {
-              value = value.slice(0, index) + value.slice(index + 1);
-              offset = Math.max(0, index);
-            }
-          }
-          set("phone", value);
-          const formatted = formatPhone(value);
-          let nextCursor = 0;
-          while (nextCursor < formatted.length && offset > 0) {
-            if (formatted[nextCursor] !== " ") offset--;
-            nextCursor++;
-          }
-          requestAnimationFrame(() => {
-            if (document.activeElement === element) element.setSelectionRange(nextCursor, nextCursor);
-          });
+          set(key, e.target.value);
         }}
         aria-invalid={!!errors[key]}
         aria-describedby={errors[key] ? `${key}-error` : undefined}
@@ -298,7 +273,6 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
       ...form,
       fullName: form.fullName.trim().toLocaleUpperCase("vi-VN"),
       email: form.email.trim(),
-      phone: normalizePhone(form.phone),
       website: form.website.trim(),
       slogan: form.slogan.trim(),
     };

@@ -152,8 +152,8 @@
     gap: 10px;
   }
   .brand img {
-    width: 66px;
-    height: auto;
+    width: auto;
+    height: 28px;
   }
   .hero-inner {
     padding-block: 38px;

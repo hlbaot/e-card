@@ -5,15 +5,14 @@ import { useTranslations } from "next-intl";
 /** Shared logo lockup for cards, live previews and the public profile. */
 export function QtmBrand() {
   return (
-    <div className="qtm-card-brand" aria-label="QTM MediaTech">
+    <div className="qtm-card-brand qtm-logo-brand" aria-label="QTM MediaTech">
       <Image
         src="/images/brand/qtm-logo.png"
-        width={34}
-        height={34}
-        alt=""
+        width={913}
+        height={273}
+        alt="QTM MediaTech"
         unoptimized
       />
-      <strong>QTM</strong>
     </div>
   );
 }

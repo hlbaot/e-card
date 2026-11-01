@@ -44,12 +44,6 @@ function wrapText(value: string, limit: number, maxLines = 2) {
 
 const INK = "#17566d";
 
-const dumbbells = [
-  { a: [203, 50], b: [57, 203] },
-  { a: [253, 230], b: [107, 375] },
-  { a: [423, 277], b: [277, 425] },
-];
-
 const connectedBlobs = [
   "M1018 115C1031 115 1040 124 1040 137C1040 149 1030 155 1028 166C1024 180 1030 188 1040 197C1060 215 1051 243 1028 253C1004 263 979 247 979 224C979 206 991 196 1002 182C1010 171 1009 160 1001 151C986 135 995 115 1018 115Z",
   "M964 267C981 267 992 277 1000 288C1013 306 1030 301 1044 287L1065 271V336C1050 324 1039 319 1025 320C1003 321 994 337 982 350C974 360 975 369 982 377C994 391 986 410 969 411C951 412 941 397 949 382C956 369 958 359 950 349C943 341 930 337 930 319C930 293 941 267 964 267Z",
@@ -121,12 +115,6 @@ function QtmBusinessCard({ employee: e, url, svgRef }: {
       style={{ display: "block", width: "100%", height: "auto", fontFamily: "Arial, Helvetica, sans-serif" }}>
       <defs>
         <clipPath id={`${id}-clip`}><rect width="1050" height="640" rx="8" /></clipPath>
-        {dumbbells.map(({ a, b }, i) => (
-          <linearGradient key={i} id={`${id}-g${i}`} gradientUnits="userSpaceOnUse"
-            x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]}>
-            <stop offset="0" stopColor="#3ccbc8" /><stop offset="1" stopColor="#1f74a4" />
-          </linearGradient>
-        ))}
       </defs>
       <g clipPath={`url(#${id}-clip)`}>
         <rect width="1050" height="640" fill="#ffffff" />
@@ -139,18 +127,14 @@ function QtmBusinessCard({ employee: e, url, svgRef }: {
           {blobDots.map(([x, y, r], i) => <circle key={i} cx={x} cy={y} r={r} />)}
         </g>
 
-        <g transform="translate(66 62) scale(.1667)">
-          {dumbbells.map(({ a, b }, i) => (
-            <g key={i}>
-              <line x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke={`url(#${id}-g${i})`} strokeWidth="46" />
-              <circle cx={a[0]} cy={a[1]} r="55" fill="#3ccbc8" />
-              <circle cx={b[0]} cy={b[1]} r="55" fill="#1f74a4" />
-            </g>
-          ))}
-          <polygon fill="#3ccbc8" transform="translate(397 85)"
-            points="0,-70 14,-30 52,-48 36,-10 70,8 30,22 30,60 0,34 -30,60 -30,22 -70,8 -36,-10 -52,-48 -14,-30" />
-        </g>
-        <text x="158" y="141" fill={INK} fontSize="68" fontWeight="600" letterSpacing="3">QTM</text>
+        <image
+          href="/images/brand/qtm-logo.png"
+          x="70"
+          y="58"
+          width="268"
+          height="80"
+          preserveAspectRatio="xMinYMid meet"
+        />
 
         <g transform="translate(0 -32)">
           <CardName name={e.fullName} color={INK} />

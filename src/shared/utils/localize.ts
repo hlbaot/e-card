@@ -18,7 +18,7 @@ const BILINGUAL_DICTIONARY: readonly BilingualEntry[] = [
   },
   {
     en: "Account Executive",
-    vi: "Chuyên viên Kinh doanh",
+    vi: "Chuyên viên Dịch vụ Khách hàng",
     aliases: ["Chuyên viên kinh doanh", "Chuyên viên Quản lý Khách hàng"],
   },
   {

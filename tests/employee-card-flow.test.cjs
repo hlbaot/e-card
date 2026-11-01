@@ -132,7 +132,19 @@ test('save is disabled on entry and when edits are reverted; unchanged submit pe
   h.patch({ position: 'Editor' });
   assert.equal(h.saveButton().props.disabled, true);
   h.patch({ phone: '0917 895 579' });
+  assert.equal(h.saveButton().props.disabled, false);
+  h.patch({ phone: '0917895579' });
   assert.equal(h.saveButton().props.disabled, true);
+});
+
+test('phone input and saving preserve user-defined separators', async () => {
+  const h = harness(true);
+  for (const phone of ['0982226666', '098 222 66 66', '09822 26666']) {
+    h.input('phone').props.onChange({ target: { value: phone } });
+    assert.equal(h.input('phone').props.value, phone);
+    await h.submit();
+    assert.equal(h.writes.at(-1).args[1].phone, phone);
+  }
 });
 
 test('saving changes resets the dirty baseline and tracks nested office changes', async () => {

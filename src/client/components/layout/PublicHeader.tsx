@@ -22,11 +22,11 @@ export function Brand({ href = routes.home }: { href?: string } = {}) {
       aria-label="E-card"
     >
       <Image
-        src="/images/icon.png"
-        width={32}
-        height={32}
+        src="/images/brand/qtm-logo.png"
+        width={94}
+        height={28}
         alt="E-card"
-        className="object-contain"
+        className="object-contain h-7 w-auto"
         priority
       />
       <i className="brand-divider" />

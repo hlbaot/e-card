@@ -2,10 +2,9 @@
 
 import { formatPhone } from "@/shared/utils/phone";
 
-import Link from "next/link";
 import { useLayoutEffect, useRef, type CSSProperties } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { MapPin, Phone, Mail, Globe, QrCode, Share2, Pencil } from "lucide-react";
+import { MapPin, Phone, Mail, Globe, QrCode, Share2 } from "lucide-react";
 import { getPublicFields } from "@/shared/types";
 import type { Employee } from "@/shared/types";
 import { getTemplate, getThemeBackgroundCss } from "@/config/card-themes";
@@ -17,8 +16,6 @@ import { localizeEmployee } from "@/shared/utils/localize";
 import { Avatar } from "@/client/components/ui/Avatar";
 import { migrateCardTheme } from "@/shared/utils/migrate-theme";
 import { websiteUrl } from "@/shared/utils/vcard";
-import { useAuthStore } from "@/client/store/auth.store";
-import { routes } from "@/shared/constants/routes";
 import { CyberSecurityBrand, QtmBrand } from "./QtmBrand";
 import { CardActions } from "./CardActions";
 import { ProfileConnectionArtwork, ProfileDecorations } from "./ProfileDecorations";
@@ -57,7 +54,6 @@ export function ECard({ employee: rawEmployee, variant = "preview", onOpenQr, on
       "data-aos-delay": String(Math.min(Math.round(delay / 50) * 50, 350)),
       "data-aos-duration": "500",
     } : {};
-  const authenticated = useAuthStore((state) => state.authenticated);
   const rows = [
     ...(pf.offices ? e.offices.map((office, index) => ({
       key: `office-${index}`, Icon: MapPin,
@@ -68,6 +64,84 @@ export function ECard({ employee: rawEmployee, variant = "preview", onOpenQr, on
     ...(pf.email && e.email.trim() ? [{ key: "email", Icon: Mail, label: t("labels.email"), value: e.email, href: e.email ? `mailto:${e.email}` : "" }] : []),
     ...(pf.website && e.website.trim() ? [{ key: "website", Icon: Globe, label: t("labels.website"), value: e.website, href: websiteUrl(e.website) }] : []),
   ];
+  useLayoutEffect(() => {
+    const layout = scrollRef.current?.firstElementChild;
+    if (!layout) return;
+    const lines = Array.from(layout.querySelectorAll<HTMLElement>(
+      ".qtm-profile-identity > h1, .qtm-profile-identity > h2, .qtm-profile-identity > h3, .qtm-position, .qtm-company-short, .qtm-contact > strong, .qtm-contact > a, .qtm-contact > span:last-child, .qtm-contact-value",
+    ));
+    const contactLines = lines.filter(line => line.parentElement?.classList.contains("qtm-contact"));
+    const icons = Array.from(layout.querySelectorAll<HTMLElement | SVGSVGElement>(".qtm-contact-icon, .qtm-contact-icon svg"));
+    let active = true;
+    const fit = () => {
+      if (!active) return;
+      for (const line of lines) {
+        line.style.removeProperty("font-size");
+        if (contactLines.includes(line)) continue;
+        const available = line.clientWidth;
+        if (!available || line.scrollWidth <= available) continue;
+        let low = 0;
+        let high = parseFloat(getComputedStyle(line).fontSize);
+        // Measure the actual font, including tracking, rather than guessing from character count.
+        for (let i = 0; i < 16; i++) {
+          const size = (low + high) / 2;
+          line.style.fontSize = `${size}px`;
+          if (line.scrollWidth > available) high = size;
+          else low = size;
+        }
+        line.style.fontSize = `${low}px`;
+      }
+      // All contact rows share one scale, including their labels and icon badges.
+      const baseFonts = contactLines.map(line => parseFloat(getComputedStyle(line).fontSize));
+      for (const icon of icons) {
+        icon.style.removeProperty("width");
+        icon.style.removeProperty("height");
+      }
+      const baseIcons = icons.map(icon => {
+        const style = getComputedStyle(icon);
+        return { width: parseFloat(style.width), height: parseFloat(style.height) };
+      });
+      const applyContactScale = (scale: number) => {
+        contactLines.forEach((line, index) => { line.style.fontSize = `${baseFonts[index] * scale}px`; });
+        icons.forEach((icon, index) => {
+          icon.style.width = `${baseIcons[index].width * scale}px`;
+          icon.style.height = `${baseIcons[index].height * scale}px`;
+        });
+      };
+      const contactsOverflow = () => contactLines.some(line => line.clientWidth > 0 && line.scrollWidth > line.clientWidth);
+      if (contactsOverflow()) {
+        let low = 0;
+        let high = 1;
+        for (let i = 0; i < 16; i++) {
+          const scale = (low + high) / 2;
+          applyContactScale(scale);
+          if (contactsOverflow()) high = scale;
+          else low = scale;
+        }
+        applyContactScale(low);
+      }
+    };
+    fit();
+    const widths = new WeakMap<Element, number>();
+    const observer = new ResizeObserver((entries) => {
+      let changed = false;
+      for (const entry of entries) {
+        if (widths.get(entry.target) !== entry.contentRect.width) changed = true;
+        widths.set(entry.target, entry.contentRect.width);
+      }
+      if (changed) fit();
+    });
+    lines.forEach(line => observer.observe(line));
+    document.fonts.ready.then(fit);
+    document.fonts.addEventListener("loadingdone", fit);
+    window.addEventListener("resize", fit);
+    return () => {
+      active = false;
+      observer.disconnect();
+      document.fonts.removeEventListener("loadingdone", fit);
+      window.removeEventListener("resize", fit);
+    };
+  }, [e, variant]);
   useLayoutEffect(() => {
     if (variant !== "preview") return;
     const viewport = scrollRef.current;
@@ -129,11 +203,6 @@ export function ECard({ employee: rawEmployee, variant = "preview", onOpenQr, on
               <div className="qtm-profile-tools" {...aos("fade-left", 160)}>
                 {onOpenQr && <button type="button" aria-label={t("actions.showQrAria")} onClick={onOpenQr}><QrCode /></button>}
                 {onShare && <button type="button" aria-label={t("actions.shareProfileAria")} onClick={onShare}><Share2 /></button>}
-                {variant === "profile" && authenticated && (
-                  <Link href={routes.employee(e.id)} aria-label={t("actions.customizeCardAria")} title={t("actions.customizeCardAria")}>
-                    <Pencil size={18} />
-                  </Link>
-                )}
               </div>
             </div>
             <section className="qtm-profile-identity" aria-label={t("sections.personalInfo")} {...aos("fade-up", 180)}>

@@ -137,7 +137,7 @@ export function TeamTable({
 
                   {/* Liên hệ */}
                   <td className="px-4 py-3">
-                    <div className="text-sm font-medium text-[var(--ink)] tabular-nums">
+                    <div className="whitespace-pre-wrap text-sm font-medium text-[var(--ink)] tabular-nums">
                       {e.phone}
                     </div>
                     <div

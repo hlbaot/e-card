@@ -59,7 +59,7 @@ export function EmployeeTable({ employees }: { employees: Employee[] }) {
                 </td>
                 <td>{localizeText(e.position, locale)}</td>
                 <td>
-                  <div>{e.phone}</div>
+                  <div className="whitespace-pre-wrap">{e.phone}</div>
                   <small className="muted">{e.email}</small>
                 </td>
                 <td>

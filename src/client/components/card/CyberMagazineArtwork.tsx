@@ -12,16 +12,19 @@ export function cyberMagazineOpacity(value = 35) {
 }
 
 /** One vector composition shared by the selector, profile and PNG export.
- * Artwork follows the reference's silhouette; only the perimeter is painted. */
-export function CyberMagazineArtwork({ className, primaryColor = "#0F4C75", thumbnail = false, decorOpacity }: {
+ * The native footer uses the original artwork; custom colors retain vector motifs. */
+export function CyberMagazineArtwork({ className, primaryColor = "#0F4C75", thumbnail = false, decorOpacity, locale = "vi" }: {
   className?: string;
   primaryColor?: string;
   thumbnail?: boolean;
   decorOpacity?: number;
+  locale?: "vi" | "en";
 }) {
+  void locale;
   const id = `cyber-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   const native = isCyberMagazineDefaultColor(primaryColor);
-  const { deep, navy, blue, surface, cyan, light } = getCyberMagazineColors(primaryColor);
+  const { deep, navy, blue, surface, cyan: themeCyan, light } = getCyberMagazineColors(primaryColor);
+  const cyan = native ? "#13CBE2" : themeCyan;
   const paint = (name: string) => `url(#${id}-${name})`;
   const stars = [[837, 83, 9], [910, 160, 8], [998, 224, 7], [1038, 291, 7], [913, 279, 10], [762, 128, 6], [81, 1200, 9], [170, 1402, 7], [876, 1374, 8], [960, 1391, 7], [1044, 1380, 9]];
   return (
@@ -38,20 +41,20 @@ export function CyberMagazineArtwork({ className, primaryColor = "#0F4C75", thum
         <linearGradient id={`${id}-teal`} x1="0" y1="0" x2="1" y2="1">
           <stop stopColor={native ? "#009BB2" : surface} /><stop offset=".45" stopColor={native ? "#00627E" : blue} /><stop offset="1" stopColor={native ? "#003651" : navy} />
         </linearGradient>
-        <linearGradient id={`${id}-left-ribbon`} gradientUnits="userSpaceOnUse" x1="0" y1="330" x2="480" y2="790">
+        <linearGradient id={`${id}-left-ribbon`} gradientUnits="userSpaceOnUse" x1="0" y1="330" x2="360" y2="550">
           <stop stopColor={native ? "#00415D" : navy} /><stop offset=".42" stopColor={native ? "#008CA7" : surface} />
           <stop offset=".72" stopColor={native ? "#13ACC0" : cyan} /><stop offset="1" stopColor={light} stopOpacity=".25" />
         </linearGradient>
         <radialGradient id={`${id}-left-gloss`}>
-          <stop stopColor="#E9FCFF" stopOpacity=".38" /><stop offset=".35" stopColor={light} stopOpacity=".19" />
+          <stop stopColor="#E9FCFF" stopOpacity=".72" /><stop offset=".35" stopColor={light} stopOpacity=".3" />
           <stop offset="1" stopColor={cyan} stopOpacity="0" />
         </radialGradient>
-        <linearGradient id={`${id}-left-gold`} gradientUnits="userSpaceOnUse" x1="0" y1="375" x2="480" y2="790">
+        <linearGradient id={`${id}-left-gold`} gradientUnits="userSpaceOnUse" x1="0" y1="375" x2="360" y2="550">
           <stop stopColor="#C9A227" /><stop offset=".18" stopColor="#E6C766" /><stop offset=".36" stopColor="#FFF4C3" />
           <stop offset=".55" stopColor="#E6C766" /><stop offset=".82" stopColor="#C9A227" /><stop offset="1" stopColor="#FFF3B0" />
         </linearGradient>
         <clipPath id={`${id}-left-surface`}>
-          <path d="M0 295C173 320 252 531 480 790C310 621 163 397 0 465Z" />
+          <path d="M0 295C145 317 244 465 360 550C239 487 144 405 0 465Z" />
         </clipPath>
         <linearGradient id={`${id}-left-fade`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="510" y2="0">
           <stop offset="0" stopColor="white" /><stop offset=".7" stopColor="white" />
@@ -66,10 +69,21 @@ export function CyberMagazineArtwork({ className, primaryColor = "#0F4C75", thum
         <radialGradient id={`${id}-glow`}>
           <stop stopColor="#FFFBE2" /><stop offset=".15" stopColor="#FFF1AA" stopOpacity=".95" /><stop offset=".4" stopColor="#E6C766" stopOpacity=".3" /><stop offset="1" stopColor="#E6C766" stopOpacity="0" />
         </radialGradient>
+        <radialGradient id={`${id}-portrait-halo`}>
+          <stop stopColor={light} stopOpacity=".22" /><stop offset=".5" stopColor={light} stopOpacity=".16" />
+          <stop offset=".72" stopColor={cyan} stopOpacity=".07" /><stop offset="1" stopColor={light} stopOpacity="0" />
+        </radialGradient>
         <radialGradient id={`${id}-aura`}>
           <stop stopColor={cyan} stopOpacity=".65" /><stop offset=".5" stopColor={cyan} stopOpacity=".18" /><stop offset="1" stopColor={cyan} stopOpacity="0" />
         </radialGradient>
         <linearGradient id={`${id}-edge`}><stop stopColor={light} stopOpacity=".22" /><stop offset="1" stopColor={light} stopOpacity="0" /></linearGradient>
+        <linearGradient id={`${id}-footer-night`} x1="0" y1="0" x2="1" y2="1">
+          <stop stopColor={native ? "#004766" : blue} /><stop offset=".45" stopColor={native ? "#003553" : navy} /><stop offset="1" stopColor={native ? "#002C4C" : deep} />
+        </linearGradient>
+        <filter id={`${id}-shield-light`} x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" />
+        </filter>
+        <pattern id={`${id}-shield-mesh`} width="3" height="3" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".5" fill={cyan} opacity=".7" /></pattern>
         <pattern id={`${id}-dots`} width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.2" fill={cyan} opacity=".38" /></pattern>
       </defs>
       {/* The footer follows card height; the top composition and icons scale uniformly. */}
@@ -92,14 +106,28 @@ export function CyberMagazineArtwork({ className, primaryColor = "#0F4C75", thum
       </g>
       <path d="M0 984H51V1228H0ZM1019 925H1080V1282H989Z" fill={paint("dots")} opacity=".22" />
 
-      {/* A full-width footer, rather than a small triangular corner. */}
-      <path d="M0 1220C109 1270 169 1378 337 1340C550 1295 665 1313 788 1326C923 1340 1017 1302 1080 1249V1440H0Z" fill={paint("teal")} />
-      <path d="M0 1253C140 1325 167 1384 351 1352C540 1313 669 1335 802 1352C934 1368 1021 1339 1080 1301V1440H0Z" fill={paint("blue")} />
-      <path d="M0 1338C227 1282 306 1366 492 1354C682 1341 766 1422 1080 1440H0Z" fill={navy} />
-      <path d="M0 1267C110 1295 171 1392 337 1341C562 1272 694 1366 811 1351C949 1332 1016 1310 1080 1255" stroke={paint("gold")} strokeWidth="2" />
-      <path d="M208 1375C371 1296 510 1322 686 1352C850 1380 939 1428 1080 1440H1026C882 1423 819 1384 681 1361C505 1333 366 1312 208 1375Z" fill={paint("gold")} />
-      <path d="M0 1325C259 1272 389 1392 599 1356S928 1453 1080 1322M0 1368C216 1299 371 1404 564 1373S924 1445 1080 1352" stroke={cyan} strokeWidth="1" opacity=".7" />
-      <path d="M0 1300H1080V1440H0Z" fill={paint("dots")} opacity=".22" />
+      {!native && <g>
+      {/* Broad overlapping swells and a single widening gold ribbon match the magazine footer. */}
+      <ellipse cx="75" cy="1280" rx="240" ry="175" fill={paint("aura")} opacity=".65" />
+      <path d="M0 1290C135 1355 207 1360 349 1322C548 1266 687 1253 820 1290C939 1325 1024 1285 1080 1230V1440H0Z" fill={paint("teal")} />
+      <path d="M0 1326C152 1380 235 1320 382 1315C560 1306 688 1264 829 1309C957 1349 1020 1320 1080 1285V1440H0Z" fill={paint("blue")} />
+      <path d="M0 1390C167 1411 218 1309 402 1318C633 1329 783 1351 915 1400L1080 1440H0Z" fill={paint("footer-night")} />
+      <path d="M0 1326C152 1380 235 1320 382 1315C560 1306 688 1264 829 1309C957 1349 1020 1320 1080 1285" stroke={cyan} strokeWidth="1.5" opacity=".42" />
+      <path d="M172 1431C303 1316 345 1281 438 1306C481 1318 511 1324 548 1325C702 1327 799 1360 887 1399C963 1432 1024 1440 1080 1440H956C877 1415 840 1384 769 1362C688 1337 610 1331 548 1328C501 1327 469 1318 436 1310C344 1287 301 1324 172 1431Z" fill={paint("gold")} />
+      <path d="M169 1398C301 1296 331 1259 424 1294C554 1343 732 1228 888 1286C960 1313 1013 1312 1080 1281" stroke={paint("gold")} strokeWidth="1.3" opacity=".8" />
+      <path d="M116 1440C242 1380 279 1295 362 1300M166 1440C296 1378 331 1320 421 1324M265 1440C369 1358 499 1340 698 1418" stroke={cyan} strokeWidth="1" opacity=".3" />
+      <path d="M1080 1288C964 1338 924 1430 827 1386C770 1360 726 1300 657 1309M1080 1356C968 1446 929 1378 844 1353" stroke={paint("gold")} strokeWidth="1" opacity=".65" />
+      <path d="M694 1280H1080V1440H944C868 1373 773 1328 694 1280Z" fill={paint("dots")} opacity=".28" />
+      <g fill={cyan} opacity=".18">
+        {Array.from({ length: 48 }, (_, i) => <rect key={i} x={925 + i % 8 * 20} y={1282 + Math.floor(i / 8) * 17} width={i % 3 ? 6 : 10} height={i % 3 ? 9 : 14} opacity={.3 + i % 4 * .15} />)}
+      </g>
+      {[[257, 1317, 23], [863, 1336, 25], [942, 1360, 22], [1035, 1356, 24], [960, 1291, 28]].map(([x, y, r]) => <g key={x}>
+        <circle cx={x} cy={y} r={r} fill={paint("glow")} />
+        <path d={`M${x - 8} ${y}h16M${x} ${y - 15}v30`} stroke="#FFF4C3" strokeWidth="1" opacity=".85" />
+        <circle cx={x} cy={y} r="2.5" fill="#FFFFEB" />
+      </g>)}
+
+      </g>}
 
       </svg>
       {/* The reference's top composition scales with card width, never its height. */}
@@ -114,20 +142,21 @@ export function CyberMagazineArtwork({ className, primaryColor = "#0F4C75", thum
           <circle cx="934" cy="490" r="4" strokeWidth="2" />
         </g>
       </svg>
-      {/* The tail curls down outside the portrait instead of pointing at its face. */}
+      {/* A shorter ribbon sits lower on the left and tapers downward beside the portrait. */}
       <svg data-cyber-wave-layer="left" x="0" y="0" width="100%" height="100%"
         viewBox="0 0 1080 1440" preserveAspectRatio="xMinYMin meet">
+      <ellipse cx="540" cy="535" rx="350" ry="295" fill={paint("portrait-halo")} />
       {/* Rounded shoulders and a feathered tail echo the reference's fluid ribbon. */}
-      <g data-cyber-wave="left" mask={paint("left-soft")}>
-        <path d="M0 295C173 320 252 531 480 790C310 621 163 397 0 465Z" fill={paint("left-ribbon")} />
-        <path d="M0 295C121.1 312.5 196.1 421.1 308.5 573.6C210 450 110 355 0 397Z" fill={paint("navy")} />
+      <g data-cyber-wave="left" transform="translate(0 85)" mask={paint("left-soft")}>
+        <path d="M0 295C145 317 244 465 360 550C239 487 144 405 0 465Z" fill={paint("left-ribbon")} />
+        <path d="M0 295C126 314 207 417 285 492C183 417 101 355 0 397Z" fill={paint("navy")} />
         <g clipPath={paint("left-surface")}>
-          <ellipse cx="110" cy="415" rx="155" ry="40" transform="rotate(12 110 415)" fill={paint("left-gloss")} />
+          <ellipse cx="110" cy="415" rx="195" ry="55" transform="rotate(12 110 415)" fill={paint("left-gloss")} />
         </g>
-        <path d="M0 375C124 344 208 452 315 598C364 663 414 727 480 790C398 712 355 661 300 594C208 469 96 372 0 403Z" fill={paint("left-gold")} />
-        <path d="M0 375C124 344 208 452 315 598C364 663 414 727 480 790" stroke="#FFF5CE" strokeWidth=".8" opacity=".45" />
-        <path d="M0 332C180 354 249 533 462 773" stroke={cyan} strokeWidth="1.1" opacity=".45" />
-        <path d="M0 465C123 415 235 538 355 665L130 585H0Z" fill={paint("dots")} opacity=".12" />
+        <path d="M0 375C141 346 246 465 360 550C237 480 137 374 0 403Z" fill={paint("left-gold")} />
+        <path d="M0 375C141 346 246 465 360 550" stroke="#FFF5CE" strokeWidth=".8" opacity=".45" />
+        <path d="M0 332C139 352 239 460 352 544" stroke={cyan} strokeWidth="1.1" opacity=".45" />
+        <path d="M0 465C108 424 221 488 312 525L130 550H0Z" fill={paint("dots")} opacity=".12" />
       </g>
       </svg>
       {/* Separate anchors keep the left cluster at the left edge on wide cards. */}
@@ -143,26 +172,53 @@ export function CyberMagazineArtwork({ className, primaryColor = "#0F4C75", thum
           {[[48, 133], [170, 182], [263, 234], [297, 268]].map(([x, y]) => <circle key={x} cx={x} cy={y} r="4" strokeWidth="2" />)}
         </g>
       </svg>
-      <svg data-cyber-icon="shield" x="0" y="82.5%" width="20.4%" height="17.5%"
-        viewBox="-25 1188 220 252" preserveAspectRatio="xMinYMax meet">
-      {/* Luminous security shield, mesh and connection points. */}
-      <circle cx="71" cy="1325" r="147" fill={paint("aura")} />
-      <g stroke={light} strokeWidth="1" opacity=".6">
-        <ellipse cx="71" cy="1325" rx="106" ry="112" /><ellipse cx="71" cy="1325" rx="124" ry="132" strokeDasharray="2 8" />
-        <path d="M0 1235L71 1218L132 1240L169 1316L141 1392L72 1425L0 1398M0 1284L132 1240M0 1353L169 1316M71 1218L141 1392M0 1398L132 1240" />
-        {[[71, 1218], [132, 1240], [169, 1316], [141, 1392], [72, 1425], [15, 1280]].map(([x, y]) => <circle key={x} cx={x} cy={y} r="3" fill={light} />)}
-      </g>
-      <g stroke={cyan} strokeLinejoin="round">
-        <path d="M73 1267Q96 1288 127 1292V1338Q124 1382 73 1408Q22 1382 19 1338V1292Q50 1288 73 1267Z" strokeWidth="12" opacity=".18" />
-        <path d="M73 1267Q96 1288 127 1292V1338Q124 1382 73 1408Q22 1382 19 1338V1292Q50 1288 73 1267Z" fill={navy} fillOpacity=".8" strokeWidth="3" />
-        <path d="M73 1277Q96 1295 118 1299V1338Q114 1374 73 1398Q32 1374 28 1338V1299Q50 1295 73 1277Z" stroke={light} strokeWidth="1.4" />
-        <path d="M73 1285L109 1306V1339Q104 1370 73 1389Q42 1370 37 1339V1306Z" fill={paint("dots")} strokeWidth=".7" />
-        <rect x="56" y="1332" width="34" height="36" rx="3" fill={cyan} stroke={light} strokeWidth="1.5" />
-        <path d="M61 1331V1320A12 12 0 0 1 85 1320V1331" stroke={light} strokeWidth="4" />
-        <path d="M73 1343V1356" stroke={navy} strokeWidth="4" strokeLinecap="round" /><circle cx="73" cy="1343" r="3" fill={navy} />
-      </g>
+      {!native && <>
+      <svg data-cyber-icon="shield" x="0" y="81%" width="24%" height="19%"
+        viewBox="0 0 220 252" preserveAspectRatio="xMinYMax meet">
+        <defs>
+          <path id={`${id}-shield-shape`} d="M94 35C114 52 136 61 164 66C168 138 148 187 94 221C40 187 20 138 24 66C52 61 74 52 94 35Z" />
+          <clipPath id={`${id}-shield-interior`}><use href={`#${id}-shield-shape`} /></clipPath>
+          <radialGradient id={`${id}-shield-glass`} cx="50%" cy="40%" r="70%">
+            <stop stopColor={native ? "#007DA2" : surface} stopOpacity=".8" />
+            <stop offset=".55" stopColor={native ? "#00496B" : blue} stopOpacity=".9" />
+            <stop offset="1" stopColor={native ? "#002C4D" : deep} />
+          </radialGradient>
+          <radialGradient id={`${id}-shield-bloom`}>
+            <stop stopColor="#B5F7FF" stopOpacity=".7" /><stop offset=".4" stopColor={cyan} stopOpacity=".4" />
+            <stop offset="1" stopColor={cyan} stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        {/* Fine circular orbits surround the curved glass shield; no polygon cage. */}
+        <ellipse cx="94" cy="132" rx="128" ry="133" fill={paint("shield-bloom")} />
+        <g stroke={light} strokeWidth=".7" opacity=".5">
+          <ellipse cx="94" cy="132" rx="91" ry="108" />
+          <ellipse cx="94" cy="132" rx="104" ry="119" strokeDasharray="1 7" />
+          <ellipse cx="94" cy="132" rx="118" ry="130" opacity=".65" />
+          <path d="M0 65Q82 5 184 57M0 92Q89 27 205 91M0 126Q99 105 215 129M1 205Q103 254 202 182" />
+        </g>
+        <use href={`#${id}-shield-shape`} fill="none" stroke={cyan} strokeWidth="14" opacity=".2" filter={paint("shield-light")} />
+        <use href={`#${id}-shield-shape`} fill={paint("shield-glass")} stroke={cyan} strokeWidth="5" opacity=".95" />
+        <g clipPath={paint("shield-interior")}>
+          <rect x="22" y="34" width="145" height="190" fill={paint("shield-mesh")} />
+          <ellipse cx="94" cy="82" rx="77" ry="60" fill={paint("shield-bloom")} opacity=".35" />
+        </g>
+        <use href={`#${id}-shield-shape`} fill="none" stroke="#C2FAFF" strokeWidth="1.8" />
+        {/* One light-blue padlock with a rounded shackle and a dark keyhole. */}
+        <g fill="none" stroke="#8CEBFF" strokeWidth="5" strokeLinecap="round">
+          <path d="M80 129V118A14 14 0 0 1 108 118V129" filter={paint("shield-light")} />
+          <path d="M80 129V118A14 14 0 0 1 108 118V129" />
+        </g>
+        <rect x="72" y="130" width="44" height="46" rx="4" fill="#8CEBFF" />
+        <path d="M94 142A5 5 0 0 0 91 151L90 164H98L97 151A5 5 0 0 0 94 142Z" fill={native ? "#005071" : navy} />
+        {[[10, 84], [40, 24], [84, 14], [143, 26], [189, 93], [199, 132], [182, 186], [94, 239], [35, 213], [8, 170]].map(([x, y]) => <g key={`${x}-${y}`}>
+          <circle cx={x} cy={y} r="9" fill={paint("shield-bloom")} />
+          <circle cx={x} cy={y} r="1.8" fill="#D0FAFF" />
+        </g>)}
+        <circle cx="94" cy="35" r="13" fill={paint("shield-bloom")} />
+        <circle cx="94" cy="221" r="14" fill={paint("shield-bloom")} />
       </svg>
-      {stars.filter(([, y]) => y >= 600).map(([x, y, r]) => <svg key={`${x}-${y}`} data-cyber-icon="sparkle"
+      </>}
+      {stars.filter(([, y]) => !native && y >= 600).map(([x, y, r]) => <svg key={`${x}-${y}`} data-cyber-icon="sparkle"
         x={`${(x - r * 3) / 1080 * 100}%`} y={`${(y - r * 3) / 1440 * 100}%`}
         width={`${r * 6 / 1080 * 100}%`} height={`${r * 6 / 1440 * 100}%`}
         viewBox={`${-r * 3} ${-r * 3} ${r * 6} ${r * 6}`} preserveAspectRatio="xMidYMid meet">
@@ -170,6 +226,7 @@ export function CyberMagazineArtwork({ className, primaryColor = "#0F4C75", thum
         <path d={`M${-r} 0h${r * 2}M0 ${-r}v${r * 2}`} stroke="#FFF5CE" strokeWidth="1" />
         <circle r="2.2" fill="#FFFBE2" />
       </svg>)}
+      {native && <CyberMagazineReferenceFooter id={id} />}
     </svg>
   );
 }
@@ -181,4 +238,39 @@ export function CyberMagazineExportDecor({ theme: rawTheme }: { theme: CardTheme
   return <g opacity={cyberMagazineOpacity(theme.decorOpacity)}>
     <CyberMagazineArtwork primaryColor={theme.primaryColor} />
   </g>;
+}
+
+/** Original reference pixels preserve the painted waves, shield and lighting
+ * with baked raster text removed so the card footer motto renders as crisp DOM text. */
+function CyberMagazineReferenceFooter({ id }: { id: string }) {
+  return <svg data-cyber-footer="reference" width="100%" height="100%"
+    viewBox="0 0 1392 328" preserveAspectRatio="xMidYMax meet">
+    <defs>
+      <linearGradient id={`${id}-reference-top-fade`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="50"><stop stopColor="black" /><stop offset="1" stopColor="white" /></linearGradient>
+      <mask id={`${id}-reference-top`} maskUnits="userSpaceOnUse" x="0" y="0" width="1392" height="328"><rect width="1392" height="328" fill={`url(#${id}-reference-top-fade)`} /></mask>
+      <linearGradient id={`${id}-reference-center-fade`} gradientUnits="userSpaceOnUse" x1="0" y1="138" x2="0" y2="215">
+        <stop stopColor="black" /><stop offset=".35" stopColor="black" />
+        <stop offset=".7" stopColor="#888" /><stop offset="1" stopColor="white" />
+      </linearGradient>
+      <filter id={`${id}-reference-feather`} x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="14" /></filter>
+      <mask id={`${id}-reference-frame`} maskUnits="userSpaceOnUse" x="0" y="0" width="1392" height="328">
+        <rect x="-30" y="138" width="1452" height="222" fill={`url(#${id}-reference-center-fade)`} />
+        <g fill="white" filter={`url(#${id}-reference-feather)`}>
+          <path d="M-30 -30H112V85L160 165V360H-30Z" />
+          <path d="M1298 -30H1422V360H1262V165L1298 90Z" />
+        </g>
+      </mask>
+      <clipPath id={`${id}-reference-left`}><rect x="-30" y="-30" width="250.5" height="388" /></clipPath>
+      <clipPath id={`${id}-reference-mid`}><rect x="219.5" y="-30" width="1021" height="388" /></clipPath>
+      <clipPath id={`${id}-reference-right`}><rect x="1239.5" y="-30" width="182.5" height="388" /></clipPath>
+      <g id={`${id}-reference-art`} mask={`url(#${id}-reference-top)`}>
+        <g mask={`url(#${id}-reference-frame)`}>
+          <image href="/images/brand/cyber-magazine-footer-reference.png" x="-48" y="0" width="1572" height="360" />
+        </g>
+      </g>
+    </defs>
+    <g data-cyber-footer-slice="left"><g clipPath={`url(#${id}-reference-left)`}><use href={`#${id}-reference-art`} /></g></g>
+    <g data-cyber-footer-slice="mid"><g clipPath={`url(#${id}-reference-mid)`}><use href={`#${id}-reference-art`} /></g></g>
+    <g data-cyber-footer-slice="right"><g clipPath={`url(#${id}-reference-right)`}><use href={`#${id}-reference-art`} /></g></g>
+  </svg>;
 }

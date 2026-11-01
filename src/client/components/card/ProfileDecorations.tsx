@@ -124,7 +124,7 @@ function CrystalClusterContent() {
   );
 }
 
-export function ProfileDecorations({ theme }: { theme: CardTheme }) {
+export function ProfileDecorations({ theme, locale = "vi" }: { theme: CardTheme; locale?: "vi" | "en" }) {
   const decor = theme.decor || [];
   const activeDecor: DecorKey | "none" = decor.length > 0 ? decor[0] : "none";
 
@@ -133,7 +133,7 @@ export function ProfileDecorations({ theme }: { theme: CardTheme }) {
   }
 
   if (activeDecor === "cyber-magazine") {
-    return <CyberMagazineArtwork className="qtm-safe-decor" primaryColor={theme.primaryColor} decorOpacity={theme.showDecor === false ? 0 : theme.decorOpacity ?? 35} />;
+    return <CyberMagazineArtwork locale={locale} className="qtm-safe-decor" primaryColor={theme.primaryColor} decorOpacity={theme.showDecor === false ? 0 : theme.decorOpacity ?? 35} />;
   }
 
   /* 7. KHUNG TINH THỂ ĐA GIÁC (Crystal / Faceted Polygonal Geometric Frame - Works on Mobile & Desktop) */

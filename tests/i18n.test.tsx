@@ -170,7 +170,7 @@ test("en.json and vi.json contain all required namespaces and matching keys", ()
   );
 });
 
-test("public card components render in both English ('en') and Vietnamese ('vi') while preserving user DB fields verbatim", () => {
+test("public card components translate known fields and preserve custom DB fields", () => {
   const enCardSvg = renderWithLocale(
     "en",
     createElement(QrBusinessCard, {
@@ -192,10 +192,13 @@ test("public card components render in both English ('en') and Vietnamese ('vi')
   assert.ok(viCardSvg.includes("Văn phòng"), "Vietnamese card SVG should display 'Văn phòng'");
   assert.ok(viCardSvg.includes("Di động"), "Vietnamese card SVG should display 'Di động'");
 
-  // User DB fields are preserved verbatim in both locales
+  assert.ok(enCardSvg.includes("Head of Partnership &amp; Development"));
+  assert.ok(enCardSvg.includes("QTM MEDIA TECHNOLOGY JOINT STOCK COMPANY"));
+  assert.ok(viCardSvg.includes("Trưởng ban Hợp tác Phát triển"));
+  assert.ok(viCardSvg.includes(sampleEmployee.company));
+
+  // Custom fields remain verbatim; localization does not change stored data.
   for (const rendered of [enCardSvg, viCardSvg]) {
-    assert.ok(rendered.includes("Trưởng ban Hợp tác Phát triển"));
-    assert.ok(rendered.includes("CÔNG TY CỔ PHẦN CÔNG NGHỆ TRUYỀN THÔNG"));
     assert.ok(rendered.includes("22 Ho Giam, Dong Da, Hanoi"));
     assert.ok(rendered.includes("an.nguyen@qtmmedia.vn"));
     assert.ok(rendered.includes("qtmmedia.vn"));
@@ -249,6 +252,34 @@ test("public card components render in both English ('en') and Vietnamese ('vi')
   assert.ok(enProfilePlaceholder.includes("EMPLOYEE FULL NAME"));
   assert.ok(viProfilePlaceholder.includes("HỌ TÊN NHÂN VIÊN"));
   assert.deepEqual(localizeEmployee(sampleEmployee), sampleEmployee);
+});
+
+test("QTM QR card keeps the company on one line and localizes both office rows", () => {
+  const employee = {
+    ...sampleEmployee,
+    offices: [
+      { label: "Head Office", address: "No.22 Ho Giam Street, Van Mieu - Quoc Tu Giam Ward, Hanoi, Vietnam" },
+      { label: "Hanoi Office", address: "01 Le Duc Tho Street, Tu Liem Ward, Hanoi, Viet Nam" },
+    ],
+  };
+  const original = structuredClone(employee);
+  const vi = localizeEmployee(employee, "vi");
+  assert.equal(vi.offices[1].address, "Số 01 Lê Đức Thọ, phường Từ Liêm, Hà Nội, Việt Nam");
+  assert.deepEqual(localizeEmployee(vi, "en").offices, localizeEmployee(employee, "en").offices);
+
+  for (const locale of ["vi", "en"] as const) {
+    const svg = renderWithLocale(locale, createElement(QrBusinessCard, { employee, url: "https://example.com/card/test" }));
+    const localized = localizeEmployee(employee, locale);
+    const texts = [...svg.matchAll(/<text\b[^>]*>(.*?)<\/text>/g)].map(match => match[1]);
+    assert.ok(texts.includes(localized.company.toUpperCase()), "Entire company must be in one SVG text element");
+    assert.equal((svg.match(/d="M12 1.5a8/g) || []).length, 2, "Both offices must have a location pin");
+    assert.ok(texts.includes(locale === "vi" ? "VPHN" : "Hanoi Office"));
+    const content = texts.join(" ");
+    assert.ok(content.includes(localized.offices[0].address));
+    assert.ok(content.includes(localized.offices[1].address));
+    assert.ok(!content.includes(locale === "vi" ? "Street" : "phường"));
+  }
+  assert.deepEqual(employee, original);
 });
 
 test("error mapper translates server error messages and status codes into English and Vietnamese", () => {

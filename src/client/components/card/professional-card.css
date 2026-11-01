@@ -739,3 +739,48 @@
 .qtm-profile-surface .qtm-profile-identity > :is(h1, h2, h3, .qtm-position, .qtm-company-short) {
   width: 100%;
 }
+
+/* Match the original footer lettering with crisp DOM text and scale down the reference footer on laptop view. */
+.qtm-professional-card[data-reference-footer] .anm-profile-motto {
+  font-family: var(--font-jakarta, Arial), Arial, Helvetica, sans-serif;
+  font-size: clamp(10.5px, calc(var(--qtm-unit, 1cqw) * 2.15), 13.5px);
+  font-weight: 500;
+  letter-spacing: .18em;
+  color: #f0f8ff;
+  text-shadow: 0 1px 3px rgba(6, 22, 48, 0.78);
+  white-space: nowrap;
+}
+
+.qtm-desktop-stage svg[data-cyber-footer="reference"] {
+  transform: scaleY(0.68);
+  transform-origin: center bottom;
+}
+.qtm-desktop-stage svg[data-cyber-footer="reference"] [data-cyber-footer-slice="left"] {
+  transform: matrix(0.68, 0, 0, 1, 0, 0);
+}
+.qtm-desktop-stage svg[data-cyber-footer="reference"] [data-cyber-footer-slice="mid"] {
+  transform: matrix(1.116706, 0, 0, 1, -96.075, 0);
+}
+.qtm-desktop-stage svg[data-cyber-footer="reference"] [data-cyber-footer-slice="right"] {
+  transform: matrix(0.68, 0, 0, 1, 445.44, 0);
+}
+
+@media (min-width: 960px) {
+  .qtm-public-profile svg[data-cyber-footer="reference"] {
+    transform: scaleY(0.68);
+    transform-origin: center bottom;
+  }
+  .qtm-public-profile svg[data-cyber-footer="reference"] [data-cyber-footer-slice="left"] {
+    transform: matrix(0.68, 0, 0, 1, 0, 0);
+  }
+  .qtm-public-profile svg[data-cyber-footer="reference"] [data-cyber-footer-slice="mid"] {
+    transform: matrix(1.116706, 0, 0, 1, -96.075, 0);
+  }
+  .qtm-public-profile svg[data-cyber-footer="reference"] [data-cyber-footer-slice="right"] {
+    transform: matrix(0.68, 0, 0, 1, 445.44, 0);
+  }
+  .qtm-public-profile .qtm-professional-card[data-reference-footer] .anm-profile-motto {
+    font-size: clamp(12px, 0.95vw, 14px);
+    letter-spacing: .2em;
+  }
+}

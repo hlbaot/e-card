@@ -6,6 +6,9 @@ import { toTint } from "@/shared/utils/color";
 const CONTINENTS = [
   [[-17, 36], [10, 37], [32, 31], [43, 12], [51, 11], [42, -12], [32, -27], [18, -35], [10, -18], [0, -2], [-16, 12]],
   [[-10, 36], [-9, 58], [5, 59], [15, 71], [29, 71], [43, 55], [50, 42], [29, 36], [20, 40], [13, 36]],
+  [[112, -11], [132, -10], [154, -25], [149, -39], [116, -35]],
+  [[130, 31], [140, 45], [145, 44], [142, 33]],
+  [[95, 5], [108, 1], [118, -5], [130, -4], [140, -8], [120, -11], [104, -5]],
   [[28, 42], [39, 60], [68, 74], [110, 73], [143, 60], [150, 47], [124, 30], [121, 20], [109, 19], [104, 7], [94, 16], [80, 7], [70, 25], [56, 25], [51, 12], [42, 13], [35, 30]],
 ];
 function onLand(longitude: number, latitude: number) {
@@ -26,13 +29,16 @@ const GOLD_ROUTES = [
   { a: [744, 194], b: [881, -56], c: [1110, 104], nodes: [.32, .77] },
   { a: [770, 274], b: [926, 29], c: [1100, 245], nodes: [.43, .8] },
   { a: [821, 3], b: [1059, 62], c: [1049, 346], nodes: [.58] },
-  { a: [823, 264], b: [981, 390], c: [1102, 182], nodes: [.57] },
+  { a: [816, 164], b: [1000, 143], c: [1046, 358], nodes: [.48, .87] },
 ];
-const DOTS = Array.from({ length: 128 * 208 }, (_, i) => {
-  const row = Math.floor(i / 208), column = i % 208;
+// Node and browser math libraries can differ in their last floating point bits.
+// SVG needs only sub-pixel precision; stable attributes also prevent hydration warnings.
+const precise = (value: number) => Number(value.toFixed(3));
+const DOTS = Array.from({ length: 104 * 168 }, (_, i) => {
+  const row = Math.floor(i / 168), column = i % 168;
   const jitter = Math.sin(i * 12.9898 + 78.233) * .13;
-  const latitude = ((row + jitter) / 127 - .5) * Math.PI;
-  const longitude = -Math.PI / 2 + (column + (row % 2) * .5 + jitter) / 207 * Math.PI;
+  const latitude = ((row + jitter) / 103 - .5) * Math.PI;
+  const longitude = -Math.PI / 2 + (column + (row % 2) * .5 + jitter) / 167 * Math.PI;
   const x = Math.cos(latitude) * Math.sin(longitude);
   const y = Math.sin(latitude), z = Math.cos(latitude) * Math.cos(longitude);
   const pitch = .16, tilt = -.18;
@@ -41,9 +47,9 @@ const DOTS = Array.from({ length: 128 * 208 }, (_, i) => {
   const px = 1130 + 390 * (x * Math.cos(tilt) - py * Math.sin(tilt));
   const sy = 285 + 390 * (x * Math.sin(tilt) + py * Math.cos(tilt));
   const land = onLand(longitude * 180 / Math.PI + 125, -latitude * 180 / Math.PI);
-  return { x: px, y: sy, land, r: land ? .65 + depth * .48 : .45,
-    opacity: land ? (.2 + depth * .64) * (.85 + .15 * Math.sin(i * .73)) : .018 + depth * .055, depth };
-}).filter(dot => dot.depth > .04 && dot.x > 738 && dot.x < 1084 && dot.y > -4 && dot.y < 365);
+  return { x: precise(px), y: precise(sy), land, r: precise(land ? .95 + depth * .65 : .5),
+    opacity: precise(land ? (.35 + depth * .65) * (.85 + .15 * Math.sin(i * .73)) : .035 + depth * .08), depth };
+}).filter(dot => dot.depth > .04 && dot.x > 658 && dot.x < 1084 && dot.y > -4 && dot.y < 365);
 
 /** This entire scene is clipped to the existing corner silhouette. It does not
  * change the portrait, controls, footer, white area or other motifs. */
@@ -68,8 +74,8 @@ export function CyberMagazineTopRight({ id: ownerId, primaryColor }: { id: strin
       <linearGradient id={`${id}-navy`} x1="0" y1="0" x2=".8" y2="1">
         <stop stopColor={native ? "#032B4A" : colors.deep} /><stop offset=".5" stopColor={native ? "#003C59" : colors.navy} /><stop offset="1" stopColor={native ? "#005272" : colors.blue} />
       </linearGradient>
-      <radialGradient id={`${id}-sphere-fill`} cx="82%" cy="48%" r="85%">
-        <stop stopColor={native ? "#07516F" : colors.surface} /><stop offset=".65" stopColor={native ? "#003450" : colors.navy} /><stop offset="1" stopColor={native ? "#001D39" : colors.deep} />
+      <radialGradient id={`${id}-sphere-fill`} cx="18%" cy="15%" r="90%">
+        <stop stopColor={native ? "#08769A" : colors.surface} /><stop offset=".36" stopColor={native ? "#004C71" : colors.blue} /><stop offset=".72" stopColor={native ? "#002F50" : colors.navy} /><stop offset="1" stopColor={native ? "#001D39" : colors.deep} />
       </radialGradient>
       <linearGradient id={`${id}-land`} gradientUnits="userSpaceOnUse" x1="780" y1="0" x2="1120" y2="325">
         <stop stopColor={cyan} /><stop offset=".42" stopColor={ice} /><stop offset="1" stopColor={cyan} stopOpacity=".6" />
@@ -94,7 +100,7 @@ export function CyberMagazineTopRight({ id: ownerId, primaryColor }: { id: strin
         <stop offset=".48" stopColor="#E6C766" stopOpacity=".22" /><stop offset="1" stopColor="#E6C766" stopOpacity="0" />
       </radialGradient>
       <radialGradient id={`${id}-haze`}>
-        <stop stopColor={ice} stopOpacity=".3" /><stop offset=".35" stopColor={cyan} stopOpacity=".1" /><stop offset="1" stopColor={cyan} stopOpacity="0" />
+        <stop stopColor={ice} stopOpacity=".45" /><stop offset=".35" stopColor={cyan} stopOpacity=".18" /><stop offset="1" stopColor={cyan} stopOpacity="0" />
       </radialGradient>
       <radialGradient id={`${id}-quiet`}>
         <stop offset="0" stopColor="#111" /><stop offset=".6" stopColor="#333" /><stop offset="1" stopColor="white" />
@@ -102,7 +108,7 @@ export function CyberMagazineTopRight({ id: ownerId, primaryColor }: { id: strin
       <mask id={`${id}-details`} maskUnits="userSpaceOnUse" x="440" y="0" width="640" height="450">
         <rect x="440" width="640" height="450" fill="white" />
         {/* Quiet lower-right pocket for the existing QR/share controls. */}
-        <ellipse cx="1006" cy="326" rx="116" ry="62" fill={url("quiet")} />
+        <ellipse cx="1020" cy="402" rx="82" ry="28" fill={url("quiet")} />
       </mask>
     </defs>
     <g clipPath={url("bounds")}>
@@ -122,9 +128,9 @@ export function CyberMagazineTopRight({ id: ownerId, primaryColor }: { id: strin
         <g mask={url("details")}>
           <g clipPath={url("sphere")}>
             {DOTS.map(({ x, y, r, opacity, land }, i) => <circle key={i} cx={x} cy={y} r={r} opacity={opacity} fill={land ? url("land") : cyan} />)}
-            <g stroke={ice} strokeWidth=".7" opacity=".13">
+            <g stroke={ice} strokeWidth=".7" opacity=".16">
               {[.38, .82].map(n => <ellipse key={n} cx="1130" cy="285" rx={390 * n} ry="390" transform="rotate(24 1130 285)" />)}
-              {[-.48, .32].map(n => <ellipse key={n} cx="1130" cy={285 + n * 350} rx={Math.sqrt(1 - n * n) * 390} ry="74" transform="rotate(18 1130 285)" />)}
+              {[-.48, .32].map(n => <ellipse key={n} cx="1130" cy={285 + n * 350} rx={precise(Math.sqrt(1 - n * n) * 390)} ry="74" transform="rotate(18 1130 285)" />)}
             </g>
           </g>
           <circle cx="1130" cy="285" r="400" fill={url("atmosphere")} />
@@ -134,15 +140,15 @@ export function CyberMagazineTopRight({ id: ownerId, primaryColor }: { id: strin
             {GOLD_ROUTES.map(({ a, b, c, nodes }, index) => {
               const d = `M${a.join(" ")}Q${b.join(" ")} ${c.join(" ")}`;
               return <g key={index}>
-                <path d={d} stroke="#E6C766" strokeWidth="4" opacity=".07" />
-                <path d={d} stroke={url("route")} strokeWidth="1.15" />
+                <path d={d} stroke="#E6C766" strokeWidth="7" opacity=".16" />
+                <path d={d} stroke={url("route")} strokeWidth="1.6" />
                 {nodes.map((t, n) => {
-                  const x = (1 - t) ** 2 * a[0] + 2 * (1 - t) * t * b[0] + t * t * c[0];
-                  const y = (1 - t) ** 2 * a[1] + 2 * (1 - t) * t * b[1] + t * t * c[1];
-                  const r = n % 2 ? 13 : 18;
+                  const x = precise((1 - t) ** 2 * a[0] + 2 * (1 - t) * t * b[0] + t * t * c[0]);
+                  const y = precise((1 - t) ** 2 * a[1] + 2 * (1 - t) * t * b[1] + t * t * c[1]);
+                  const r = n % 2 ? 19 : 26;
                   return <g key={t}>
                     <circle cx={x} cy={y} r={r} fill={url("node")} />
-                    <circle cx={x} cy={y} r="1.8" fill="#FFFFED" />
+                    <circle cx={x} cy={y} r="2.4" fill="#FFFFED" />
                     {n === 0 && <path d={`M${x - 6} ${y}h12M${x} ${y - 6}v12`} stroke="#FFF4C0" strokeWidth=".75" opacity=".8" />}
                   </g>;
                 })}
@@ -155,10 +161,10 @@ export function CyberMagazineTopRight({ id: ownerId, primaryColor }: { id: strin
           </g>
           <g data-corner-chart="true">
             {[21, 34, 53, 44, 83, 115, 65, 143, 96, 166].map((h, i) => {
-              const x = 950 + i * 14, y = 303 - h;
+              const x = 936 + i * 15, y = 346 - h;
               return <g key={i}>
-                <rect x={x} y={y} width={i % 3 ? 6 : 4} height={h} fill={i === 6 ? ice : url("bars")} opacity={i === 6 ? .8 : .75} />
-                <path d={`M${x + 3} ${y - 17}V${y}M${x - 1} ${y - 8}h8`} stroke={ice} strokeWidth=".9" opacity=".65" />
+                <rect x={x} y={y} width={i % 3 ? 8 : 5} height={h} fill={i === 6 ? ice : url("bars")} opacity={i === 6 ? .8 : .75} />
+                <path d={`M${x + 3} ${y - 17}V${y}`} stroke={ice} strokeWidth=".9" opacity=".65" />
                 <circle cx={x + 3} cy={y - 17} r="1.3" fill={ice} />
               </g>;
             })}
@@ -174,9 +180,9 @@ export function CyberMagazineTopRight({ id: ownerId, primaryColor }: { id: strin
       </g>
       {/* The gold seam sits above every detail and catches two small reflections. */}
       <path d={SEAM} stroke="#E6C766" strokeWidth="15" opacity=".09" />
-      <path d="M440 0C642 44 780 205 905 285C953 322 1002 345 1080 350V361C1002 356 950 332 900 295C774 214 635 49 440 3Z" fill={url("gold")} />
+      <path d="M440 0C642 44 780 205 905 285C953 322 1002 345 1080 350V373C1002 365 950 341 900 303C774 219 635 49 440 3Z" fill={url("gold")} />
       <path d={SEAM} stroke="#FFF1BB" strokeWidth=".9" opacity=".85" />
-      {[[847, 247, 12], [1012, 347, 9]].map(([x, y, r]) => <g key={x}>
+      {[[905, 285, 27], [1012, 347, 13]].map(([x, y, r]) => <g key={x}>
         <circle cx={x} cy={y} r={r} fill={url("node")} />
         <path d={`M${x - 5} ${y}h10M${x} ${y - 5}v10`} stroke="#FFF7D6" strokeWidth=".75" />
       </g>)}

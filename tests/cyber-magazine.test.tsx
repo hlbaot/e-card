@@ -75,3 +75,18 @@ test("magazine retains saturated inks at default strength and responds across th
   const hidden = html(<ProfileDecorations theme={{ ...base, showDecor: false }} />);
   assert.ok(hidden.includes('opacity:0'));
 });
+
+
+test("native footer uses the reference artwork without baked text and keeps proportional slices for laptop scaling", () => {
+  for (const locale of ["vi", "en"] as const) {
+    const rendered = html(<CyberMagazineArtwork locale={locale} />);
+    assert.ok(rendered.includes('data-cyber-footer="reference"'));
+    assert.ok(rendered.includes('viewBox="0 0 1392 328" preserveAspectRatio="xMidYMax meet"'));
+    assert.ok(rendered.includes('/images/brand/cyber-magazine-footer-reference.png'));
+    assert.ok(rendered.includes('data-cyber-footer-slice="left"'));
+    assert.ok(rendered.includes('data-cyber-footer-slice="mid"'));
+    assert.ok(rendered.includes('data-cyber-footer-slice="right"'));
+    assert.ok(!rendered.includes('data-cyber-icon="shield"'), "Do not overlay the old vector shield on the original artwork");
+  }
+  assert.ok(!html(<CyberMagazineArtwork primaryColor="#10B981" />).includes('data-cyber-footer="reference"'));
+});

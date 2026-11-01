@@ -742,13 +742,50 @@
 
 /* Match the original footer lettering with crisp DOM text and scale down the reference footer on laptop view. */
 .qtm-professional-card[data-reference-footer] .anm-profile-motto {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(10px, 2.6cqw, 16px);
+  margin: 0 auto;
+  text-align: center;
   font-family: var(--font-jakarta, Arial), Arial, Helvetica, sans-serif;
-  font-size: clamp(10.5px, calc(var(--qtm-unit, 1cqw) * 2.15), 13.5px);
-  font-weight: 500;
-  letter-spacing: .18em;
-  color: #f0f8ff;
-  text-shadow: 0 1px 3px rgba(6, 22, 48, 0.78);
+  font-size: clamp(10px, calc(var(--qtm-unit, 1cqw) * 2.1), 13.5px);
+  font-weight: 600;
+  letter-spacing: .2em;
+  color: #ffffff;
+  text-shadow: 0 1px 4px rgba(0, 12, 30, 0.95);
   white-space: nowrap;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Ensure action buttons never collide with footer shield on responsive/mobile */
+.qtm-cyber-magazine .card-actions {
+  margin-bottom: clamp(8px, calc(var(--qtm-unit, 1cqw) * 2), 16px);
+}
+
+.qtm-cyber-magazine .qtm-profile-footer {
+  min-height: clamp(60px, calc(var(--qtm-unit, 1cqw) * 16), 85px);
+  margin-top: auto;
+}
+
+@media (max-width: 959px) {
+  /* Fill up the footer on mobile so there is no empty void, and add the missing blue base */
+  .qtm-cyber-magazine svg[data-cyber-footer="reference"] {
+    transform: scaleY(1.32) scaleX(1.04);
+    transform-origin: center bottom;
+  }
+  .qtm-professional-card.qtm-cyber-magazine::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: clamp(20px, 5.5cqw, 32px);
+    background: #143158;
+    z-index: 0;
+    pointer-events: none;
+  }
 }
 
 .qtm-desktop-stage svg[data-cyber-footer="reference"] {
@@ -763,6 +800,10 @@
 }
 .qtm-desktop-stage svg[data-cyber-footer="reference"] [data-cyber-footer-slice="right"] {
   transform: matrix(0.68, 0, 0, 1, 445.44, 0);
+}
+.qtm-desktop-stage .qtm-professional-card[data-reference-footer] .anm-profile-motto {
+  bottom: 10px;
+  font-size: 11px;
 }
 
 @media (min-width: 960px) {
@@ -780,7 +821,8 @@
     transform: matrix(0.68, 0, 0, 1, 445.44, 0);
   }
   .qtm-public-profile .qtm-professional-card[data-reference-footer] .anm-profile-motto {
-    font-size: clamp(12px, 0.95vw, 14px);
-    letter-spacing: .2em;
+    bottom: clamp(10px, 1.1vw, 16px);
+    font-size: clamp(11.5px, 0.95vw, 14px);
+    letter-spacing: .22em;
   }
 }

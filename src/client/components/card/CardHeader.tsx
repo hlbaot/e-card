@@ -24,11 +24,11 @@ export function CardHeader({ onOpenQr, onShare }: CardHeaderProps) {
         >
           <Image
             src="/images/brand/qtm-logo.png"
-            width={36}
-            height={36}
+            width={100}
+            height={30}
             alt="QTM MediaTech"
             unoptimized
-            className="shrink-0 object-contain mt-0.5"
+            className="shrink-0 object-contain mt-0.5 h-8 w-auto"
           />
           <div className="flex flex-col items-start leading-[1.18] select-none">
             <span

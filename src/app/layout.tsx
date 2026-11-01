@@ -33,9 +33,9 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description,
     icons: {
-      icon: "/images/icon.png",
-      shortcut: "/images/icon.png",
-      apple: "/images/icon.png",
+      icon: "/images/qtm-symbol.png",
+      shortcut: "/images/qtm-symbol.png",
+      apple: "/images/qtm-symbol.png",
     },
     robots: siteConfig.indexHomepage
       ? { index: true, follow: true }

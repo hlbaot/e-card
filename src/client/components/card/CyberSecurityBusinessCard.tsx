@@ -1,6 +1,5 @@
 "use client";
 
-import { CyberMagazineExportDecor } from "./CyberMagazineArtwork";
 import { formatPhone } from "@/shared/utils/phone";
 import { useTranslations } from "next-intl";
 import { useId, type Ref } from "react";
@@ -69,7 +68,6 @@ export function CyberSecurityBusinessCard({ employee: e, url, svgRef }: {
       <path d="M1050 600H787C911 568 1002 494 1050 383Z" fill={`url(#${id}-blue)`} />
       <path d="M1050 600H865C957 566 1020 511 1050 461Z" fill="#387aa7" opacity=".65" />
       <path d="M1050 600H947C995 575 1030 545 1050 516Z" fill="#5397bb" opacity=".7" />
-      <CyberMagazineExportDecor theme={e.theme} />
       <g transform={`translate(0 ${brandOffset})`}>
         <svg x="40" y="206" width="390" height="109" viewBox="150 300 1400 390">
           <image href="/logo_anninhmang.png" width="1672" height="941" />

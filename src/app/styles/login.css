@@ -19,7 +19,8 @@
   backdrop-filter: blur(18px);
 }
 .login-story .brand img {
-  filter: brightness(0) invert(1);
+  width: auto;
+  height: 34px;
 }
 .login-story h1 {
   font-size: 46px;

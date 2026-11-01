@@ -2,11 +2,11 @@
 
 import { CyberMagazineExportDecor } from "./CyberMagazineArtwork";
 import { resolveLocale } from "@/i18n/config";
-import { localizeEmployeeName } from "@/shared/utils/localize";
+import { localizeEmployee, localizeText } from "@/shared/utils/localize";
 import { formatPhone } from "@/shared/utils/phone";
 import { useLocale, useTranslations } from "next-intl";
 import { QRCodeSVG } from "qrcode.react";
-import { useId, type Ref, type SVGProps } from "react";
+import { useId, useLayoutEffect, useRef, type Ref, type SVGProps } from "react";
 import { getPublicFields, type Employee } from "@/shared/types";
 import { capitalizeFirstLetter } from "@/shared/utils/format-text";
 import { CyberSecurityBusinessCard } from "./CyberSecurityBusinessCard";
@@ -71,7 +71,7 @@ export function QrBusinessCard(props: {
   const locale = resolveLocale(useLocale());
   const localizedProps = {
     ...props,
-    employee: { ...props.employee, fullName: localizeEmployeeName(props.employee.fullName, locale) },
+    employee: localizeEmployee(props.employee, locale),
   };
   return props.employee.theme.businessCardType === "an-ninh-mang"
     ? <CyberSecurityBusinessCard {...localizedProps} />
@@ -84,23 +84,45 @@ function QtmBusinessCard({ employee: e, url, svgRef }: {
   svgRef?: Ref<SVGSVGElement>;
 }) {
   const t = useTranslations("card");
+  const locale = resolveLocale(useLocale());
   const id = useId().replace(/:/g, "");
+  const companyRef = useRef<SVGTextElement>(null);
   const pf = getPublicFields(e);
   const website = e.website.replace(/^https?:\/\//, "").replace(/\/$/, "");
-  type Row = { Icon: typeof Phone | null; label: string; value: string };
+  type Row = { Icon: typeof Phone; label: string; value: string };
   const rows: Row[] = [
     ...(pf.offices
-      ? e.offices.filter((o) => o.address).slice(0, 3).map((o, i): Row => ({
-          Icon: i === 0 ? MapPin : null, label: o.label || t("labels.office"), value: o.address,
+      ? e.offices.filter((o) => o.address).slice(0, 3).map((o): Row => ({
+          Icon: MapPin,
+          label: locale === "vi" && localizeText(o.label, "vi") === "Văn phòng Hà Nội"
+            ? "VPHN" : o.label || t("labels.office"),
+          value: o.address,
         }))
       : []),
     ...(pf.phone && e.phone ? [{ Icon: Phone, label: t("labels.mobile"), value: formatPhone(e.phone) }] : []),
     ...(pf.email && e.email ? [{ Icon: Mail, label: t("labels.email"), value: e.email }] : []),
     ...(pf.website && website ? [{ Icon: Globe, label: t("labels.web"), value: website }] : []),
   ];
-  const company = wrapText((e.company || "").toUpperCase(), 40);
+  const company = (e.company || "").toUpperCase();
+  useLayoutEffect(() => {
+    let active = true;
+    const fit = () => {
+      const text = companyRef.current;
+      if (!active || !text) return;
+      text.setAttribute("font-size", "23");
+      const width = text.getComputedTextLength();
+      if (width > 904) text.setAttribute("font-size", String(23 * 904 / width));
+    };
+    fit();
+    document.fonts.ready.then(fit);
+    document.fonts.addEventListener("loadingdone", fit);
+    return () => {
+      active = false;
+      document.fonts.removeEventListener("loadingdone", fit);
+    };
+  }, [company]);
   const contactRows = rows.map((row) => ({ ...row, lines: wrapText(row.value, 48) }));
-  const firstContactY = 398 + Math.max(0, company.length - 1) * 30;
+  const firstContactY = 398;
   const lineCount = contactRows.reduce((count, row) => count + row.lines.length, 0);
   const rowGap = 6;
   const lineHeight = Math.min(28, (608 - firstContactY - Math.max(0, rows.length - 1) * rowGap) / Math.max(1, lineCount - 1));
@@ -141,7 +163,7 @@ function QtmBusinessCard({ employee: e, url, svgRef }: {
           <text x="73" y="334" fill={INK} fontSize="20" fontWeight="400" fontStyle="italic">{capitalizeFirstLetter(e.position)}</text>
         </g>
 
-        {company.map((line, i) => <text key={i} x="73" y={354 + i * 30} fill={INK} fontSize="23" fontWeight="700">{line}</text>)}
+        <text ref={companyRef} x="73" y="354" fill={INK} fontSize="23" fontWeight="700">{company}</text>
         {contactRows.map(({ Icon, label, lines }, index) => {
           const y = cursor;
           cursor += lines.length * lineHeight + rowGap;

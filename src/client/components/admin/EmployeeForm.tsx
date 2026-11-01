@@ -423,7 +423,7 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
           {input("email", t("email"), t("emailPlaceholder"), false, "email")}
           {input("zalo", t("zalo"), t("zaloPlaceholder"))}
           {input("website", t("website"), t("websitePlaceholder"))}
-          {input("slogan", t("slogan"), t("sloganPlaceholder"), true)}
+          {input("slogan", t("slogan"), (form.theme.businessCardType ?? "qtm") === "an-ninh-mang" ? tRoot("card.placeholders.cyberMotto") : t("sloganPlaceholder"), true)}
           {employee && <div className="field full">
             <span id="business-card-type-label" className="text-sm font-semibold">{t("businessCardTypeLabel")}</span>
             <div role="group" aria-labelledby="business-card-type-label" className="mt-2 grid grid-cols-2 gap-3">

@@ -42,6 +42,15 @@ export function ECard({ employee: rawEmployee, variant = "preview", onOpenQr, on
       : rawTheme;
   const isCyberStyle = isCyberSecurity || theme.decor[0] === "cyber-magazine";
   const hasReferenceFooter = theme.decor[0] === "cyber-magazine" && theme.showDecor !== false && (theme.decorOpacity ?? 35) >= 20 && isCyberMagazineDefaultColor(theme.primaryColor);
+  const rawSlogan = rawEmployee.slogan?.trim() || "";
+  const useDefaultCyberMotto = !rawSlogan || [
+    "your journey partner",
+    "người bạn đồng hành trên mọi hành trình",
+    "tin cậy - tiên phong - khát vọng",
+    "trust - pioneer - aspiration",
+    "quality - technology - mindset",
+  ].includes(rawSlogan.toLowerCase());
+  const cyberMotto = useDefaultCyberMotto ? t("placeholders.cyberMotto") : e.slogan.trim();
   const template = getTemplate(theme.templateId);
   const pf = getPublicFields(e);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -230,19 +239,9 @@ export function ECard({ employee: rawEmployee, variant = "preview", onOpenQr, on
             <CardActions employee={e} animate={isProfile} />
             <ProfileConnectionArtwork theme={theme} />
             <footer className="qtm-profile-footer qtm-brand-footer" {...aos("fade-up", 420)}>
-              {isCyberSecurity ? (
+              {isCyberSecurity ? !hasReferenceFooter && (
                 <p className="qtm-profile-motto anm-profile-motto">
-                  {(() => {
-                    const rawSlogan = rawEmployee.slogan?.trim() || "";
-                    const isDefault = !rawSlogan || [
-                      "your journey partner",
-                      "người bạn đồng hành trên mọi hành trình",
-                      "tin cậy - tiên phong - khát vọng",
-                      "trust - pioneer - aspiration",
-                      "quality - technology - mindset",
-                    ].includes(rawSlogan.toLowerCase());
-                    return isDefault ? t("placeholders.cyberMotto") : e.slogan.trim();
-                  })()}
+                  {cyberMotto}
                 </p>
               ) : (
                 <p className="qtm-profile-motto qtm-platform-motto">QUALITY - TECHNOLOGY - MINDSET</p>
@@ -250,6 +249,9 @@ export function ECard({ employee: rawEmployee, variant = "preview", onOpenQr, on
             </footer>
           </div>
         </div>
+        {isCyberSecurity && hasReferenceFooter && (
+          <p className="qtm-profile-motto anm-profile-motto qtm-reference-motto">{cyberMotto}</p>
+        )}
       </article>
     </div>
   );

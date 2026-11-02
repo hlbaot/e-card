@@ -759,6 +759,20 @@
   z-index: 2;
 }
 
+/* Anchor lettering to the artwork, independent of content padding and preview scaling. */
+.qtm-profile-surface .qtm-professional-card[data-reference-footer] > .anm-profile-motto.qtm-reference-motto {
+  bottom: max(12px, env(safe-area-inset-bottom));
+  width: calc(100% - 64px);
+  font-size: clamp(9px, 1.9cqw, 12px);
+  line-height: 1.5;
+  font-weight: 500;
+  letter-spacing: .14em;
+  color: #cfdae5;
+  text-shadow: none;
+  white-space: normal;
+  text-wrap: balance;
+}
+
 /* Ensure action buttons never collide with footer shield on responsive/mobile */
 .qtm-cyber-magazine .card-actions {
   margin-bottom: clamp(8px, calc(var(--qtm-unit, 1cqw) * 2), 16px);
@@ -772,14 +786,18 @@
 @media (max-width: 959px) {
   /* Raise the painted waves so the mobile footer has a broad blue band. */
   .qtm-cyber-magazine svg[data-cyber-footer="reference"] {
-    transform: scaleY(1.85) scaleX(1.04);
+    transform: scaleY(1.6) scaleX(1.04);
     transform-origin: center bottom;
   }
   .qtm-professional-card[data-reference-footer]:not(.qtm-desktop-stage *) .qtm-profile-footer {
     min-height: clamp(90px, 24cqw, 140px);
   }
-  .qtm-professional-card[data-reference-footer] .anm-profile-motto {
-    bottom: calc(clamp(14px, 3.8cqw, 24px) - 5px);
+  .qtm-professional-card[data-reference-footer]:not(.qtm-desktop-stage *) .anm-profile-motto {
+    bottom: calc(clamp(14px, 3.8cqw, 24px) - 12px);
+    font-size: clamp(9px, calc(var(--qtm-unit, 1cqw) * 1.9), 12px);
+    font-weight: 500;
+    color: #cfdae5;
+    text-shadow: none;
   }
   .qtm-professional-card.qtm-cyber-magazine::after {
     content: "";

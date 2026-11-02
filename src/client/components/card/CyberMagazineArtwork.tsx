@@ -142,12 +142,12 @@ export function CyberMagazineArtwork({ className, primaryColor = "#0F4C75", thum
           <circle cx="934" cy="490" r="4" strokeWidth="2" />
         </g>
       </svg>
-      {/* A shorter ribbon sits lower on the left and tapers downward beside the portrait. */}
+      {/* The ribbon points just below the portrait, clear of the employee name. */}
       <svg data-cyber-wave-layer="left" x="0" y="0" width="100%" height="100%"
         viewBox="0 0 1080 1440" preserveAspectRatio="xMinYMin meet">
       <ellipse cx="540" cy="535" rx="350" ry="295" fill={paint("portrait-halo")} />
       {/* Rounded shoulders and a feathered tail echo the reference's fluid ribbon. */}
-      <g data-cyber-wave="left" transform="translate(0 85)" mask={paint("left-soft")}>
+      <g data-cyber-wave="left" transform="translate(0 35)" mask={paint("left-soft")}>
         <path d="M0 295C145 317 244 465 360 550C239 487 144 405 0 465Z" fill={paint("left-ribbon")} />
         <path d="M0 295C126 314 207 417 285 492C183 417 101 355 0 397Z" fill={paint("navy")} />
         <g clipPath={paint("left-surface")}>
@@ -248,17 +248,12 @@ function CyberMagazineReferenceFooter({ id }: { id: string }) {
     <defs>
       <linearGradient id={`${id}-reference-top-fade`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="50"><stop stopColor="black" /><stop offset="1" stopColor="white" /></linearGradient>
       <mask id={`${id}-reference-top`} maskUnits="userSpaceOnUse" x="0" y="0" width="1392" height="328"><rect width="1392" height="328" fill={`url(#${id}-reference-top-fade)`} /></mask>
-      <linearGradient id={`${id}-reference-center-fade`} gradientUnits="userSpaceOnUse" x1="0" y1="138" x2="0" y2="215">
-        <stop stopColor="black" /><stop offset=".35" stopColor="black" />
-        <stop offset=".7" stopColor="#888" /><stop offset="1" stopColor="white" />
-      </linearGradient>
-      <filter id={`${id}-reference-feather`} x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="14" /></filter>
+      <filter id={`${id}-reference-feather`} x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3" /></filter>
       <mask id={`${id}-reference-frame`} maskUnits="userSpaceOnUse" x="0" y="0" width="1392" height="328">
-        <rect x="-30" y="138" width="1452" height="222" fill={`url(#${id}-reference-center-fade)`} />
-        <g fill="white" filter={`url(#${id}-reference-feather)`}>
-          <path d="M-30 -30H112V85L160 165V360H-30Z" />
-          <path d="M1298 -30H1422V360H1262V165L1298 90Z" />
-        </g>
+        {/* One continuous contour preserves the shield's shoulder and joins the waves
+            without a notch between separate masks or a broad white halo. */}
+        <path d="M-30 -30H112V85C118 105 148 125 180 145C220 170 250 175 280 180C320 185 350 155 390 160C500 162 550 202 700 196C850 180 920 133 1060 152C1160 156 1180 185 1240 166C1270 150 1288 120 1298 90V-30H1422V360H-30Z"
+          fill="white" filter={`url(#${id}-reference-feather)`} />
       </mask>
       <clipPath id={`${id}-reference-left`}><rect x="-30" y="-30" width="250.5" height="388" /></clipPath>
       <clipPath id={`${id}-reference-mid`}><rect x="219.5" y="-30" width="1021" height="388" /></clipPath>

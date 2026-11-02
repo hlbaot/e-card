@@ -786,7 +786,7 @@
 @media (max-width: 959px) {
   /* Raise the painted waves so the mobile footer has a broad blue band. */
   .qtm-cyber-magazine svg[data-cyber-footer="reference"] {
-    transform: scaleY(1.6) scaleX(1.04);
+    transform: scaleY(1.2) scaleX(1.04);
     transform-origin: center bottom;
   }
   .qtm-professional-card[data-reference-footer]:not(.qtm-desktop-stage *) .qtm-profile-footer {
@@ -851,5 +851,91 @@
     bottom: clamp(10px, 1.1vw, 16px);
     font-size: clamp(11.5px, 0.95vw, 14px);
     letter-spacing: .22em;
+  }
+}
+
+/* Share spare height across useful content instead of an expanding empty footer.
+   ECard measures each viewport and selects a bounded type/avatar density. */
+.qtm-profile-surface .qtm-professional-card[data-adaptive-layout] {
+  --content-density: 1;
+  --adaptive-avatar-size: calc(var(--qtm-unit, 1cqw) * 34);
+  --adaptive-footer-height: clamp(32px, 9cqw, 64px);
+  --adaptive-footer-clearance: 8px;
+}
+.qtm-profile-surface .qtm-professional-card[data-adaptive-layout] .qtm-card-layout {
+  gap: calc(var(--qtm-unit, 1cqw) * 1.5 * var(--content-density));
+}
+.qtm-profile-surface .qtm-professional-card[data-adaptive-layout] .qtm-portrait .avatar {
+  width: calc(var(--adaptive-avatar-size) * var(--content-density)) !important;
+  height: calc(var(--adaptive-avatar-size) * var(--content-density)) !important;
+}
+.qtm-profile-surface .qtm-professional-card[data-adaptive-layout] .qtm-portrait::after {
+  width: calc(var(--adaptive-avatar-size) * var(--content-density) + 12px);
+  height: calc(var(--adaptive-avatar-size) * var(--content-density) + 12px);
+}
+.qtm-profile-surface .qtm-professional-card[data-adaptive-layout] .qtm-profile-identity > :is(h1, h2) {
+  font-size: calc(var(--qtm-unit, 1cqw) * 5.6 * var(--content-density));
+}
+.qtm-profile-surface .qtm-professional-card[data-adaptive-layout] .qtm-position {
+  font-size: calc(var(--qtm-unit, 1cqw) * 2.7 * var(--content-density));
+}
+.qtm-profile-surface .qtm-professional-card[data-adaptive-layout] .qtm-profile-identity > h3 {
+  font-size: calc(var(--qtm-unit, 1cqw) * 2.8 * var(--content-density));
+}
+.qtm-profile-surface .qtm-professional-card[data-adaptive-layout] .qtm-company-short {
+  font-size: calc(var(--qtm-unit, 1cqw) * 2.4 * var(--content-density));
+}
+.qtm-profile-surface .qtm-professional-card[data-adaptive-layout] .qtm-profile-contacts {
+  flex: 1 0 auto;
+  justify-content: space-evenly;
+}
+.qtm-profile-surface .qtm-professional-card[data-adaptive-layout] .qtm-card-layout:not(:has(.qtm-profile-contacts)) .qtm-portrait {
+  flex: 1 0 auto;
+}
+.qtm-profile-surface .qtm-professional-card[data-adaptive-layout] .qtm-contact {
+  flex: 1 0 auto;
+  font-size: calc(var(--qtm-unit, 1cqw) * 3.05 * var(--content-density));
+  padding-block: calc(var(--qtm-unit, 1cqw) * 1.6 * var(--content-density));
+}
+.qtm-profile-surface .qtm-professional-card[data-adaptive-layout] .qtm-contact strong {
+  font-size: calc(var(--qtm-unit, 1cqw) * 2.8 * var(--content-density));
+}
+.qtm-profile-surface .qtm-professional-card[data-adaptive-layout] .card-actions :is(a, button) {
+  font-size: calc(var(--qtm-unit, 1cqw) * 2.65 * var(--content-density));
+}
+.qtm-profile-surface .qtm-professional-card[data-adaptive-layout] .qtm-profile-footer {
+  flex: 0 0 auto;
+  min-height: clamp(32px, 8cqw, 52px);
+  margin-top: 0;
+}
+.qtm-profile-surface .qtm-professional-card[data-adaptive-layout][data-reference-footer] .qtm-profile-footer {
+  min-height: calc(var(--adaptive-footer-height) + var(--adaptive-footer-clearance));
+  padding-block: 0;
+}
+.qtm-preview-device .qtm-professional-card[data-adaptive-layout] svg[data-cyber-footer="reference"] {
+  transform: scaleY(1.2) scaleX(1.04);
+  transform-origin: center bottom;
+}
+.qtm-desktop-stage .qtm-professional-card[data-adaptive-layout] {
+  --adaptive-avatar-size: 190px;
+  --adaptive-footer-height: 64px;
+  --adaptive-footer-clearance: 16px;
+}
+.qtm-desktop-stage .qtm-professional-card[data-adaptive-layout] .qtm-card-layout {
+  grid-template-rows: auto minmax(230px, 1fr) auto auto;
+}
+@media (max-width: 959px) {
+  .qtm-public-profile .qtm-professional-card[data-adaptive-layout] .qtm-card-layout {
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+}
+@media (min-width: 960px) {
+  .qtm-public-profile .qtm-professional-card[data-adaptive-layout] {
+    --adaptive-avatar-size: 216px;
+    --adaptive-footer-height: clamp(64px, 7cqw, 100px);
+    --adaptive-footer-clearance: 16px;
+  }
+  .qtm-public-profile .qtm-professional-card[data-adaptive-layout] .qtm-card-layout {
+    grid-template-rows: auto minmax(260px, 1fr) auto auto;
   }
 }

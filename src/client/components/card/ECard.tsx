@@ -219,11 +219,10 @@ export function ECard({ employee: rawEmployee, variant = "preview", onOpenQr, on
               <Name>{(e.fullName || t("placeholders.fullName")).toUpperCase()}</Name>
               <p className="qtm-position">{capitalizeFirstLetter(e.position || t("placeholders.position"))}</p>
               <span className="qtm-identity-rule" aria-hidden="true" />
-              <h3>{e.company || (isCyberSecurity ? t("placeholders.cyberCompany") : t("placeholders.qtmCompany"))}</h3>
-              {(!isCyberSecurity || e.companyShort.trim()) && (
-                <p className="qtm-company-short" aria-hidden={!e.companyShort.trim()}
-                  style={e.companyShort.trim() ? undefined : { visibility: "hidden" }}>
-                  {e.companyShort.trim() || "\u00a0"}
+              {e.company.trim() && <h3>{e.company.trim()}</h3>}
+              {e.companyShort.trim() && (
+                <p className="qtm-company-short">
+                  {e.companyShort.trim()}
                 </p>
               )}
             </section>

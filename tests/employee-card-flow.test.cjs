@@ -193,3 +193,40 @@ test('full name allows Vietnamese IME composition before uppercasing the committ
   input.props.onCompositionEnd({ currentTarget: element });
   assert.equal(h.input('fullName').props.value, 'NGUYỄN ĐỨC');
 });
+
+test('company input updates the adjacent card preview and clearing removes the company without a default', async () => {
+  require('tsx/cjs');
+  // The server renderer verifies the real card markup; styles are checked by the app.
+  require.extensions['.css'] = () => {};
+  const { createElement } = require('react');
+  const { renderToStaticMarkup } = require('react-dom/server');
+  const { NextIntlClientProvider } = require('next-intl');
+  const { ECard } = require('../src/client/components/card/ECard.tsx');
+  const { ProfileInfo } = require('../src/client/components/card/ProfileInfo.tsx');
+  for (const type of ['QTM', 'Cyber Security']) {
+    const h = harness(true);
+    h.chooseCard(type);
+    for (const company of ['', '  CÔNG TY KHÁCH HÀNG  ', 'CÔNG TY MỚI', '   ', '']) {
+      h.input('company').props.onChange({ target: { value: company } });
+      const preview = h.find(h.render(), 'EmployeeFormLayout').props.previewPanel.props.employee;
+      assert.equal(preview.company, company);
+      for (const Component of [ECard, ProfileInfo]) {
+        const markup = renderToStaticMarkup(createElement(NextIntlClientProvider,
+          { locale: 'vi', timeZone: 'Asia/Ho_Chi_Minh', messages: require('../src/messages/vi.json') },
+          createElement(Component, { employee: preview, variant: 'preview' })));
+        if (company.trim()) {
+          assert.ok(markup.includes(company.trim()), `${type}: entered company must appear`);
+        } else {
+          assert.ok(!markup.includes('ecard-company-name'));
+          assert.ok(!/<h3\b/.test(markup), `${type}: no default company heading`);
+        }
+      }
+      if (company) {
+        await h.submit();
+        assert.equal(h.writes.at(-1).args[1].company, company);
+      }
+    }
+    await h.submit();
+    assert.equal(h.writes.at(-1).args[1].company, '');
+  }
+});

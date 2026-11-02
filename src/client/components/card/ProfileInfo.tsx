@@ -87,25 +87,24 @@ export function ProfileInfo({ employee: e }: { employee: Employee }) {
         />
       </div>
 
-      <div
+      {(e.company.trim() || e.companyShort.trim()) && <div
         data-aos="fade-up"
         data-aos-delay="300"
         className="mt-[clamp(5px,1dvh,12px)] w-full min-w-0"
       >
-        <h2
+        {e.company.trim() && <h2
           className="ecard-company-name font-extrabold uppercase tracking-wide line-clamp-2 break-words"
           style={{ color: "var(--pv-strong)" }}
         >
-          {e.company || t("qtmCompany")}
-        </h2>
-        <p
+          {e.company.trim()}
+        </h2>}
+        {e.companyShort.trim() && <p
           className="ecard-company-short font-bold uppercase tracking-[0.14em] line-clamp-1"
-          aria-hidden={!e.companyShort.trim()}
-          style={{ color: "var(--pv-muted)", visibility: e.companyShort.trim() ? undefined : "hidden" }}
+          style={{ color: "var(--pv-muted)" }}
         >
-          {e.companyShort.trim() ? `(${e.companyShort.trim()})` : "\u00a0"}
-        </p>
-      </div>
+          {`(${e.companyShort.trim()})`}
+        </p>}
+      </div>}
     </div>
   );
 }

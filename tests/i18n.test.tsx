@@ -345,9 +345,10 @@ test("public directory and both exported card styles show names in the selected 
 });
 
 test("admin employee tables and mobile cards localize displayed names while preserving their source", () => {
-  const employee = { ...sampleEmployee, fullName: "TRẦN DUY NAM ANH" };
+  const employee = { ...sampleEmployee, fullName: "TRẦN DUY NAM ANH", position: "CEO Assistant" };
   for (const locale of ["en", "vi"] as const) {
     const expected = locale === "en" ? "TRAN DUY NAM ANH" : employee.fullName;
+    const expectedPosition = locale === "en" ? "CEO Assistant" : "Trợ lý Tổng Giám đốc";
     for (const element of [
       createElement(EmployeeTable, { employees: [employee] }),
       createElement(TeamTable, { employees: [employee] }),
@@ -357,6 +358,7 @@ test("admin employee tables and mobile cards localize displayed names while pres
       try {
         const html = renderWithLocale(locale, createElement(QueryClientProvider, { client }, element));
         assert.ok(html.includes(expected));
+        assert.ok(html.includes(expectedPosition));
         if (locale === "en") assert.ok(!html.includes(employee.fullName));
       } finally { client.clear(); }
     }

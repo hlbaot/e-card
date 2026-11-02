@@ -770,10 +770,16 @@
 }
 
 @media (max-width: 959px) {
-  /* Fill up the footer on mobile so there is no empty void, and add the missing blue base */
+  /* Raise the painted waves so the mobile footer has a broad blue band. */
   .qtm-cyber-magazine svg[data-cyber-footer="reference"] {
-    transform: scaleY(1.32) scaleX(1.04);
+    transform: scaleY(1.85) scaleX(1.04);
     transform-origin: center bottom;
+  }
+  .qtm-professional-card[data-reference-footer]:not(.qtm-desktop-stage *) .qtm-profile-footer {
+    min-height: clamp(90px, 24cqw, 140px);
+  }
+  .qtm-professional-card[data-reference-footer] .anm-profile-motto {
+    bottom: calc(clamp(14px, 3.8cqw, 24px) - 5px);
   }
   .qtm-professional-card.qtm-cyber-magazine::after {
     content: "";
@@ -785,6 +791,9 @@
     background: #143158;
     z-index: 0;
     pointer-events: none;
+  }
+  .qtm-professional-card[data-reference-footer]::after {
+    display: none;
   }
 }
 

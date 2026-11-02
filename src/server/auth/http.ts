@@ -2,7 +2,7 @@ import "server-only";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { env } from "@/server/config/env";
-import { ACCESS_TTL, REFRESH_TTL, AuthError } from "./service";
+import { ACCESS_TTL, REFRESH_TTL, AuthError, isAuthError } from "./service";
 import { isAllowedAuthOrigin } from "./origin";
 
 export const ACCESS_COOKIE = "ecard_access";
@@ -72,7 +72,7 @@ export function clearAuthCookies(response: NextResponse) {
 export async function authHandler(action: () => Promise<NextResponse>) {
   try { return await action(); }
   catch (error) {
-    if (error instanceof AuthError) return authJson({ error: error.message }, error.status);
+    if (isAuthError(error)) return authJson({ error: error.message }, error.status);
     // Không bao giờ trả về lỗi hệ thống, hash hoặc thông tin kỹ thuật
     return authJson({ error: "Hệ thống đang bận. Vui lòng thử lại sau ít phút." }, 503);
   }

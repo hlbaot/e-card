@@ -5,7 +5,23 @@ import { SignJWT, jwtVerify } from "jose";
 export const ACCESS_TTL = 15 * 60;
 export const REFRESH_TTL = 7 * 24 * 60 * 60;
 export class AuthError extends Error {
-  constructor(message = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.", public status = 401) { super(message); }
+  constructor(message = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.", public status = 401) {
+    super(message);
+    this.name = "AuthError";
+    Object.setPrototypeOf(this, AuthError.prototype);
+  }
+}
+
+export function isAuthError(error: unknown): error is AuthError {
+  if (error instanceof AuthError) return true;
+  if (
+    error instanceof Error &&
+    ((error as { name?: string }).name === "AuthError" ||
+      typeof (error as { status?: number }).status === "number")
+  ) {
+    return true;
+  }
+  return false;
 }
 export interface AdminRecord {
   id: string;

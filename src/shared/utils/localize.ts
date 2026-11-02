@@ -68,6 +68,20 @@ const BILINGUAL_DICTIONARY: readonly BilingualEntry[] = [
     ],
   },
   {
+    en: "CEO Assistant",
+    vi: "Trợ lý Tổng Giám đốc",
+    aliases: [
+      "Trợ lí Tổng Giám đốc",
+      "Trợ lý CEO",
+      "Trợ lí CEO",
+      "Executive Assistant",
+      "Assistant to CEO",
+      "Assistant to the CEO",
+      "Trợ lý Giám đốc Điều hành",
+      "Trợ lí Giám đốc Điều hành",
+    ],
+  },
+  {
     en: "Deputy CEO",
     vi: "Phó Tổng Giám đốc",
     aliases: ["Deputy General Director", "Phó tổng giám đốc", "Phó Tổng Giám Đốc"],

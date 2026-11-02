@@ -75,7 +75,51 @@ export function ECard({ employee: rawEmployee, variant = "preview", onOpenQr, on
     ...(pf.website && e.website.trim() ? [{ key: "website", Icon: Globe, label: t("labels.website"), value: e.website, href: websiteUrl(e.website) }] : []),
   ];
   useLayoutEffect(() => {
-    const layout = scrollRef.current?.firstElementChild;
+    const viewport = scrollRef.current;
+    const layout = viewport?.firstElementChild as HTMLDivElement | null;
+    const card = viewport?.closest<HTMLElement>(".qtm-professional-card");
+    if (!viewport || !layout || !card) return;
+    let active = true;
+    const fit = () => {
+      if (!active) return;
+      const available = variant === "preview" ? viewport.clientHeight : window.innerHeight;
+      if (!available) return;
+      const minHeight = layout.style.minHeight;
+      layout.style.minHeight = "0";
+      layout.style.setProperty("--preview-scale", "1");
+      layout.style.setProperty("--preview-spacing", "1");
+      const apply = (density: number) => card.style.setProperty("--content-density", String(density));
+      // Measure natural content, before flex/grid distribute the remaining space.
+      // Keep public text readable; long profiles can still scroll normally.
+      let low = 0.92;
+      let high = 1.2;
+      for (let i = 0; i < 10; i++) {
+        const middle = (low + high) / 2;
+        apply(middle);
+        if (layout.scrollHeight > available) high = middle;
+        else low = middle;
+      }
+      apply(low);
+      layout.style.minHeight = minHeight;
+      // Refitting line widths must happen after the density changes.
+      viewport.dispatchEvent(new Event("qtm-density-change"));
+    };
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(viewport);
+    document.fonts.ready.then(fit);
+    document.fonts.addEventListener("loadingdone", fit);
+    window.addEventListener("resize", fit);
+    return () => {
+      active = false;
+      observer.disconnect();
+      document.fonts.removeEventListener("loadingdone", fit);
+      window.removeEventListener("resize", fit);
+    };
+  }, [e, variant]);
+  useLayoutEffect(() => {
+    const viewport = scrollRef.current;
+    const layout = viewport?.firstElementChild;
     if (!layout) return;
     const lines = Array.from(layout.querySelectorAll<HTMLElement>(
       ".qtm-profile-identity > h1, .qtm-profile-identity > h2, .qtm-profile-identity > h3, .qtm-position, .qtm-company-short, .qtm-contact > strong, .qtm-contact > a, .qtm-contact > span:last-child, .qtm-contact-value",
@@ -145,11 +189,13 @@ export function ECard({ employee: rawEmployee, variant = "preview", onOpenQr, on
     document.fonts.ready.then(fit);
     document.fonts.addEventListener("loadingdone", fit);
     window.addEventListener("resize", fit);
+    viewport?.addEventListener("qtm-density-change", fit);
     return () => {
       active = false;
       observer.disconnect();
       document.fonts.removeEventListener("loadingdone", fit);
       window.removeEventListener("resize", fit);
+      viewport?.removeEventListener("qtm-density-change", fit);
     };
   }, [e, variant]);
   useLayoutEffect(() => {
@@ -183,10 +229,45 @@ export function ECard({ employee: rawEmployee, variant = "preview", onOpenQr, on
     observer.observe(viewport);
     document.fonts.ready.then(fit);
     document.fonts.addEventListener("loadingdone", fit);
+    viewport.addEventListener("qtm-density-change", fit);
     return () => {
       active = false;
       observer.disconnect();
       document.fonts.removeEventListener("loadingdone", fit);
+      viewport.removeEventListener("qtm-density-change", fit);
+    };
+  }, [e, variant]);
+
+  useLayoutEffect(() => {
+    const viewport = scrollRef.current;
+    const card = viewport?.closest<HTMLElement>(".qtm-professional-card");
+    const wave = card?.querySelector<SVGSVGElement>('[data-cyber-wave-layer="left"]');
+    const branch = wave?.querySelector<SVGGElement>('[data-cyber-wave="left"]');
+    const avatar = card?.querySelector<HTMLElement>(".qtm-portrait .avatar");
+    const name = card?.querySelector<HTMLElement>(".qtm-profile-identity > :is(h1, h2)");
+    if (!viewport || !wave || !branch || !avatar || !name) return;
+    const alignWave = () => {
+      const matrix = wave.getScreenCTM();
+      if (!matrix?.d) return;
+      const avatarBottom = avatar.getBoundingClientRect().bottom;
+      const nameTop = name.getBoundingClientRect().top;
+      const target = avatarBottom + Math.max(4, (nameTop - avatarBottom) / 2);
+      const tip = new DOMPoint(360, 550).matrixTransform(matrix);
+      branch.setAttribute("transform", `translate(0 ${(target - tip.y) / matrix.d})`);
+    };
+    alignWave();
+    const observer = new ResizeObserver(alignWave);
+    observer.observe(viewport);
+    observer.observe(avatar);
+    observer.observe(name);
+    viewport.addEventListener("qtm-density-change", alignWave);
+    viewport.addEventListener("transitionend", alignWave);
+    window.addEventListener("resize", alignWave);
+    return () => {
+      observer.disconnect();
+      viewport.removeEventListener("qtm-density-change", alignWave);
+      viewport.removeEventListener("transitionend", alignWave);
+      window.removeEventListener("resize", alignWave);
     };
   }, [e, variant]);
 
@@ -199,7 +280,7 @@ export function ECard({ employee: rawEmployee, variant = "preview", onOpenQr, on
       "--card-font": template.fontFamily || (template.fontStyle === "serif" ? "Georgia, serif" : template.fontStyle === "mono" ? "\"Courier New\", monospace" : "var(--font-body), Arial, sans-serif"),
       "--motif-opacity": (theme.showDecor === false ? 0 : (theme.decorOpacity ?? 35)) / 100,
     } as CSSProperties}>
-      <article className={`qtm-professional-card qtm-template-${theme.templateId}${isCyberStyle ? " qtm-cyber-controls" : ""}${isCyberStyle && theme.showDecor !== false && (theme.decorOpacity ?? 35) >= 20 ? " qtm-cyber-magazine" : ""}${variant === "preview" ? " qtm-fit-preview" : ""}`} data-reference-footer={hasReferenceFooter || undefined} aria-label={t("profileAria", { name: e.fullName || t("placeholders.employee") })}>
+      <article className={`qtm-professional-card qtm-template-${theme.templateId}${isCyberStyle ? " qtm-cyber-controls" : ""}${isCyberStyle && theme.showDecor !== false && (theme.decorOpacity ?? 35) >= 20 ? " qtm-cyber-magazine" : ""}${variant === "preview" ? " qtm-fit-preview" : ""}`} data-adaptive-layout data-reference-footer={hasReferenceFooter || undefined} aria-label={t("profileAria", { name: e.fullName || t("placeholders.employee") })}>
         <ProfileDecorations theme={theme} locale={locale} />
         <div className="qtm-card-scroll" ref={scrollRef}>
           <div className="qtm-card-layout">

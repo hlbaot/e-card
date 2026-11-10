@@ -5,7 +5,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import type { Employee } from "@/shared/types";
 import { resolveLocale } from "@/i18n/config";
-import { localizeText, localizeEmployeeName } from "@/shared/utils/localize";
+import { localizeText, localizeEmployeeName, localizePosition } from "@/shared/utils/localize";
 import { Avatar } from "@/client/components/ui/Avatar";
 import { Switch } from "@/client/components/ui/Switch";
 import { Spinner } from "@/client/components/ui/Spinner";
@@ -57,7 +57,7 @@ export function EmployeeTable({ employees }: { employees: Employee[] }) {
                     </div>
                   </div>
                 </td>
-                <td>{localizeText(e.position, locale)}</td>
+                <td>{localizePosition(e, locale)}</td>
                 <td>
                   <div className="whitespace-pre-wrap">{e.phone}</div>
                   <small className="muted">{e.email}</small>

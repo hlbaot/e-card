@@ -7,6 +7,7 @@ URL có tiền tố `/api`, thống nhất với các endpoint auth/public hiệ
 | GET | `/api/admin/employees` | `{ employees: [...] }`, gồm active/inactive, loại bản đã xóa |
 | GET | `/api/admin/employees/:id` | `{ employee: {...} }` cho form sửa |
 | POST | `/api/admin/employees` | `201 { employee: {...} }` |
+| POST | `/api/admin/employees/position-translation` | `{ title: "..." }` |
 | PATCH | `/api/admin/employees/:id` | `{ employee: {...} }` |
 | PATCH | `/api/admin/employees/:id/active` | `{ employee: {...} }`, đảo isActive, không cần body |
 | DELETE | `/api/admin/employees/:id` | `{ success: true }`, đặt deletedAt và isActive=false |
@@ -47,7 +48,11 @@ Body tạo mới theo kiểu `EmployeeInput` của FE:
 }
 ```
 
-PATCH nhận một hoặc nhiều trường trên; trường không gửi được giữ nguyên. Nếu gửi offices thì thay toàn bộ mảng (tối đa 20 văn phòng). Nếu gửi theme thì gửi đủ cấu hình và thay toàn bộ theme trong cùng transaction với employee. offices được lưu dạng JSONB theo schema hiện có. Không cần migration mới.
+PATCH nhận một hoặc nhiều trường trên; trường không gửi được giữ nguyên. Nếu gửi offices thì thay toàn bộ mảng (tối đa 20 văn phòng). Nếu gửi theme thì gửi đủ cấu hình và thay toàn bộ theme trong cùng transaction với employee. offices được lưu dạng JSONB theo schema hiện có.
+
+`positionVi` và `positionEn` là hai trường tùy chọn, mỗi trường tối đa 150 ký tự. Danh thiếp ưu tiên bản đã lưu theo ngôn ngữ đang chọn. Hồ sơ cũ chỉ có `position` tiếp tục dùng từ điển chức danh hiện có.
+
+Endpoint gợi ý nhận `{ "title": "Account Director", "source": "en" }` và trả bản dịch sang ngôn ngữ còn lại. Server tra từ điển trước rồi mới dùng Google Cloud Translation API v2. Bật Cloud Translation API trong Google Cloud và đặt `GOOGLE_CLOUD_TRANSLATION_API_KEY` ở môi trường server để gợi ý cho chức danh ngoài từ điển. Admin có thể nhập thủ công và xác nhận bản dịch bằng nút Lưu thay đổi.
 
 Server tự sinh slug khi tạo mới, retry với hậu tố ngẫu nhiên nếu trùng unique constraint, kể cả khi có request đồng thời. Slug tối đa 120 ký tự và không tái sử dụng slug của bản đã xóa mềm. PATCH không nhận id, slug, createdAt, updatedAt hoặc deletedAt. Nên URL QR cũ vẫn giữ nguyên khi đổi tên.
 

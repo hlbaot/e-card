@@ -54,6 +54,8 @@ function sanitizeInput(input: EmployeeInput) {
   const {
     fullName,
     position,
+    positionVi,
+    positionEn,
     company,
     companyShort,
     email,
@@ -71,6 +73,8 @@ function sanitizeInput(input: EmployeeInput) {
   return {
     fullName,
     position,
+    positionVi,
+    positionEn,
     company,
     companyShort,
     email,

@@ -26,7 +26,7 @@ export function AdminCardsView() {
       !normalizedSearch
         ? employees
         : employees.filter((e) =>
-            slugify(`${e.fullName} ${e.position}`).includes(normalizedSearch),
+            slugify(`${e.fullName} ${e.position} ${e.positionVi ?? ""} ${e.positionEn ?? ""}`).includes(normalizedSearch),
           ),
     [employees, normalizedSearch],
   );

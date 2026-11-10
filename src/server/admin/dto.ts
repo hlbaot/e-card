@@ -30,6 +30,7 @@ export const themeInput = z.object({
 });
 export const employeeInput = z.object({
   fullName: text(150).min(1, "Vui lòng nhập họ tên."), position: text(150),
+  positionVi: text(150).optional(), positionEn: text(150).optional(),
   company: text(255), companyShort: text(150),
   website: text(2048).refine((value) => !value || Boolean(websiteUrl(value)), "Website không hợp lệ."),
   email: z.union([z.literal(""), text(255).email()]), phone: text(30), zalo: text(30),

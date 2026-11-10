@@ -7,6 +7,7 @@ type Record = Prisma.EmployeeGetPayload<{ include: { theme: true } }>;
 const card: Record = {
   id: "211cb740-bad0-4940-9c21-859b6c580434", slug: "public-card", fullName: "Test User",
   position: "Developer", company: "Test Company", companyShort: "TC", website: "example.com",
+  positionVi: null, positionEn: null,
   offices: [{ label: "Office", address: "Test Address" }], email: null, phone: null, zalo: null,
   slogan: null, avatarUrl: null, isActive: true, allowIndexing: false,
   createdAt: new Date("2026-10-01"), updatedAt: new Date("2026-10-25"), deletedAt: null,
@@ -113,7 +114,10 @@ test("native contact file includes name and mobile number, respects language and
   const original = publicCards.bySlug;
   const service = createCardsService({ ...repository, async bySlug(slug) {
     const record = await repository.bySlug(slug);
-    return record ? { ...record, fullName: "NGUYỄN ĐỨC AN", phone: "0917 895 579" } : null;
+    return record ? {
+      ...record, fullName: "NGUYỄN ĐỨC AN", phone: "0917 895 579",
+      positionVi: "Giám đốc phụ trách khách hàng", positionEn: "Account Director",
+    } : null;
   } });
   publicCards.bySlug = service.bySlug;
   const get = (slug: string, locale = "vi") => GET(new Request(`http://localhost/api/cards/${slug}/contact.vcf?lang=${locale}`), { params: Promise.resolve({ slug }) });
@@ -127,6 +131,7 @@ test("native contact file includes name and mobile number, respects language and
       const text = await response.text();
       assert.ok(text.startsWith("BEGIN:VCARD\r\nVERSION:3.0\r\n"));
       assert.ok(text.includes(`FN:${locale === "vi" ? "NGUYỄN ĐỨC AN" : "NGUYEN DUC AN"}\r\n`));
+      assert.ok(text.includes(`TITLE:${locale === "vi" ? "Giám đốc phụ trách khách hàng" : "Account Director"}\r\n`));
       assert.ok(text.includes("TEL;TYPE=CELL:0917895579\r\n"));
       assert.ok(text.endsWith("END:VCARD\r\n"));
     }

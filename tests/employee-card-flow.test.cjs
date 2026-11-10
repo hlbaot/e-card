@@ -88,6 +88,17 @@ function harness(existing = false) {
   } };
 }
 
+test('a legacy title can be edited and saved in both languages', async () => {
+  const h = harness(true);
+  h.patch({ position: 'Account Director' });
+  h.input('positionEn').props.onChange({ target: { value: 'Account Director' } });
+  h.input('positionVi').props.onChange({ target: { value: 'Giám đốc Quan hệ Khách hàng' } });
+  await h.submit();
+  assert.equal(h.writes.length, 1);
+  assert.equal(h.writes[0].args[1].positionEn, 'Account Director');
+  assert.equal(h.writes[0].args[1].positionVi, 'Giám đốc Quan hệ Khách hàng');
+});
+
 test('opening the card picker and going back never creates an employee or selects QTM implicitly', async () => {
   const h = harness();
   await h.submit();

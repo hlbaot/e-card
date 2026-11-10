@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import type { CardsResponse, CardResponse } from "@/shared/types";
 import { conditionalJson } from "@/server/http-cache";
 import { createVCard } from "@/shared/utils/vcard";
-import { localizeEmployeeName } from "@/shared/utils/localize";
+import { localizeEmployeeName, localizePosition } from "@/shared/utils/localize";
 import { resolveLocale } from "@/i18n/config";
 import { publicCards } from "./runtime";
 
@@ -34,7 +34,7 @@ export async function getContact(request: Request, context: { params: Promise<{ 
     if (!card) return json({ error: "Không tìm thấy danh thiếp." }, 404);
     const locale = resolveLocale(new URL(request.url).searchParams.get("lang"));
     const filename = card.slug.replace(/[^a-zA-Z0-9_-]/g, "-").slice(0, 120) || "contact";
-    const contact = { ...card, fullName: localizeEmployeeName(card.fullName, locale) };
+    const contact = { ...card, fullName: localizeEmployeeName(card.fullName, locale), position: localizePosition(card, locale) };
     return new Response(createVCard(contact), { headers: {
       "Content-Type": "text/vcard; charset=utf-8",
       "Content-Disposition": `inline; filename="${filename}.vcf"`,

@@ -60,6 +60,8 @@ const blank: EmployeeInput = {
   isActive: true,
   fullName: "",
   position: "",
+  positionVi: "",
+  positionEn: "",
   avatarUrl: "",
   phone: "",
   email: "",
@@ -76,7 +78,8 @@ const blank: EmployeeInput = {
 
 type TextField =
   | "fullName"
-  | "position"
+  | "positionVi"
+  | "positionEn"
   | "company"
   | "companyShort"
   | "phone"
@@ -133,12 +136,19 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
   const tValidation = useTranslations("validation");
   const tToast = useTranslations("toast");
   const tRoot = useTranslations();
+  const legacyPosition = !form.positionVi?.trim() && !form.positionEn?.trim() ? form.position.trim() : "";
 
   const set = <K extends keyof EmployeeInput>(
     key: K,
     value: EmployeeInput[K],
   ) => {
-    setForm((f) => ({ ...f, [key]: value }));
+    setForm((f) => {
+      const next = { ...f, [key]: value };
+      if (key === "positionVi" || key === "positionEn") {
+        next.position = next.positionVi?.trim() || next.positionEn?.trim() || "";
+      }
+      return next;
+    });
     if (formError) setFormError("");
     if (errors[key as TextField]) {
       setErrors((prev) => {
@@ -222,7 +232,8 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
           uppercaseFullName(e.currentTarget);
         } : undefined}
         required={requiredFields.includes(key)}
-        value={form[key]}
+        value={form[key] ?? ""}
+        maxLength={key === "positionVi" || key === "positionEn" ? 150 : undefined}
         placeholder={placeholder}
         onChange={(e) => {
           if (key === "fullName") {
@@ -416,7 +427,11 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
         </div>
         <div className="fields">
           {input("fullName", t("fullName"), t("fullNamePlaceholder"), true)}
-          {input("position", t("position"), t("positionPlaceholder"), true)}
+          {legacyPosition && (
+            <p className="field-note col-span-full">{t("positionLegacy", { title: legacyPosition })}</p>
+          )}
+          {input("positionVi", t("positionVi"))}
+          {input("positionEn", t("positionEn"))}
           {input("company", t("company"), "", true)}
           {input("companyShort", t("companyShort"), "", true)}
           {input("phone", t("phone"), t("phonePlaceholder"), false, "tel")}

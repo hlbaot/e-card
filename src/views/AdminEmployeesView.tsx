@@ -28,7 +28,7 @@ export function AdminEmployeesView() {
       !normalizedSearch
         ? employees
         : employees.filter((e) =>
-            slugify(`${e.fullName} ${e.position} ${e.email}`).includes(
+            slugify(`${e.fullName} ${e.position} ${e.positionVi ?? ""} ${e.positionEn ?? ""} ${e.email}`).includes(
               normalizedSearch,
             ),
           ),

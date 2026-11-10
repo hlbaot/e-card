@@ -357,14 +357,22 @@ for (const entry of BILINGUAL_DICTIONARY) {
   }
 }
 
+export function findTextTranslation(value: string, locale: Locale): string | undefined {
+  return LOOKUP_BY_LOWER.get(normalizeKey(value))?.[locale];
+}
+
 export function localizeText(value: string, locale: Locale = defaultLocale): string {
-  if (!value) return value;
-  const trimmed = value.trim();
-  if (!trimmed) return value;
-  const resolved = resolveLocale(locale);
-  const matched = LOOKUP_BY_LOWER.get(normalizeKey(trimmed));
-  if (!matched) return value;
-  return resolved === "vi" ? matched.vi : matched.en;
+  return findTextTranslation(value, resolveLocale(locale)) ?? value;
+}
+
+export function localizePosition(
+  employee: Pick<Employee, "position" | "positionVi" | "positionEn">,
+  locale: Locale,
+): string {
+  const { position, positionVi, positionEn } = employee;
+  const target = locale === "vi" ? positionVi : positionEn;
+  const source = locale === "vi" ? positionEn : positionVi;
+  return target?.trim() || localizeText(source?.trim() || position, locale);
 }
 
 /** Display-only transliteration. The stored Vietnamese name remains untouched. */
@@ -397,7 +405,7 @@ export function localizeEmployee(e: Employee, locale?: Locale): Employee {
   return {
     ...normalized,
     fullName: localizeEmployeeName(normalized.fullName, locale),
-    position: localizeText(normalized.position, locale),
+    position: localizePosition(normalized, locale),
     company: localizeText(normalized.company, locale),
     companyShort: localizeText(normalized.companyShort, locale),
     slogan: localizeText(normalized.slogan, locale),

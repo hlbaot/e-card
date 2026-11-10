@@ -4,7 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { absoluteUrl, siteConfig } from "@/config/site";
 import { getRequestLocale } from "@/i18n/request";
 import { cachedPublicCards } from "@/server/cards/cache";
-import { localizeEmployeeName } from "@/shared/utils/localize";
+import { localizeEmployeeName, localizePosition } from "@/shared/utils/localize";
 import { CardView } from "@/views/CardView";
 
 // Luôn kiểm tra DB để card vừa ẩn hoặc xóa trả 404 ngay.
@@ -29,10 +29,11 @@ export async function generateMetadata({
       ? t("cardBrandCyber")
       : t("cardBrandQtm");
   const displayName = localizeEmployeeName(employee.fullName, locale);
-  const pageTitle = `${displayName} - ${employee.position} | ${brandName}`;
+  const position = localizePosition(employee, locale);
+  const pageTitle = `${displayName} - ${position} | ${brandName}`;
   const pageDescription = t("cardDescription", {
     name: displayName,
-    position: employee.position,
+    position,
     company: employee.company,
   });
   const canonicalUrl = absoluteUrl(`/card/${employee.slug}`);

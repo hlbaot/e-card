@@ -7,6 +7,7 @@ import { createAdminEmployeesService } from "../src/server/admin/service";
 import { createCardsService, type CardRecord } from "../src/server/cards/service";
 import type { AdminEmployeesRepository } from "../src/server/admin/repository";
 import { AuthError } from "../src/server/auth/service";
+import { localizePosition } from "../src/shared/utils/localize";
 
 const input = employeeInput.parse({
   fullName: "Đặng Thị Ánh", position: "Developer", company: "Test", companyShort: "T",
@@ -25,7 +26,7 @@ function setup() {
       const id = randomUUID();
       const { theme, publicFields: ignored, ...fields } = data;
       void ignored;
-      const record: CardRecord = { ...fields, id, slug, theme: toStoredCardTheme(theme), createdAt: new Date(), updatedAt: new Date(), deletedAt: null };
+      const record: CardRecord = { ...fields, positionVi: fields.positionVi ?? null, positionEn: fields.positionEn ?? null, id, slug, theme: toStoredCardTheme(theme), createdAt: new Date(), updatedAt: new Date(), deletedAt: null };
       rows.set(id, record);
       return record;
     },
@@ -114,6 +115,7 @@ test("all admin routes enforce auth, CSRF and input limits; CRUD and stats expos
   const collection = await import("../src/app/api/admin/employees/route");
   const item = await import("../src/app/api/admin/employees/[id]/route");
   const active = await import("../src/app/api/admin/employees/[id]/active/route");
+  const translation = await import("../src/app/api/admin/employees/position-translation/route");
   const stats = await import("../src/app/api/admin/stats/route");
   const upload = await import("../src/app/api/admin/uploads/avatar/route");
   const req = (method = "GET", body?: unknown, cookie = "ecard_access=valid", origin = "https://ecard.example.com") => new NextRequest("https://ecard.example.com/api/admin/employees", { method, headers: { cookie, origin, "content-type": "application/json" }, ...(body === undefined ? {} : { body: JSON.stringify(body) }) });
@@ -124,8 +126,14 @@ test("all admin routes enforce auth, CSRF and input limits; CRUD and stats expos
       item.GET(req("GET", undefined, ""), context()), item.PATCH(req("PATCH", input, ""), context()),
       item.DELETE(req("DELETE", undefined, ""), context()), active.PATCH(req("PATCH", undefined, ""), context()),
       stats.GET(req("GET", undefined, "")), upload.POST(req("POST", undefined, "")),
+      translation.POST(req("POST", { title: "Account Director", source: "en" }, "")),
     ])) assert.equal(response.status, 401);
     assert.equal((await collection.POST(req("POST", input, "ecard_access=valid", "https://attacker.example"))).status, 403);
+    assert.equal((await translation.POST(req("POST", { title: "Account Director", source: "en" }, "ecard_access=valid", "https://attacker.example"))).status, 403);
+    assert.equal((await translation.POST(req("POST", { title: "Account Director", source: "fr" }))).status, 400);
+    const suggestion = await translation.POST(req("POST", { title: "Account Manager", source: "en" }));
+    assert.equal(suggestion.status, 200);
+    assert.deepEqual(await suggestion.json(), { title: "Quản lý Khách hàng" });
     assert.equal((await collection.POST(req("POST", {}))).status, 400);
     const huge = req("POST", input); huge.headers.set("content-length", String(128 * 1024));
     assert.equal((await collection.POST(huge)).status, 413);
@@ -136,9 +144,17 @@ test("all admin routes enforce auth, CSRF and input limits; CRUD and stats expos
     const { employee } = await created.json();
     assert.equal((await item.GET(req(), context(employee.id))).status, 200);
     assert.equal((await item.PATCH(req("PATCH", { slug: "overwrite" }), context(employee.id))).status, 400);
-    const updated = await item.PATCH(req("PATCH", { offices: [], theme: { ...input.theme, primaryColor: "#000000" } }), context(employee.id));
+    const updated = await item.PATCH(req("PATCH", {
+      offices: [],
+      theme: { ...input.theme, primaryColor: "#000000" },
+      positionVi: "Giám đốc phụ trách khách hàng",
+      positionEn: "Account Director",
+    }), context(employee.id));
     assert.equal(updated.status, 200);
-    assert.deepEqual((await updated.json()).employee.offices, []);
+    const editedEmployee = (await updated.json()).employee;
+    assert.deepEqual(editedEmployee.offices, []);
+    assert.equal(localizePosition(editedEmployee, "vi"), "Giám đốc phụ trách khách hàng");
+    assert.equal(localizePosition(editedEmployee, "en"), "Account Director");
     assert.equal((await active.PATCH(req("PATCH"), context(employee.id))).status, 200);
     const listed = await collection.GET(req());
     assert.equal(listed.headers.get("cache-control"), "private, max-age=0, must-revalidate");
@@ -185,6 +201,42 @@ test("all admin routes enforce auth, CSRF and input limits; CRUD and stats expos
     serverAuth.currentUser = originals.auth;
     Object.assign(adminEmployees, originals.service);
     avatarStorage.upload = originals.upload;
+  }
+});
+
+test("position suggestions use the dictionary first and send only the title to Google in either direction", async () => {
+  const { suggestPositionTranslation } = await import("../src/server/admin/position-translation");
+  const originalKey = process.env.GOOGLE_CLOUD_TRANSLATION_API_KEY;
+  const originalFetch = globalThis.fetch;
+  try {
+    delete process.env.GOOGLE_CLOUD_TRANSLATION_API_KEY;
+    globalThis.fetch = async () => assert.fail("Unexpected request to Google");
+    assert.equal(await suggestPositionTranslation({ title: "Account Manager", source: "en" }), "Quản lý Khách hàng");
+    assert.equal(localizePosition({ position: "Quản lý Khách hàng" }, "en"), "Account Manager");
+    assert.equal(localizePosition({ position: "Developer", positionEn: "Account Director" }, "vi"), "Account Director");
+    await assert.rejects(suggestPositionTranslation({ title: "Account Director", source: "en" }), { status: 503 });
+
+    process.env.GOOGLE_CLOUD_TRANSLATION_API_KEY = "test-key";
+    for (const [source, title, target, translated] of [
+      ["en", "Account Director", "vi", "Giám đốc phụ trách khách hàng"],
+      ["vi", "Giám đốc phụ trách khách hàng", "en", "Account Director"],
+    ] as const) {
+      globalThis.fetch = async (input, options) => {
+        assert.equal(input, "https://translation.googleapis.com/language/translate/v2");
+        assert.equal(new Headers(options?.headers).get("x-goog-api-key"), "test-key");
+        assert.deepEqual(JSON.parse(String(options?.body)), { q: title, source, target, format: "text" });
+        return Response.json({ data: { translations: [{ translatedText: translated }] } });
+      };
+      assert.equal(await suggestPositionTranslation({ title, source }), translated);
+    }
+
+    globalThis.fetch = async () => Response.json({ error: "private provider details" }, { status: 429 });
+    await assert.rejects(suggestPositionTranslation({ title: "Account Director", source: "en" }), (error: unknown) =>
+      error instanceof AuthError && error.status === 502 && !error.message.includes("private"));
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalKey === undefined) delete process.env.GOOGLE_CLOUD_TRANSLATION_API_KEY;
+    else process.env.GOOGLE_CLOUD_TRANSLATION_API_KEY = originalKey;
   }
 });
 

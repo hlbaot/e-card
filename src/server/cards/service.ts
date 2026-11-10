@@ -20,6 +20,7 @@ export function toPublicCard(record: CardRecord): Employee {
   const theme = record.theme;
   return localizeEmployee({
     id: record.id, slug: record.slug, fullName: record.fullName, position: record.position,
+    positionVi: record.positionVi ?? undefined, positionEn: record.positionEn ?? undefined,
     company: record.company, companyShort: record.companyShort, website: record.website,
     offices: offices.parse(record.offices), avatarUrl: record.avatarUrl ?? "",
     phone: record.phone ?? "", email: record.email ?? "", zalo: record.zalo ?? "",

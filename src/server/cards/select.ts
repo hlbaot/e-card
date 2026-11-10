@@ -4,6 +4,7 @@ import type { Prisma } from "@prisma/client";
 // the relation once avoids a query per card; its unused employeeId is omitted.
 export const employeeCardSelect = {
   id: true, slug: true, fullName: true, position: true, company: true, companyShort: true,
+  positionVi: true, positionEn: true,
   website: true, offices: true, email: true, phone: true, zalo: true, slogan: true,
   avatarUrl: true, isActive: true, allowIndexing: true, createdAt: true, updatedAt: true, deletedAt: true,
   theme: { select: { templateId: true, backgroundId: true, primaryColor: true,

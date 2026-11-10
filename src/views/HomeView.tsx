@@ -7,7 +7,7 @@ import {
   Users,
   ArrowRight,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { PublicHeader } from "@/client/components/layout/PublicHeader";
 import { PublicFooter } from "@/client/components/layout/PublicFooter";
 import type { Employee } from "@/shared/types";
@@ -21,6 +21,8 @@ import { slugify } from "@/shared/utils/slugify";
 import { routes } from "@/shared/constants/routes";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/shared/utils/cn";
+import { resolveLocale } from "@/i18n/config";
+import { localizePosition } from "@/shared/utils/localize";
 
 export function HomeView({ employees }: { employees: Employee[] }) {
   const ready = true;
@@ -30,6 +32,7 @@ export function HomeView({ employees }: { employees: Employee[] }) {
   const tHero = useTranslations("home.hero");
   const tDir = useTranslations("home.directory");
   const tCommon = useTranslations("common");
+  const locale = resolveLocale(useLocale());
   useAos(ready, `${deferredSearch}:${activeFilter}`);
 
   const active = employees.filter((e) => e.isActive);
@@ -38,7 +41,7 @@ export function HomeView({ employees }: { employees: Employee[] }) {
   ).slice(0, 4);
 
   const filtered = active.filter((e) => {
-    const matchesSearch = slugify(`${e.fullName} ${e.position}`).includes(
+    const matchesSearch = slugify(`${e.fullName} ${e.position} ${e.positionVi ?? ""} ${e.positionEn ?? ""} ${localizePosition(e, locale)}`).includes(
       slugify(deferredSearch),
     );
     const matchesTab = activeFilter === "all" || e.position === activeFilter;
@@ -142,7 +145,7 @@ export function HomeView({ employees }: { employees: Employee[] }) {
                   <span className="qtm-pill-count">{active.length}</span>
                 </button>
                 {departments.map((pos) => {
-                  const count = active.filter((e) => e.position === pos).length;
+                  const members = active.filter((e) => e.position === pos);
                   return (
                     <button
                       key={pos}
@@ -153,8 +156,8 @@ export function HomeView({ employees }: { employees: Employee[] }) {
                         activeFilter === pos && "active",
                       )}
                     >
-                      <span>{pos}</span>
-                      <span className="qtm-pill-count">{count}</span>
+                      <span>{localizePosition(members[0], locale)}</span>
+                      <span className="qtm-pill-count">{members.length}</span>
                     </button>
                   );
                 })}

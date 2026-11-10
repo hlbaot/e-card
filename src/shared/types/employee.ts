@@ -23,6 +23,8 @@ export interface Employee {
   slug: string;
   fullName: string;
   position: string;
+  positionVi?: string;
+  positionEn?: string;
   company: string;
   companyShort: string;
   avatarUrl: string;

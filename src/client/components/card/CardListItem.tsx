@@ -7,7 +7,7 @@ import type { Employee } from "@/shared/types";
 import { Avatar } from "@/client/components/ui/Avatar";
 import { routes } from "@/shared/constants/routes";
 import { resolveLocale } from "@/i18n/config";
-import { localizeText, localizeEmployeeName } from "@/shared/utils/localize";
+import { localizeText, localizeEmployeeName, localizePosition } from "@/shared/utils/localize";
 import { capitalizeFirstLetter } from "@/shared/utils/format-text";
 
 export function CardListContent({
@@ -19,7 +19,7 @@ export function CardListContent({
 }) {
   const locale = resolveLocale(useLocale());
   const displayName = localizeEmployeeName(e.fullName, locale);
-  const position = capitalizeFirstLetter(localizeText(e.position, locale));
+  const position = capitalizeFirstLetter(localizePosition(e, locale));
   const company = localizeText(e.companyShort, locale);
   const tCommon = useTranslations("common");
   const tHome = useTranslations("home.directory");

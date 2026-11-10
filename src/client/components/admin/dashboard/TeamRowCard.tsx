@@ -6,7 +6,7 @@ import { Pencil, Trash2, Phone, Mail } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import type { Employee } from "@/shared/types";
 import { resolveLocale } from "@/i18n/config";
-import { localizeText, localizeEmployeeName } from "@/shared/utils/localize";
+import { localizeText, localizeEmployeeName, localizePosition } from "@/shared/utils/localize";
 import { Avatar } from "@/client/components/ui/Avatar";
 import { Switch } from "@/client/components/ui/Switch";
 import { routes } from "@/shared/constants/routes";
@@ -71,7 +71,7 @@ export const TeamRowCard = memo(function TeamRowCard({
 
       {/* Position */}
       <p className="mt-2.5 text-xs font-medium text-[var(--text-body)]">
-        {localizeText(e.position, locale)}
+        {localizePosition(e, locale)}
       </p>
 
       {/* Contact rows */}

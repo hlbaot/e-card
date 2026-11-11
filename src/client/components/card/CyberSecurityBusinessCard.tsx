@@ -41,15 +41,16 @@ export function CyberSecurityBusinessCard({ employee: e, url, svgRef }: {
   const lineCount = rows.reduce((n, row) => n + row.lines.length, 0);
   const lineHeight = Math.min(36, (540 - contactTop - rows.length * rowGap) / Math.max(1, lineCount));
   const centerY = 320;
-  const brandTop = 128;
-  const brandBottom = 393;
-  const brandOffset = centerY - (brandTop + brandBottom) / 2;
+  const brandCenterX = 235;
+  const logoWidth = 330;
+  const logoHeight = 278;
+  const qrSize = 156;
   const detailsTop = 226 - nameSize * .8;
   const detailsBottom = rows.length
     ? contactTop + (lineCount - 1) * lineHeight + (rows.length - 1) * rowGap + 7
     : 269 + Math.max(0, position.length - 1) * 31;
   const detailsOffset = centerY - (detailsTop + detailsBottom) / 2;
-  const dividerHalfHeight = Math.max(brandBottom - brandTop, detailsBottom - detailsTop) / 2 + 16;
+  const dividerHalfHeight = Math.max(logoHeight, detailsBottom - detailsTop) / 2 + 16;
   let y = contactTop;
 
   return (
@@ -68,11 +69,10 @@ export function CyberSecurityBusinessCard({ employee: e, url, svgRef }: {
       <path d="M1050 600H787C911 568 1002 494 1050 383Z" fill={`url(#${id}-blue)`} />
       <path d="M1050 600H865C957 566 1020 511 1050 461Z" fill="#387aa7" opacity=".65" />
       <path d="M1050 600H947C995 575 1030 545 1050 516Z" fill="#5397bb" opacity=".7" />
-      <g transform={`translate(0 ${brandOffset})`}>
-        <svg x="40" y="206" width="390" height="109" viewBox="150 300 1400 390">
-          <image href="/logo_anninhmang.png" width="1672" height="941" />
-        </svg>
-      </g>
+      <svg x={brandCenterX - logoWidth / 2} y="106" width={logoWidth} height={logoHeight} viewBox="360 64 950 800">
+        <image href="/logo_anninhmang_card.png" width="1672" height="941" />
+      </svg>
+      <QRCodeSVG x={brandCenterX - qrSize / 2} y="396" value={url} size={qrSize} level="M" marginSize={4} fgColor={INK} bgColor="#ffffff" />
       <path d={`M467 ${centerY - dividerHalfHeight}V${centerY + dividerHalfHeight}`} stroke={INK} strokeWidth="1.5" />
       <g transform={`translate(18 ${detailsOffset})`}>
         <text x="489" y="226" fill={INK} fontSize={nameSize} fontWeight="800"
@@ -89,8 +89,6 @@ export function CyberSecurityBusinessCard({ employee: e, url, svgRef }: {
           </g>;
         })}
       </g>
-      <rect x="904" y="26" width="120" height="120" fill="white" />
-      <QRCodeSVG x="912" y="34" value={url} size={104} level="M" marginSize={0} fgColor={INK} bgColor="#ffffff" />
     </svg>
   );
 }

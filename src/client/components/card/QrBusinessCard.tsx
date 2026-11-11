@@ -43,6 +43,7 @@ function wrapText(value: string, limit: number, maxLines = 2) {
 }
 
 const INK = "#17566d";
+const CONTENT_INSET = 20;
 
 const connectedBlobs = [
   "M1018 115C1031 115 1040 124 1040 137C1040 149 1030 155 1028 166C1024 180 1030 188 1040 197C1060 215 1051 243 1028 253C1004 263 979 247 979 224C979 206 991 196 1002 182C1010 171 1009 160 1001 151C986 135 995 115 1018 115Z",
@@ -111,7 +112,8 @@ function QtmBusinessCard({ employee: e, url, svgRef }: {
       if (!active || !text) return;
       text.setAttribute("font-size", "23");
       const width = text.getComputedTextLength();
-      if (width > 904) text.setAttribute("font-size", String(23 * 904 / width));
+      const maxWidth = 904 - CONTENT_INSET;
+      if (width > maxWidth) text.setAttribute("font-size", String(23 * maxWidth / width));
     };
     fit();
     document.fonts.ready.then(fit);
@@ -149,31 +151,33 @@ function QtmBusinessCard({ employee: e, url, svgRef }: {
           {blobDots.map(([x, y, r], i) => <circle key={i} cx={x} cy={y} r={r} />)}
         </g>
 
-        <image
-          href="/images/brand/qtm-logo.png"
-          x="70"
-          y="58"
-          width="268"
-          height="80"
-          preserveAspectRatio="xMinYMid meet"
-        />
+        <g transform={`translate(${CONTENT_INSET} 0)`}>
+          <image
+            href="/images/brand/qtm-logo.png"
+            x="70"
+            y="58"
+            width="268"
+            height="80"
+            preserveAspectRatio="xMinYMid meet"
+          />
 
-        <g transform="translate(0 -32)">
-          <CardName name={e.fullName} color={INK} />
-          <text x="73" y="334" fill={INK} fontSize="20" fontWeight="400" fontStyle="italic">{capitalizeFirstLetter(e.position)}</text>
+          <g transform="translate(0 -32)">
+            <CardName name={e.fullName} color={INK} />
+            <text x="73" y="334" fill={INK} fontSize="20" fontWeight="400" fontStyle="italic">{capitalizeFirstLetter(e.position)}</text>
+          </g>
+
+          <text ref={companyRef} x="73" y="354" fill={INK} fontSize="23" fontWeight="700">{company}</text>
+          {contactRows.map(({ Icon, label, lines }, index) => {
+            const y = cursor;
+            cursor += lines.length * lineHeight + rowGap;
+            return <g key={index} transform="translate(6 0)">
+              {Icon && <Icon x="38" y={y - iconSize * .8} width={iconSize} height={iconSize} color={INK} />}
+              <text x="76" y={y} fill={INK} fontSize={contactFontSize} fontWeight="600">{label}</text>
+              <text x="228" y={y} fill={INK} fontSize={contactFontSize}>:</text>
+              {lines.map((line, i) => <text key={i} x="244" y={y + i * lineHeight} fill={INK} fontSize={contactFontSize} fontWeight="600">{line}</text>)}
+            </g>;
+          })}
         </g>
-
-        <text ref={companyRef} x="73" y="354" fill={INK} fontSize="23" fontWeight="700">{company}</text>
-        {contactRows.map(({ Icon, label, lines }, index) => {
-          const y = cursor;
-          cursor += lines.length * lineHeight + rowGap;
-          return <g key={index}>
-            {Icon && <Icon x="38" y={y - iconSize * .8} width={iconSize} height={iconSize} color={INK} />}
-            <text x="76" y={y} fill={INK} fontSize={contactFontSize} fontWeight="600">{label}</text>
-            <text x="228" y={y} fill={INK} fontSize={contactFontSize}>:</text>
-            {lines.map((line, i) => <text key={i} x="244" y={y + i * lineHeight} fill={INK} fontSize={contactFontSize} fontWeight="600">{line}</text>)}
-          </g>;
-        })}
         <rect x="860" y="54" width="124" height="124" rx="8" fill="#ffffff" />
         <QRCodeSVG x="868" y="62" value={url} size={108} level="M" marginSize={0} bgColor="#ffffff" fgColor="#17566d" />
         <rect x="1" y="1" width="1048" height="638" rx="8" fill="none" stroke="#c4c8cc" strokeWidth="2" />
